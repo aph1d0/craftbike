@@ -1,0 +1,160 @@
+{% extends "layout.html" %}
+    {% block content %}
+<form class="form-new-account" method="POST">
+    {{ form.hidden_tag() }} <!-- security 'csrf' token -->
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h2 class="h4">{% if title %}{{title}}{% else %}No Title{% endif %}</h2>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            {{ form.submit(class="btn btn-md btn-outline-info mr-2") }}
+            <input type="reset" class="btn btn-md btn-outline-secondary mr-2" />
+            <a href="{{ url_for('deals.get_deals_view') }}" class="btn btn-md btn-outline-secondary" role="button">
+                <span data-feather="arrow-left"></span>
+                  Back to List
+            </a>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-9">
+            <div class="form-row mb-3">
+                <div class="col">
+                    {{ form.title.label(class="form-control-label") }}
+                    {{ form.title(class="form-control from-control-lg required", placeholder="enter deal title ...") }}
+                </div>
+            </div>
+            <div class="form-row mb-3">
+                <div class="col">
+                    {{ form.expected_close_price.label(class="form-control-label") }}
+                      {% if form.expected_close_price.errors %}
+                        {{ form.expected_close_price(class="form-control form-control-lg required is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.expected_close_price.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                      {% else %}
+                        {{ form.expected_close_price(class="form-control required from-control-lg", placeholder="expected close price ...") }}
+                      {% endif %}
+                </div>
+                <div class="col">
+                    {{ form.expected_close_date.label(class="form-control-label datepicker") }}
+                    {{ form.expected_close_date(class="form-control from-control-lg", placeholder="select date ...") }}
+                </div>
+            </div>
+
+            <div class="form-row mb-3">
+                <div class="col">
+                    {{ form.accounts.label(class="form-control-label") }}
+                         {% if form.accounts.errors %}
+                             {{ form.accounts(id="deal_accounts", class="my-select form-control form-control-lg required is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.accounts.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                         {% else %}
+                            {{ form.accounts(id="deal_accounts", class="my-select form-control from-control-lg required") }}
+                         {% endif %}
+                </div>
+            </div>
+
+            <div class="form-row mb-3">
+                <div class="col">
+                    {{ form.contacts.label(class="form-control-label") }}
+                    {{ form.contacts(id="deal_contacts" ,class="my-select form-control from-control-lg") }}
+                </div>
+                <div class="col">
+                    {{ form.deal_stages.label(class="form-control-label") }}
+                    {% if form.deal_stages.errors %}
+                        {{ form.deal_stages(class="my-select form-control form-control-lg required is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.deal_stages.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                    {% else %}
+                    {{ form.deal_stages(class="my-select form-control from-control-lg required") }}
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if current_user.is_admin %}
+            <div class="form-row mb-3">
+                <div class="col-6">
+                    {{ form.assignees.label(class="form-control-label") }}
+                    {{ form.assignees(class="form-control from-control-lg") }}
+                 </div>
+            </div>
+            {% endif %}
+
+            <div class="form-group">
+                {{ form.notes.label(class="form-control-label") }}
+                {{ form.notes(class="form-control from-control-lg") }}
+            </div>
+        </div>
+    </div>
+</form>
+<script>
+    $(document).ready(function() {
+
+        function remove_contact_options() {
+            $('#deal_contacts')
+                        .empty()
+                        .append('<option value="__None">Select A Contact</option>');
+        }
+
+        function on_account_change() {
+            var accId = $('#deal_accounts').val();
+            var contactId = $('#deal_contacts').val();
+
+            if (accId !== '__None') {
+                $('.ajax_indicator')
+                    .css('display', 'block')
+                    .text('loading ...')
+                    .removeClass('done')
+                    .addClass('processing');
+            } else {
+                remove_contact_options();
+                // refresh bootstrap-select on change
+                $('#deal_contacts.my-select').selectpicker('refresh');
+                return;
+            }
+
+            $.ajax({
+                type: "GET",
+                url: "/contacts/acc/" + accId,
+                contentType: 'application/json',
+                dataType: 'json',
+                success: function(data) {
+
+                    $('.ajax_indicator')
+                            .removeClass('processing')
+                            .addClass('done')
+                            .text("done")
+                            .fadeOut(2000);
+
+                    // remove the previous options if any
+                    remove_contact_options();
+
+                    // add the new options
+                    $.each(data, function(i, d) {
+                        console.log(contactId)
+                        if (contactId == d.id) {
+                            $('#deal_contacts').append('<option selected value="' + d.id + '">' + d.name + '</option>');
+                        } else {
+                            $('#deal_contacts').append('<option value="' + d.id + '">' + d.name + '</option>');
+                        }
+                    });
+
+                    // refresh bootstrap-select on change
+                    $('#deal_contacts.my-select').selectpicker('refresh');
+                }
+            });
+            return false;
+        }
+
+        on_account_change();
+
+        $('#deal_accounts').on('change', on_account_change);
+    });
+</script>
+    {% endblock %}
