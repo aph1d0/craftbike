@@ -3,12 +3,12 @@ from flask_login import current_user, login_required
 from flask import render_template, flash, url_for, redirect, request
 from sqlalchemy.exc import IntegrityError
 
-from eeazycrm.users.forms import UpdateProfile, UpdateRoleForm, NewRoleForm, UpdateUser, ResourceForm
-from eeazycrm.users.utils import upload_avatar
-from eeazycrm.users.models import User, Role, Resource
+from serwis_crm.users.forms import UpdateProfile, UpdateRoleForm, NewRoleForm, UpdateUser, ResourceForm
+from serwis_crm.users.utils import upload_avatar
+from serwis_crm.users.models import User, Role, Resource
 
-from eeazycrm import db, bcrypt
-from eeazycrm.rbac import check_access, is_admin
+from serwis_crm import db, bcrypt
+from serwis_crm.rbac import check_access, is_admin
 
 settings = Blueprint('settings', __name__)
 
@@ -18,7 +18,7 @@ settings = Blueprint('settings', __name__)
 def settings_profile():
     form = UpdateProfile()
     if request.method == 'POST':
-        if form.validate_on_submit():
+        if form.is_submitted() and form.validate():
             if form.picture.data:
                 picture_file = upload_avatar(current_user, form.picture.data)
                 current_user.avatar = picture_file
@@ -138,7 +138,7 @@ def settings_staff_new():
     form = UpdateUser()
     if request.method == 'POST':
         hashed_pwd = bcrypt.generate_password_hash('123').decode('utf-8')
-        if form.validate_on_submit():
+        if form.is_submitted() and form.validate():
             user = User()
             user.first_name = form.first_name.data
             user.last_name = form.last_name.data
@@ -206,7 +206,7 @@ def settings_roles_view():
 def settings_roles_new():
     form = NewRoleForm()
     if request.method == 'POST':
-        if form.validate_on_submit():
+        if form.is_submitted() and form.validate():
             role = Role()
             role.name = form.name.data
 
@@ -246,7 +246,7 @@ def settings_roles_update(role_id):
     role = Role.query.filter_by(id=role_id).first()
     form = UpdateRoleForm()
     if request.method == 'POST':
-        if form.validate_on_submit():
+        if form.is_submitted() and form.validate():
             role.name = form.name.data.lower()
             role.set_permissions(form.permissions)
 

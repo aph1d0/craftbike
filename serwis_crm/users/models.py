@@ -1,4 +1,4 @@
-from eeazycrm import db, login_manager
+from serwis_crm import db, login_manager
 from flask_login import UserMixin, current_user
 
 

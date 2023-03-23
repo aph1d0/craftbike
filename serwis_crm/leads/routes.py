@@ -6,15 +6,15 @@ from flask import Blueprint, session, Response
 from flask_login import current_user, login_required
 from flask import render_template, flash, url_for, redirect, request
 
-from eeazycrm import db
+from serwis_crm import db
 from .models import LeadMain
-from eeazycrm.common.paginate import Paginate
-from eeazycrm.common.filters import CommonFilters
+from serwis_crm.common.paginate import Paginate
+from serwis_crm.common.filters import CommonFilters
 from .filters import set_date_filters, set_source, set_status
 from .forms import NewLead, ImportLeads, ConvertLead, \
     FilterLeads, BulkOwnerAssign, BulkLeadSourceAssign, BulkLeadStatusAssign, BulkDelete
 
-from eeazycrm.rbac import check_access, is_admin
+from serwis_crm.rbac import check_access, is_admin
 
 leads = Blueprint('leads', __name__)
 

@@ -2,10 +2,10 @@ from flask import Blueprint
 from flask_login import current_user, login_required
 from flask import render_template
 from sqlalchemy import func, text
-from eeazycrm.deals.models import Deal, DealStage
-from eeazycrm.accounts.models import Account
-from eeazycrm.users.models import User
-from eeazycrm.rbac import is_admin
+from serwis_crm.deals.models import Deal, DealStage
+from serwis_crm.accounts.models import Account
+from serwis_crm.users.models import User
+from serwis_crm.rbac import is_admin
 
 from functools import reduce
 

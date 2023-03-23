@@ -3,10 +3,10 @@ from flask_login import current_user, login_required
 from flask import render_template, flash, url_for, redirect, request
 from sqlalchemy.exc import IntegrityError
 
-from eeazycrm import db, bcrypt
-from eeazycrm.rbac import check_access, is_admin
-from eeazycrm.settings.forms import AppConfigForm
-from eeazycrm.settings.models import AppConfig
+from serwis_crm import db, bcrypt
+from serwis_crm.rbac import check_access, is_admin
+from serwis_crm.settings.forms import AppConfigForm
+from serwis_crm.settings.models import AppConfig
 
 app_config = Blueprint('app_config', __name__)
 

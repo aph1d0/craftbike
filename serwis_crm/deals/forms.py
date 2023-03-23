@@ -5,10 +5,10 @@ from wtforms.widgets import TextArea
 from wtforms.validators import DataRequired, Optional
 from wtforms_sqlalchemy.fields import QuerySelectField
 
-from eeazycrm.users.models import User
-from eeazycrm.accounts.models import Account
-from eeazycrm.contacts.models import Contact
-from eeazycrm.deals.models import DealStage
+from serwis_crm.users.models import User
+from serwis_crm.accounts.models import Account
+from serwis_crm.contacts.models import Contact
+from serwis_crm.deals.models import DealStage
 
 
 class NewDeal(FlaskForm):

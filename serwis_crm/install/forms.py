@@ -3,7 +3,7 @@ from wtforms import StringField, PasswordField, SubmitField, BooleanField
 from wtforms.validators import DataRequired, Length, Email, EqualTo
 from wtforms_sqlalchemy.fields import QuerySelectField
 
-from eeazycrm.settings.models import Currency, TimeZone
+from serwis_crm.settings.models import Currency, TimeZone
 
 
 class NewSystemUser(FlaskForm):

@@ -22,7 +22,7 @@ login_manager = LoginManager()
 login_manager.login_view = 'users.login'
 
 def run_install(app_ctx):
-    from eeazycrm.install.routes import install
+    from serwis_crm.install.routes import install
     app_ctx.register_blueprint(install)
     return app_ctx
 
@@ -53,28 +53,28 @@ def create_app(config_class=ProductionConfig):
         if not inspect(engine).has_table('app_config'):
             return run_install(app)
         else:
-            from eeazycrm.settings.models import AppConfig
+            from serwis_crm.settings.models import AppConfig
             row = AppConfig.query.first()
             if not row:
                 return run_install(app)
 
         # application is installed so extends the config
-        from eeazycrm.settings.models import AppConfig, Currency, TimeZone
+        from serwis_crm.settings.models import AppConfig, Currency, TimeZone
         app_cfg = AppConfig.query.first()
         app.config['def_currency'] = Currency.get_currency_by_id(app_cfg.default_currency)
         app.config['def_tz'] = TimeZone.get_tz_by_id(app_cfg.default_timezone)
 
         # include the routes
-        # from eeazycrm import routes
-        from eeazycrm.main.routes import main
-        from eeazycrm.users.routes import users
-        from eeazycrm.leads.routes import leads
-        from eeazycrm.accounts.routes import accounts
-        from eeazycrm.contacts.routes import contacts
-        from eeazycrm.deals.routes import deals
-        from eeazycrm.settings.routes import settings
-        from eeazycrm.settings.app_routes import app_config
-        from eeazycrm.reports.routes import reports
+        # from serwis_crm import routes
+        from serwis_crm.main.routes import main
+        from serwis_crm.users.routes import users
+        from serwis_crm.leads.routes import leads
+        from serwis_crm.accounts.routes import accounts
+        from serwis_crm.contacts.routes import contacts
+        from serwis_crm.deals.routes import deals
+        from serwis_crm.settings.routes import settings
+        from serwis_crm.settings.app_routes import app_config
+        from serwis_crm.reports.routes import reports
 
         # register routes with blueprint
         app.register_blueprint(main)

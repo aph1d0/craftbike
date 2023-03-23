@@ -1,5 +1,5 @@
 from flask import render_template, flash, url_for, redirect, Blueprint, current_app
-from eeazycrm import db
+from serwis_crm import db
 from flask_login import login_required
 from configparser import ConfigParser
 

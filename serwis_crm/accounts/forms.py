@@ -4,7 +4,7 @@ from wtforms.widgets import TextArea
 from wtforms.validators import DataRequired, Email
 from wtforms_sqlalchemy.fields import QuerySelectField
 
-from eeazycrm.users.models import User
+from serwis_crm.users.models import User
 
 
 class NewAccount(FlaskForm):

@@ -4,13 +4,13 @@ from flask import render_template, flash, url_for, redirect, request
 from sqlalchemy import or_, text
 from datetime import date, timedelta
 
-from eeazycrm import db
+from serwis_crm import db
 from .models import Account
-from eeazycrm.common.paginate import Paginate
-from eeazycrm.common.filters import CommonFilters
+from serwis_crm.common.paginate import Paginate
+from serwis_crm.common.filters import CommonFilters
 from .forms import NewAccount, FilterAccounts, filter_accounts_adv_filters_query
 
-from eeazycrm.rbac import check_access
+from serwis_crm.rbac import check_access
 from wtforms import Label
 
 accounts = Blueprint('accounts', __name__)

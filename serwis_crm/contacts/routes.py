@@ -5,14 +5,14 @@ from wtforms import Label
 from sqlalchemy import or_, text
 from datetime import date, timedelta
 
-from eeazycrm import db
+from serwis_crm import db
 from .models import Contact
-from eeazycrm.common.paginate import Paginate
-from eeazycrm.common.filters import CommonFilters
+from serwis_crm.common.paginate import Paginate
+from serwis_crm.common.filters import CommonFilters
 from .forms import NewContact, FilterContacts, filter_contacts_adv_filters_query
-from eeazycrm.users.utils import upload_avatar
+from serwis_crm.users.utils import upload_avatar
 
-from eeazycrm.rbac import check_access
+from serwis_crm.rbac import check_access
 
 contacts = Blueprint('contacts', __name__)
 

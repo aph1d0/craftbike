@@ -1,15 +1,15 @@
-# EeazyCRM
+# serwis_crm
 
 #### Python based open source CRM developed using Flask framework
 
 ##### It's still WORK IN PROGRESS (I'm still building the modules)
 ##### But I have a small DEMO image below
-![alt text](https://i.ibb.co/BsWm9Kf/eeazycrm-demo1.gif)
+![alt text](https://i.ibb.co/BsWm9Kf/serwis_crm-demo1.gif)
 
 Features List
 ============
 
-EeazyCRM contains the following modules (along with the 
+serwis_crm contains the following modules (along with the 
 completion progress report):
 
    1. Leads (99% complete)
@@ -64,15 +64,15 @@ Installation Steps
 1. Create a virtual environment using the following commands
     .. code-block:: python
     
-        virtualenv -p python3 eeazycrm
-        source eeazycrm/bin/activate
+        virtualenv -p python3 serwis_crm
+        source serwis_crm/bin/activate
         
 2. Add github repository using the following command
 
     .. code-block:: python
     
-        cd eeazycrm
-        git remote add origin https://github.com/jagjot2008/EeazyCRM
+        cd serwis_crm
+        git remote add origin https://github.com/jagjot2008/serwis_crm
         git pull origin master
         
 3. Now create the configuration file using the command

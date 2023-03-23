@@ -1,5 +1,5 @@
 from datetime import datetime
-from eeazycrm import db
+from serwis_crm import db
 from flask_login import current_user
 
 DEFAULT_ADDRESS = '{address_line}\n{address_state}, {address_city}-{post_code}\n{address_country}'

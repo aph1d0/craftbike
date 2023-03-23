@@ -6,11 +6,11 @@ from wtforms.widgets import TextArea
 from wtforms.validators import DataRequired, Email, Optional
 from wtforms_sqlalchemy.fields import QuerySelectField, QuerySelectMultipleField
 
-from eeazycrm.leads.models import LeadSource, LeadStatus
-from eeazycrm.users.models import User
-from eeazycrm.accounts.models import Account
-from eeazycrm.contacts.models import Contact
-from eeazycrm.deals.models import DealStage
+from serwis_crm.leads.models import LeadSource, LeadStatus
+from serwis_crm.users.models import User
+from serwis_crm.accounts.models import Account
+from serwis_crm.contacts.models import Contact
+from serwis_crm.deals.models import DealStage
 
 
 def lead_source_query():

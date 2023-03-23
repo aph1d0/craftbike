@@ -1,5 +1,5 @@
 from datetime import datetime
-from eeazycrm import db
+from serwis_crm import db
 
 
 class LeadStatus(db.Model):

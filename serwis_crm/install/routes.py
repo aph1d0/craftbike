@@ -1,20 +1,20 @@
 from flask import render_template, session, url_for, redirect, Blueprint, request
-from eeazycrm import db, bcrypt
+from serwis_crm import db, bcrypt
 import os
 import sys
 from flask import current_app
 from tzlocal import get_localzone
 
-from eeazycrm.settings.models import Currency, TimeZone, AppConfig
-from eeazycrm.leads.models import LeadSource, LeadStatus, LeadMain
-from eeazycrm.accounts.models import Account
-from eeazycrm.contacts.models import Contact
-from eeazycrm.deals.models import DealStage, Deal
-from eeazycrm.users.models import Role, Resource, User
+from serwis_crm.settings.models import Currency, TimeZone, AppConfig
+from serwis_crm.leads.models import LeadSource, LeadStatus, LeadMain
+from serwis_crm.accounts.models import Account
+from serwis_crm.contacts.models import Contact
+from serwis_crm.deals.models import DealStage, Deal
+from serwis_crm.users.models import Role, Resource, User
 
-from eeazycrm.install.forms import NewSystemUser, CurrencyTz, FinishInstall
-from eeazycrm.install.data.currency_timezone import INSERT_SQL
-from eeazycrm.install.data.sample_data import SAMPLE_DATA
+from serwis_crm.install.forms import NewSystemUser, CurrencyTz, FinishInstall
+from serwis_crm.install.data.currency_timezone import INSERT_SQL
+from serwis_crm.install.data.sample_data import SAMPLE_DATA
 
 install = Blueprint('install', __name__)
 
@@ -29,7 +29,7 @@ def sys_info():
     v = tuple(sys.version.split('.'))
     if v and int(v[0]) < 3 and int(v[1]) < 5:
         return render_template("install/error.html", title="Eeazy CRM installation failed",
-                               reason=f"Python version >= {current_app.config['PYTHON_VER_MIN_REQUIRED']} is required for EeazyCRM")
+                               reason=f"Python version >= {current_app.config['PYTHON_VER_MIN_REQUIRED']} is required for serwis_crm")
     env_vars = {
         'email_user': True if os.getenv('EMAIL_USER') else False,
         'email_pass': True if os.getenv('EMAIL_PASS') else False

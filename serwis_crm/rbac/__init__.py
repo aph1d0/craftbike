@@ -1,7 +1,7 @@
 from flask import render_template
 from functools import wraps
 from flask_login import current_user
-from eeazycrm.users.models import Resource, Role
+from serwis_crm.users.models import Resource, Role
 
 
 class NullRBACRowException(Exception):

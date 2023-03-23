@@ -2,7 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, PasswordField, TextAreaField
 from wtforms_sqlalchemy.fields import QuerySelectField
 
-from eeazycrm.settings.models import Currency, TimeZone, DEFAULT_ADDRESS
+from serwis_crm.settings.models import Currency, TimeZone, DEFAULT_ADDRESS
 
 
 def date_format_query():

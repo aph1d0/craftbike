@@ -5,15 +5,15 @@ from sqlalchemy import or_
 import json
 from wtforms import Label
 
-from eeazycrm import db
+from serwis_crm import db
 from .models import Deal, DealStage
-from eeazycrm.common.paginate import Paginate
-from eeazycrm.common.filters import CommonFilters
-from eeazycrm.accounts.models import Account
+from serwis_crm.common.paginate import Paginate
+from serwis_crm.common.filters import CommonFilters
+from serwis_crm.accounts.models import Account
 from .forms import NewDeal, FilterDeals
 from .filters import set_date_filters, set_price_filters, set_deal_stage_filters
 
-from eeazycrm.rbac import check_access
+from serwis_crm.rbac import check_access
 
 deals = Blueprint('deals', __name__)
 

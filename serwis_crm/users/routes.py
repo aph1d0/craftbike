@@ -2,7 +2,7 @@ from flask import Blueprint, session
 from flask_login import current_user, login_user, logout_user
 from flask import render_template, flash, url_for, redirect, request
 
-from eeazycrm import db, bcrypt
+from serwis_crm import db, bcrypt
 from .forms import Register, Login
 from .models import User
 
@@ -31,7 +31,7 @@ def login():
                     return redirect(next_page) if next_page else redirect(url_for('main.home'))
             else:
                 flash('User does not exist! Please contact the system administrator', 'danger')
-    return render_template("login.html", title="EeazyCRM - Login", form=form)
+    return render_template("login.html", title="serwis_crm - Login", form=form)
 
 
 @users.route("/register", methods=['GET', 'POST'])
@@ -51,7 +51,7 @@ def register():
             return redirect(url_for('users.login'))
         else:
             flash(f'Failed to register user!', 'danger')
-    return render_template("register.html", title="EeazyCRM - Register New User", form=form)
+    return render_template("register.html", title="serwis_crm - Register New User", form=form)
 
 
 @users.route("/logout")
