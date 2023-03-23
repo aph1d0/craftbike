@@ -51,8 +51,6 @@ def reset_contacts_filters():
         session.pop('contacts_owner', None)
     if 'contacts_search' in session:
         session.pop('contacts_search', None)
-    if 'contacts_acc_owner' in session:
-        session.pop('contacts_acc_owner', None)
     if 'contacts_date_created' in session:
         session.pop('contacts_date_created', None)
 
@@ -64,7 +62,6 @@ def get_contacts_view():
     filters = FilterContacts()
     search = CommonFilters.set_search(filters, 'contacts_search')
     owner = CommonFilters.set_owner(filters, 'Contact', 'contacts_owner')
-    account = CommonFilters.set_accounts(filters, 'Contact', 'contacts_acc_owner')
     advanced_filters = set_date_filters(filters, 'Contact', 'contacts_date_created')
 
     query = Contact.query.filter(or_(
@@ -78,29 +75,12 @@ def get_contacts_view():
             Contact.addr_city.ilike(f'%{search}%'),
             Contact.post_code.ilike(f'%{search}%')
         ) if search else True)\
-        .filter(account) \
         .filter(owner) \
         .filter(advanced_filters) \
         .order_by(Contact.date_created.desc())
 
     return render_template("contacts/contacts_list.html", title="Contacts View",
                            contacts=Paginate(query=query), filters=filters)
-
-
-@contacts.route("/contacts/acc/<int:account_id>")
-@login_required
-@check_access('contacts', 'view')
-def get_account_contacts(account_id):
-    items = Contact.query\
-        .filter_by(account_id=account_id)\
-        .order_by(Contact.date_created.desc())\
-        .all()
-
-    d = []
-    for item in items:
-        f = {'id': item.id, 'name': item.get_contact_name()}
-        d.append(f)
-    return json.dumps(d)
 
 
 @contacts.route("/contacts/new", methods=['GET', 'POST'])
@@ -122,7 +102,6 @@ def new_contact():
                               country=form.country.data,
                               notes=form.notes.data)
 
-            contact.account = form.accounts.data
 
             if form.avatar.data:
                 picture_file = upload_avatar(contact, form.avatar.data)
@@ -166,7 +145,6 @@ def update_contact(contact_id):
             contact.post_code = form.post_code.data
             contact.country = form.country.data
             contact.contact_owner = form.assignees.data
-            contact.account = form.accounts.data
             contact.notes = form.notes.data
             db.session.commit()
             flash('The contact has been successfully updated', 'success')
@@ -186,7 +164,6 @@ def update_contact(contact_id):
         form.post_code.data = contact.post_code
         form.country.data = contact.country
         form.assignees.data = contact.contact_owner
-        form.accounts.data = contact.account
         form.notes.data = contact.notes
         form.submit.label = Label('update_contact', 'Update Contact')
     return render_template("contacts/new_contact.html", title="Update Contact", form=form)

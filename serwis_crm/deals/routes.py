@@ -119,9 +119,6 @@ def new_deal():
 @check_access('deals', 'update')
 def update_deal(deal_id):
     form = NewDeal()
-    account = request.args.get('acc', None, type=int)
-    if account:
-        form.accounts.data = Account.get_account(account)
 
     deal = Deal.get_deal(deal_id)
     if not deal:

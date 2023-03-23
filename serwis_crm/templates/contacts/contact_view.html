@@ -133,7 +133,6 @@
                             <thead>
                                 <tr>
                                     <th>Title</th>
-                                    <th>Account</th>
                                     <th>Price (USD)</th>
                                     <th>Status</th>
                                 </tr>
@@ -142,7 +141,6 @@
                                 {% for deal in contact.deals %}
                                     <tr>
                                         <td>{{ deal.title }}</td>
-                                        <td>{{ deal.account.name }}</td>
                                         <td>{{ deal.expected_close_price }}</td>
                                         <td>{{ deal.title }}</td>
                                     </tr>

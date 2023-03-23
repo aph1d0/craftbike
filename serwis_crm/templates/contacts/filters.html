@@ -6,11 +6,6 @@
             <div class="col-md-3 pl-0">
                 {{ filters.txt_search(class="form-control from-control-lg", placeholder="search contacts ...") }}
             </div>
-            <div class="col-md-3 pl-0">
-                <div class="form-group text-left">
-                    {{ filters.accounts(class="my-select form-control") }}
-                </div>
-            </div>
             {% if current_user.is_admin %}
             <div class="col-md-3 pl-0">
                 <div class="form-group text-left">

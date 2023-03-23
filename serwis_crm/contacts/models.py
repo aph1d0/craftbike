@@ -19,7 +19,6 @@ class Contact(db.Model):
     post_code = db.Column(db.String(20))
     country = db.Column(db.String(40))
     notes = db.Column(db.String(200))
-    account_id = db.Column(db.Integer, db.ForeignKey('account.id', ondelete='cascade'), nullable=False)
     owner_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='SET NULL'), nullable=True)
     deals = db.relationship(
         'Deal',
