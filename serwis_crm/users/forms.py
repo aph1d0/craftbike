@@ -106,8 +106,8 @@ class UpdateUser(FlaskForm):
     permissions = FieldList(FormField(ResourceForm), min_entries=0)
     submit = SubmitField('Update Staff Member')
 
-    def validate(self, extra_validators=None):
-        initial_validation = super(Register, self).validate(extra_validators)
+    # def validate(self, extra_validators=None):
+    #     initial_validation = super(Register, self).validate(extra_validators)
     # def validate_email(self, email):
     #     user = User.query.filter_by(email=email.data).first()
     #     if user:

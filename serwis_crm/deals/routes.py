@@ -9,7 +9,6 @@ from serwis_crm import db
 from .models import Deal, DealStage
 from serwis_crm.common.paginate import Paginate
 from serwis_crm.common.filters import CommonFilters
-from serwis_crm.accounts.models import Account
 from .forms import NewDeal, FilterDeals
 from .filters import set_date_filters, set_price_filters, set_deal_stage_filters
 
@@ -87,11 +86,8 @@ def new_deal():
     account = request.args.get('acc', None, type=int)
     form = NewDeal()
 
-    if account:
-        form.accounts.data = Account.get_account(account)
-
     if request.method == 'POST':
-        if form.validate_on_submit():
+        if form.is_submitted() and form.validate():
             deal = Deal(title=form.title.data,
                         expected_close_price=form.expected_close_price.data,
                         expected_close_date=form.expected_close_date.data,
@@ -132,7 +128,7 @@ def update_deal(deal_id):
         return redirect(url_for('deals.get_deals_view'))
 
     if request.method == 'POST':
-        if form.validate_on_submit():
+        if form.is_submitted() and form.validate():
             deal.title = form.title.data
             deal.expected_close_price = form.expected_close_price.data
             deal.expected_close_date = form.expected_close_date.data

@@ -7,7 +7,6 @@ from tzlocal import get_localzone
 
 from serwis_crm.settings.models import Currency, TimeZone, AppConfig
 from serwis_crm.leads.models import LeadSource, LeadStatus, LeadMain
-from serwis_crm.accounts.models import Account
 from serwis_crm.contacts.models import Contact
 from serwis_crm.deals.models import DealStage, Deal
 from serwis_crm.users.models import Role, Resource, User
@@ -42,7 +41,7 @@ def sys_info():
 def setup_sys_user():
     form = NewSystemUser()
     if request.method == 'POST':
-        if form.validate_on_submit():
+        if form.is_submitted() and form.validate():
             hashed_pwd = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
             session['admin_first_name'] = form.first_name.data
             session['admin_last_name'] = form.last_name.data
@@ -63,7 +62,7 @@ def ex_settings():
     # insert currency & timezone tables with data
     form = CurrencyTz()
     if request.method == 'POST':
-        if form.validate_on_submit():
+        if form.is_submitted() and form.validate():
             session['app_currency_name'] = form.currency.data.name + f'({form.currency.data.symbol})' if form.currency.data.symbol else ''
             session['app_currency_id'] = form.currency.data.id
             session['app_tz_name'] = form.time_zone.data.name
@@ -158,7 +157,7 @@ def finish():
         'def_tz': session['app_tz_name']
     }
     if request.method == 'POST':
-        if form.validate_on_submit():
+        if form.is_submitted() and form.validate():
 
             if form.import_sample_data.data:
                 db.session.execute(SAMPLE_DATA % (

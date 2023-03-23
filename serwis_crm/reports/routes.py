@@ -3,7 +3,6 @@ from flask_login import current_user, login_required
 from flask import render_template
 from sqlalchemy import func, text
 from serwis_crm.deals.models import Deal, DealStage
-from serwis_crm.accounts.models import Account
 from serwis_crm.users.models import User
 from serwis_crm.rbac import is_admin
 
@@ -45,50 +44,6 @@ def deal_stages():
 
     return render_template("reports/deals_stages.html",
                            title="Reports: Deal Stages", deals=query.all())
-
-
-@reports.route("/reports/deals_closed")
-@login_required
-def deals_closed():
-    if current_user.is_admin:
-        query = Deal.query \
-            .with_entities(
-                Account.name.label('account_name'),
-                DealStage.stage_name.label('stage_name'),
-                func.sum(Deal.expected_close_price).label('total_price'),
-                func.count(Deal.id).label('total_count')
-            ) \
-            .join(Deal.account, Deal.deal_stage) \
-            .group_by(Account.name, DealStage.stage_name) \
-            .order_by(text('stage_name'))
-    else:
-        query = Deal.query \
-            .with_entities(
-                Account.name.label('account_name'),
-                DealStage.stage_name.label('stage_name'),
-                func.sum(Deal.expected_close_price).label('total_price'),
-                func.count(Deal.id).label('total_count')
-            ) \
-            .join(Deal.account, Deal.deal_stage) \
-            .group_by(Account.name, DealStage.stage_name, Deal.owner_id) \
-            .having(Deal.owner_id == current_user.id) \
-            .order_by(text('stage_name'))
-
-    stages = []
-    data = []
-    rows = query.all()
-    if len(rows) > 0:
-        for d in rows:
-            if d[1] not in stages:
-                stages.append(d[1])
-                data.append({
-                    'stage_name': d[1],
-                    'accounts_count': len([x[1] for x in rows if x[1] == d[1]]),
-                    'rows': [(x[0], x[2], x[3]) for x in rows if x[1] == d[1]]
-                })
-
-    return render_template("reports/deals_closed.html",
-                           title="Reports: Deals Stages by Accounts", deals=data)
 
 
 def get_users_deals():

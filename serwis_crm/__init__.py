@@ -69,7 +69,6 @@ def create_app(config_class=ProductionConfig):
         from serwis_crm.main.routes import main
         from serwis_crm.users.routes import users
         from serwis_crm.leads.routes import leads
-        from serwis_crm.accounts.routes import accounts
         from serwis_crm.contacts.routes import contacts
         from serwis_crm.deals.routes import deals
         from serwis_crm.settings.routes import settings
@@ -82,7 +81,6 @@ def create_app(config_class=ProductionConfig):
         app.register_blueprint(settings)
         app.register_blueprint(app_config)
         app.register_blueprint(leads)
-        app.register_blueprint(accounts)
         app.register_blueprint(contacts)
         app.register_blueprint(deals)
         app.register_blueprint(reports)

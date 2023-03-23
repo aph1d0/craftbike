@@ -19,7 +19,6 @@ class User(db.Model, UserMixin):
     is_user_active = db.Column(db.Boolean, nullable=False, default=False)
     role_id = db.Column(db.Integer, db.ForeignKey('role.id', ondelete='SET NULL'), nullable=True)
     leads = db.relationship('LeadMain', backref='owner', lazy=True)
-    accounts = db.relationship('Account', backref='account_owner', lazy=True)
     contacts = db.relationship('Contact', backref='contact_owner', lazy=True)
     deals = db.relationship('Deal', backref='deal_owner', lazy=True)
 

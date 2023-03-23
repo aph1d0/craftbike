@@ -6,7 +6,6 @@ from wtforms.validators import DataRequired, Optional
 from wtforms_sqlalchemy.fields import QuerySelectField
 
 from serwis_crm.users.models import User
-from serwis_crm.accounts.models import Account
 from serwis_crm.contacts.models import Contact
 from serwis_crm.deals.models import DealStage
 
@@ -20,9 +19,6 @@ class NewDeal(FlaskForm):
     deal_stages = QuerySelectField('Deal Stage', query_factory=DealStage.deal_stage_list_query, get_pk=lambda a: a.id,
                                  get_label=DealStage.get_label, allow_blank=False,
                                  validators=[DataRequired(message='Please select deal stage')])
-    accounts = QuerySelectField('Account', query_factory=Account.account_list_query, get_pk=lambda a: a.id,
-                                 get_label=Account.get_label, blank_text='Select An Account', allow_blank=True,
-                                validators=[DataRequired(message='Please choose an account for the deal')])
     contacts = QuerySelectField('Contact', query_factory=Contact.contact_list_query, get_pk=lambda a: a.id,
                                  get_label=Contact.get_label, blank_text='Select A Contact', allow_blank=True)
     assignees = QuerySelectField('Assign To', query_factory=User.user_list_query, get_pk=lambda a: a.id,
@@ -60,9 +56,6 @@ class FilterDeals(FlaskForm):
     txt_search = StringField()
     assignees = QuerySelectField(query_factory=User.user_list_query, get_pk=lambda a: a.id,
                                  get_label=User.get_label, allow_blank=True, blank_text='[-- Select Owner --]')
-
-    accounts = QuerySelectField(query_factory=Account.account_list_query, get_pk=lambda a: a.id,
-                                get_label=Account.get_label, blank_text='[-- Select Account --]', allow_blank=True)
 
     contacts = QuerySelectField(query_factory=Contact.contact_list_query, get_pk=lambda a: a.id,
                                 get_label=Contact.get_label, blank_text='[-- Select Contact --]', allow_blank=True)

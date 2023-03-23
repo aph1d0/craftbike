@@ -15,7 +15,7 @@ def login():
         return redirect(url_for('main.home'))
     form = Login()
     if request.method == 'POST':
-        #if form.validate_on_submit():
+        #if form.is_submitted() and form.validate():
         if form.is_submitted() and form.validate():
             user = User.query.filter_by(email=form.email.data).first()
             if user:
@@ -40,7 +40,7 @@ def register():
         return redirect(url_for('main.home'))
     form = Register()
     if request.method == 'POST':
-        if form.validate_on_submit():
+        if form.is_submitted() and form.validate():
             hashed_pwd = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
             user = User(first_name=form.first_name.data, last_name=form.last_name.data,
                         email=form.email.data, is_admin=True, is_first_login=False,

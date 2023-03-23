@@ -78,7 +78,7 @@ def settings_staff_update(user_id):
         .all()
 
     if request.method == 'POST':
-        if form.validate_on_submit():
+        if form.is_submitted() and form.validate():
             if form.picture.data:
                 picture_file = upload_avatar(user, form.picture.data)
                 user.avatar = picture_file

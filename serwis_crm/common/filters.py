@@ -2,7 +2,6 @@ from flask import request, session
 from flask_login import current_user
 from sqlalchemy import text
 from serwis_crm.users.models import User
-from serwis_crm.accounts.models import Account
 from serwis_crm.contacts.models import Contact
 
 
@@ -31,24 +30,6 @@ class CommonFilters:
             else:
                 owner = True if current_user.is_admin else text('%s.owner_id=%d' % (module, current_user.id))
         return owner
-
-    @staticmethod
-    def set_accounts(filters, module, key):
-        if not module or not filters or not key:
-            return None
-
-        account = True
-        if request.method == 'POST':
-            if filters.accounts.data:
-                account = text('%s.account_id=%d' % (module, filters.accounts.data.id))
-                session[key] = filters.accounts.data.id
-            else:
-                session.pop(key, None)
-        else:
-            if key in session:
-                account = text('%s.account_id=%d' % (module, session[key]))
-                filters.accounts.data = Account.get_account(session[key])
-        return account
 
     @staticmethod
     def set_contacts(filters, module, key):

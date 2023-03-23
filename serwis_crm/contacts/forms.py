@@ -6,7 +6,6 @@ from wtforms.validators import DataRequired, Email
 from wtforms_sqlalchemy.fields import QuerySelectField
 
 from serwis_crm.users.models import User
-from serwis_crm.accounts.models import Account
 
 
 class NewContact(FlaskForm):
@@ -24,9 +23,6 @@ class NewContact(FlaskForm):
     post_code = StringField('Postcode')
     country = StringField('Country')
     notes = StringField('Notes', widget=TextArea())
-    accounts = QuerySelectField('Account', query_factory=Account.account_list_query, get_pk=lambda a: a.id,
-                                 get_label=Account.get_label, blank_text='Select An Account', allow_blank=True,
-                                validators=[DataRequired(message='Please choose an account for the contact')])
     assignees = QuerySelectField('Assign To', query_factory=User.user_list_query, get_pk=lambda a: a.id,
                                  get_label=User.get_label, default=User.get_current_user)
     submit = SubmitField('Create New Contact')
@@ -43,8 +39,6 @@ def filter_contacts_adv_filters_query():
 
 class FilterContacts(FlaskForm):
     txt_search = StringField()
-    accounts = QuerySelectField(query_factory=Account.account_list_query, get_pk=lambda a: a.id,
-                                get_label=Account.get_label, blank_text='[-- Select Account--]', allow_blank=True)
     assignees = QuerySelectField(query_factory=User.user_list_query, get_pk=lambda a: a.id,
                                  get_label=User.get_label, allow_blank=True, blank_text='[-- Select Owner --]')
     advanced_user = QuerySelectField(query_factory=filter_contacts_adv_filters_query,

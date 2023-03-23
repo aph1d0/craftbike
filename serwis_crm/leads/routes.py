@@ -76,7 +76,7 @@ def get_leads_view():
 def new_lead():
     form = NewLead()
     if request.method == 'POST':
-        if form.validate_on_submit():
+        if form.is_submitted() and form.validate():
             lead = LeadMain(title=form.title.data,
                         first_name=form.first_name.data, last_name=form.last_name.data,
                         email=form.email.data, company_name=form.company.data,
@@ -111,7 +111,7 @@ def update_lead(lead_id):
 
     form = NewLead()
     if request.method == 'POST':
-        if form.validate_on_submit():
+        if form.is_submitted() and form.validate():
             lead.title = form.title.data
             lead.first_name = form.first_name.data
             lead.last_name = form.last_name.data
@@ -190,7 +190,7 @@ def convert_lead(lead_id):
     form.account_email.data = lead.email
 
     if request.method == 'POST':
-        if form.validate_on_submit():
+        if form.is_submitted() and form.validate():
             if form.use_account_information.data and form.use_contact_information.data:
                 # create both account and contact
 
@@ -225,7 +225,7 @@ def import_bulk_leads():
     form = ImportLeads()
     if request.method == 'POST':
         ind = 0
-        if form.validate_on_submit():
+        if form.is_submitted() and form.validate():
             data = pd.read_csv(form.csv_file.data)
 
             for _, row in data.iterrows():
@@ -258,7 +258,7 @@ def reset_filters():
 def bulk_owner_assign():
     form = BulkOwnerAssign()
     if request.method == 'POST':
-        if form.validate_on_submit():
+        if form.is_submitted() and form.validate():
             if form.owners_list.data:
                 ids = [int(x) for x in request.form['leads_owner'].split(',')]
                 LeadMain.query\
@@ -280,7 +280,7 @@ def bulk_owner_assign():
 def bulk_lead_source_assign():
     form = BulkLeadSourceAssign()
     if request.method == 'POST':
-        if form.validate_on_submit():
+        if form.is_submitted() and form.validate():
             if form.lead_source_list.data:
                 ids = [int(x) for x in request.form['leads_source'].split(',')]
                 LeadMain.query \
@@ -302,7 +302,7 @@ def bulk_lead_source_assign():
 def bulk_lead_status_assign():
     form = BulkLeadStatusAssign()
     if request.method == 'POST':
-        if form.validate_on_submit():
+        if form.is_submitted() and form.validate():
             if form.lead_status_list.data:
                 ids = [int(x) for x in request.form['leads_status'].split(',')]
                 LeadMain.query \
@@ -323,7 +323,7 @@ def bulk_lead_status_assign():
 def bulk_delete():
     form = BulkDelete()
     if request.method == 'POST':
-        if form.validate_on_submit():
+        if form.is_submitted() and form.validate():
             ids = [int(x) for x in request.form['leads_to_delete'].split(',')]
             LeadMain.query \
                 .filter(LeadMain.id.in_(ids)) \

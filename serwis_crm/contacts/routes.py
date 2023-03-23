@@ -109,7 +109,7 @@ def get_account_contacts(account_id):
 def new_contact():
     form = NewContact()
     if request.method == 'POST':
-        if form.validate_on_submit():
+        if form.is_submitted() and form.validate():
             contact = Contact(first_name=form.first_name.data,
                               last_name=form.last_name.data,
                               email=form.email.data,
@@ -154,7 +154,7 @@ def update_contact(contact_id):
 
     form = NewContact()
     if request.method == 'POST':
-        if form.validate_on_submit():
+        if form.is_submitted() and form.validate():
             contact.first_name = form.first_name.data
             contact.last_name = form.last_name.data
             contact.email = form.email.data

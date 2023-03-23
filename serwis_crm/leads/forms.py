@@ -8,7 +8,6 @@ from wtforms_sqlalchemy.fields import QuerySelectField, QuerySelectMultipleField
 
 from serwis_crm.leads.models import LeadSource, LeadStatus
 from serwis_crm.users.models import User
-from serwis_crm.accounts.models import Account
 from serwis_crm.contacts.models import Contact
 from serwis_crm.deals.models import DealStage
 
@@ -94,8 +93,6 @@ class ConvertLead(FlaskForm):
     use_account_information = BooleanField('Use Account Information', default=True)
     account_name = StringField('Account Name')
     account_email = StringField('Account Email')
-    accounts = QuerySelectField('Account', query_factory=Account.account_list_query, get_pk=lambda a: a.id,
-                                get_label=Account.get_label, blank_text='Select An Account', allow_blank=True)
 
     use_contact_information = BooleanField('Use Contact Information', default=False)
     contact_first_name = StringField('Contact First Name')
