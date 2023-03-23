@@ -55,13 +55,13 @@ def set_source(filters, key):
     if request.method == 'POST':
         if filters.lead_source.data:
             sources_list = tuple(map(lambda a: a.id, filters.lead_source.data))
-            lead_sources_list = Lead.lead_source_id.in_(sources_list)
+            lead_sources_list = LeadMain.lead_source_id.in_(sources_list)
             session[key] = sources_list
         else:
             session.pop(key, None)
     else:
         if key in session:
-            lead_sources_list = Lead.lead_source_id.in_(session[key])
+            lead_sources_list = LeadMain.lead_source_id.in_(session[key])
             filters.lead_source.data = list(map(lambda a: LeadSource.get_by_id(a), session[key]))
     return lead_sources_list
 
@@ -71,12 +71,12 @@ def set_status(filters, key):
     if request.method == 'POST':
         if filters.lead_status.data:
             status_list = tuple(map(lambda a: a.id, filters.lead_status.data))
-            lead_status_list = Lead.lead_status_id.in_(status_list)
+            lead_status_list = LeadMain.lead_status_id.in_(status_list)
             session[key] = status_list
         else:
             session.pop(key, None)
     else:
         if key in session:
-            lead_status_list = Lead.lead_status_id.in_(session[key])
+            lead_status_list = LeadMain.lead_status_id.in_(session[key])
             filters.lead_status.data = list(map(lambda a: LeadStatus.get_by_id(a), session[key]))
     return lead_status_list
