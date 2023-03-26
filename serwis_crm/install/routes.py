@@ -6,9 +6,9 @@ from flask import current_app
 from tzlocal import get_localzone
 
 from serwis_crm.settings.models import Currency, TimeZone, AppConfig
-from serwis_crm.leads.models import LeadSource, LeadStatus, LeadMain
+from serwis_crm.leads.models import LeadStatus, LeadMain
 from serwis_crm.contacts.models import Contact
-from serwis_crm.deals.models import DealStage, Deal
+from serwis_crm.bikes.models import DealStage, Deal
 from serwis_crm.users.models import Role, Resource, User
 
 from serwis_crm.install.forms import NewSystemUser, CurrencyTz, FinishInstall

@@ -1,18 +1,25 @@
+from datetime import date
 import pandas as pd
-from sqlalchemy import or_
+import requests
+from sqlalchemy import Date, cast, or_
 from wtforms import Label
 
-from flask import Blueprint, session, Response
+from flask import Blueprint, jsonify, session, Response
 from flask_login import current_user, login_required
 from flask import render_template, flash, url_for, redirect, request
 
 from serwis_crm import db
-from .models import LeadMain
+from serwis_crm.bikes.models import Bike
+from serwis_crm.bikes.routes import new_bike
+from serwis_crm.users.models import User
+from .models import LeadMain, LeadStatus
+from serwis_crm.contacts.models import Contact
+from serwis_crm.contacts.routes import new_contact
 from serwis_crm.common.paginate import Paginate
 from serwis_crm.common.filters import CommonFilters
-from .filters import set_date_filters, set_source, set_status
-from .forms import NewLead, ImportLeads, ConvertLead, \
-    FilterLeads, BulkOwnerAssign, BulkLeadSourceAssign, BulkLeadStatusAssign, BulkDelete
+from .filters import set_date_filters, set_status
+from .forms import NewLead, ImportLeads, \
+    FilterLeads, BulkOwnerAssign, BulkLeadStatusAssign, BulkDelete
 
 from serwis_crm.rbac import check_access, is_admin
 
@@ -26,8 +33,6 @@ def reset_lead_filters():
         session.pop('lead_search', None)
     if 'lead_date_created' in session:
         session.pop('lead_date_created', None)
-    if 'lead_source' in session:
-        session.pop('lead_source', None)
     if 'lead_status' in session:
         session.pop('lead_status', None)
 
@@ -38,22 +43,19 @@ def reset_lead_filters():
 def get_leads_view():
     filters = FilterLeads()
     search = CommonFilters.set_search(filters, 'lead_search')
-    owner = CommonFilters.set_owner(filters, 'Lead', 'lead_owner')
+    owner = CommonFilters.set_owner(filters, 'lead_main', 'lead_owner')
     advanced_filters = set_date_filters(filters, 'lead_date_created')
-    source_filter = set_source(filters, 'lead_source')
     status_filter = set_status(filters, 'lead_status')
 
     query = LeadMain.query \
+        .join(Contact, LeadMain.contact_id==Contact.id)\
+        .join(User, LeadMain.owner_id==User.id)\
+        .join(Bike, LeadMain.bike_id==Bike.id)\
+        .join(LeadStatus, LeadMain.lead_status_id==LeadStatus.id)\
+        .add_columns(LeadMain.id, LeadMain.title, Contact.first_name, Contact.last_name, Contact.phone, Bike.manufacturer, Bike.model, LeadMain.owner_id, User, LeadStatus.status_name, LeadMain.date_created)\
         .filter(or_(
             LeadMain.title.ilike(f'%{search}'),
-            LeadMain.first_name.ilike(f'%{search}'),
-            LeadMain.last_name.ilike(f'%{search}'),
-            LeadMain.email.ilike(f'%{search}'),
-            LeadMain.company_name.ilike(f'%{search}'),
-            LeadMain.phone.ilike(f'%{search}'),
-            LeadMain.mobile.ilike(f'%{search}'),
         ) if search else True) \
-        .filter(source_filter) \
         .filter(status_filter) \
         .filter(owner) \
         .filter(advanced_filters) \
@@ -61,44 +63,83 @@ def get_leads_view():
 
     bulk_form = {
         'owner': BulkOwnerAssign(),
-        'lead_source': BulkLeadSourceAssign(),
         'lead_status': BulkLeadStatusAssign(),
         'delete': BulkDelete()
     }
 
-    return render_template("leads/leads_list.html", title="Leads View",
+    return render_template("leads/leads_list.html", title="Widok zleceń serwisowych",
                            leads=Paginate(query), filters=filters, bulk_form=bulk_form)
 
+@leads.route('/leads/update_stage/<int:lead_id>/<int:lead_stage_id>', methods=['POST'])
+def update_stage(lead_id, lead_stage_id):
+    lead = LeadMain.query.filter(LeadMain.id == lead_id).first()
+    lead.lead_status_id = lead_stage_id
+    db.session.add(lead)
+    db.session.commit()
+    return redirect(url_for('main.home'))
+
+@leads.route('/leads/new/_autoset_title', methods=['POST'])
+def autoset():
+    input_1_value = request.form['bike_manufacturer']
+    input_2_value = request.form['bike_model']
+    # Calculate the new value for input 3 based on input 1 and input 2
+    new_value = str(input_1_value) + " " + str(input_2_value)
+    return jsonify({'new_value': new_value})
+
+@check_access('leads', 'view')
+@leads.route('/leads/get_scheduled', methods=['GET'])
+def get_scheduled():
+    json_scheduled_serwices = []
+    scheduled_serwices = LeadMain.query.filter(cast(LeadMain.date_scheduled,Date) >= date.today()).all()
+    for scheduled_service in scheduled_serwices:
+        json_scheduled_serwices.append({
+            'id' : scheduled_service.id,
+            'title' : scheduled_service.title,
+            'start' : scheduled_service.date_scheduled.strftime('%Y-%m-%d')
+        }
+            )
+        #a = jsonify(json_scheduled_serwices)
+    return json_scheduled_serwices
 
 @leads.route("/leads/new", methods=['GET', 'POST'])
 @login_required
 @check_access('leads', 'create')
 def new_lead():
+    found_bike = False
     form = NewLead()
     if request.method == 'POST':
         if form.is_submitted() and form.validate():
+            client = Contact.query.filter_by(phone=form.phone.data).first()
+            if not client:
+                client = new_contact(first_name=form.first_name.data, last_name=form.last_name.data, phone=form.phone.data, current_user=current_user.id)
+            clients_bikes = Bike.query.filter_by(contact_id=client.id).all()
+            for client_bike in clients_bikes:
+                if str(form.bike_manufacturer.data).lower() == client_bike.manufacturer and str(form.bike_model.data).lower() == client_bike.model:
+                    bike = client_bike
+                    found_bike=True
+                    break
+            if not found_bike:
+                    bike = new_bike(bike_manufacturer=str(form.bike_manufacturer.data).lower(), bike_model=str(form.bike_model.data).lower(), client_id=client.id)
             lead = LeadMain(title=form.title.data,
-                        first_name=form.first_name.data, last_name=form.last_name.data,
-                        email=form.email.data, company_name=form.company.data,
-                        address_line=form.address_line.data, addr_state=form.addr_state.data,
-                        addr_city=form.addr_city.data, post_code=form.post_code.data,
-                        country=form.country.data, source=form.lead_source.data,
                         status=form.lead_status.data, notes=form.notes.data)
-
+            if form.lead_status.data.status_name == 'Umówiony na serwis':
+                lead.date_scheduled = form.date_scheduled.data
+                
             if current_user.is_admin:
                 lead.owner = form.assignees.data
             else:
                 lead.owner = current_user
-
+            lead.contact_id = client.id
+            lead.bike_id = bike.id
             db.session.add(lead)
             db.session.commit()
-            flash('New lead has been successfully created!', 'success')
+            flash('Nowe zlecenie serwisowe utworzone!', 'success')
             return redirect(url_for('leads.get_leads_view'))
         else:
             for error in form.errors:
                 print(error)
-            flash('Your form has errors! Please check the fields', 'danger')
-    return render_template("leads/new_lead.html", title="New Lead", form=form)
+            flash('Błednie wypełniony formularz. Sprawdz go ponownie baranie!', 'danger')
+    return render_template("leads/new_lead.html", title="Nowe zlecenie", form=form)
 
 
 @leads.route("/leads/edit/<int:lead_id>", methods=['GET', 'POST'])
@@ -106,6 +147,8 @@ def new_lead():
 @check_access('leads', 'update')
 def update_lead(lead_id):
     lead = LeadMain.get_by_id(lead_id)
+    bike = Bike.get_bike(lead.bike_id)
+    contact = Contact.get_contact(lead.contact_id)
     if not lead:
         return redirect(url_for('leads.get_leads_view'))
 
@@ -113,46 +156,34 @@ def update_lead(lead_id):
     if request.method == 'POST':
         if form.is_submitted() and form.validate():
             lead.title = form.title.data
-            lead.first_name = form.first_name.data
-            lead.last_name = form.last_name.data
-            lead.email = form.email.data
-            lead.company_name = form.company.data
-            lead.phone = form.phone.data
-            lead.mobile = form.mobile.data
-            lead.address_line = form.address_line.data
-            lead.addr_state = form.addr_state.data
-            lead.addr_city = form.addr_city.data
-            lead.post_code = form.post_code.data
-            lead.country = form.country.data
+            contact.first_name = form.first_name.data
+            contact.last_name = form.last_name.data
+            contact.phone = form.phone.data
+            bike.manufacturer = form.bike_manufacturer.data
+            bike.model = form.bike_model.data
             lead.owner = form.assignees.data
-            lead.source = form.lead_source.data
             lead.status = form.lead_status.data
+            lead.date_scheduled = form.date_scheduled.data
             lead.notes = form.notes.data
             db.session.commit()
-            flash('The lead has been successfully updated', 'success')
+            flash('Zlecenie uaktualnione poprawnie!', 'success')
             return redirect(url_for('leads.get_lead_view', lead_id=lead.id))
         else:
             print(form.errors)
-            flash('User update failed! Form has errors', 'danger')
+            flash('Aktualizacja zlecenia nie powiodła się! Sprawdź formularz.', 'danger')
     elif request.method == 'GET':
         form.title.data = lead.title
-        form.first_name.data = lead.first_name
-        form.last_name.data = lead.last_name
-        form.email.data = lead.email
-        form.company.data = lead.company_name
-        form.phone.data = lead.phone
-        form.mobile.data = lead.mobile
-        form.address_line.data = lead.address_line
-        form.addr_state.data = lead.addr_state
-        form.addr_city.data = lead.addr_city
-        form.post_code.data = lead.post_code
-        form.country.data = lead.country
+        form.first_name.data = contact.first_name
+        form.last_name.data = contact.last_name
+        form.phone.data = contact.phone
+        form.bike_manufacturer.data = bike.manufacturer
+        form.bike_model.data = bike.model
         form.assignees.data = lead.owner
-        form.lead_source.data = lead.source
         form.lead_status.data = lead.status
+        form.date_scheduled.data = lead.date_scheduled.strftime('%Y-%m-%d')
         form.notes.data = lead.notes
-        form.submit.label = Label('update_lead', 'Update Lead')
-    return render_template("leads/new_lead.html", title="Update Lead", form=form)
+        form.submit.label = Label('update_lead', 'Aktualizuj zlecenie')
+    return render_template("leads/new_lead.html", title="Aktualizuj zlecenie", form=form)
 
 
 @leads.route("/leads/<int:lead_id>")
@@ -160,7 +191,9 @@ def update_lead(lead_id):
 @check_access('leads', 'view')
 def get_lead_view(lead_id):
     lead = LeadMain.query.filter_by(id=lead_id).first()
-    return render_template("leads/lead_view.html", title="View Lead", lead=lead)
+    bike = Bike.get_bike(lead.bike_id)
+    contact = Contact.get_contact(lead.contact_id)
+    return render_template("leads/lead_view.html", title="Przegląd zlecenia", lead=lead, bike=bike, contact=contact)
 
 
 @leads.route("/leads/del/<int:lead_id>")
@@ -169,53 +202,13 @@ def get_lead_view(lead_id):
 def delete_lead(lead_id):
     lead = LeadMain.query.filter_by(id=lead_id).first()
     if not lead:
-        flash('The lead does not exist', 'danger')
+        flash('Zlecenie nie istnieje :(', 'danger')
     else:
         LeadMain.query.filter_by(id=lead_id).delete()
         db.session.commit()
-        flash('The lead has been removed successfully', 'success')
+        flash('Zlecenie usunięte poprawnie', 'success')
     return redirect(url_for('leads.get_leads_view'))
 
-
-@leads.route("/leads/convert/<int:lead_id>", methods=['GET', 'POST'])
-@login_required
-@check_access('leads', 'view')
-@check_access('accounts', 'create')
-@check_access('contacts', 'create')
-@check_access('deals', 'create')
-def convert_lead(lead_id):
-    lead = LeadMain.query.filter_by(id=lead_id).first()
-    form = ConvertLead()
-    form.account_name.data = lead.company_name
-    form.account_email.data = lead.email
-
-    if request.method == 'POST':
-        if form.is_submitted() and form.validate():
-            if form.use_account_information.data and form.use_contact_information.data:
-                # create both account and contact
-
-                pass
-            elif form.use_account_information.data and not form.use_contact_information.data:
-                # create account only (and contact if chosen from dropdown)
-                if not form.account_name.data:
-                    form.account_name.errors = ['Please enter account name']
-                if not form.account_name.data:
-                    form.account_email.errors = ['Please enter account email']
-            elif not form.use_account_information.data and form.use_contact_information.data:
-                pass
-                # create contact only (account dropdown must be selected)
-            elif not form.use_account_information.data and not form.use_contact_information.data:
-                # account must be selected in dropdown (and create contact if selected in dropdown)
-                if not form.accounts.data:
-                    form.accounts.errors = ['Please select an account']
-                pass
-
-            flash('Leads has been successfully converted!', 'success')
-        else:
-            flash('Your form has errors! Please check the fields', 'danger')
-    else:
-        form.title.data = lead.title
-    return render_template("leads/lead_convert.html", title="Convert Lead", lead=lead, form=form)
 
 
 @leads.route("/leads/import", methods=['GET', 'POST'])
@@ -240,7 +233,7 @@ def import_bulk_leads():
             db.session.commit()
             flash(f'{ind} new lead(s) has been successfully imported!', 'success')
         else:
-            flash('Your form has errors! Please check the fields', 'danger')
+            flash('Błednie wypełniony formularz. Sprawdz go ponownie baranie!', 'danger')
     return render_template("leads/leads_import.html", title="Import Leads", form=form)
 
 

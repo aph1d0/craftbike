@@ -3,23 +3,13 @@
     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
         <h2 class="h4">{% if title %}{{title}}{% else %}No Title{% endif %}</h2>
         <div class="btn-toolbar mb-2 mb-md-0">
-            <a class="btn btn btn-sm btn-outline-primary mr-2" role="button" href="{{ url_for('deals.get_deals_view') }}?view_t=kanban">
+            <a class="btn btn btn-sm btn-outline-primary mr-2" role="button" href="{{ url_for('bikes.get_bikes_view') }}?view_t=kanban">
                 <span data-feather="trello"></span>
-            </a>
-            {% if current_user.is_admin %}
-            <a class="btn btn-sm btn-outline-secondary mr-2" role="button" href="{{ url_for('leads.import_bulk_leads') }}">
-                <span data-feather="upload"></span>
-                  import deals ...
-            </a>
-            {% endif %}
-            <a class="btn btn btn-sm btn-outline-primary" role="button" href="{{ url_for('deals.new_deal') }}">
-                <span data-feather="plus"></span>
-                  New
             </a>
         </div>
     </div>
-    {% include "deals/filters.html" %}
-    {% if deals.items()|length > 0 %}
+    {% include "bikes/filters.html" %}
+    {% if bikes.items()|length > 0 %}
         <div class="table-responsive">
             <table class="table table-striped table-hover fixed-layout-table">
               <thead class="thead-light">
@@ -39,24 +29,24 @@
                 </tr>
               </thead>
               <tbody>
-                {% for deal in deals.items() %}
+                {% for bike in bikes.items() %}
                 <tr>
                   <th scope="row">
                       <input class="cb" type="checkbox" value="{{ deal.id }}" />
                   </th>
                     <th>
-                        <a href="{{ url_for('deals.update_deal', deal_id=deal.id) }}" class="btn btn-outline-secondary btn-sm mr-1" role="button">
+                        <a href="{{ url_for('bikes.update_bike', deal_id=deal.id) }}" class="btn btn-outline-secondary btn-sm mr-1" role="button">
                             <span data-feather="edit"></span>
                         </a>
                         <a href="#" class="btn btn-outline-secondary btn-sm mr-1" role="button">
                             <span data-feather="trash"></span>
                         </a>
-                        <a href="{{ url_for('deals.get_deal_view', deal_id=deal.id) }}"
+                        <a href="{{ url_for('bikes.get_bike_view', deal_id=deal.id) }}"
                            class="btn btn-outline-secondary btn-sm mr-1" role="button">
                             <span data-feather="arrow-up-right"></span>
                         </a>
                     </th>
-                    <td>{{ deal.title }}</td>
+                    <td>{{ bike.title }}</td>
                   <td>{{ config.def_currency.symbol }} {{ "{:,.2f}".format(deal.expected_close_price) }}</td>
                     <td>{% if deal.is_expired() %}<span class="icon-warning" data-feather="alert-circle"></span>{%endif%}
                         {{ deal.expected_close_date.strftime('%Y-%m-%d %I:%M %p').lower() if deal.expected_close_date }}</td>
@@ -72,15 +62,15 @@
         </div>
 
         <!-- pagination -->
-        {% if deals.total_records > 10 %}
-            {% with view_id="deals.get_deals_view", items=deals %}
+        {% if bikes.total_records > 10 %}
+            {% with view_id="bikes.get_bikes_view", items=bikes %}
                 {% include "common/pagination.html" %}
             {% endwith %}
         {% endif %}
     {% else %}
         <div class="container text-center pt-4">
             <div><span data-feather="eye-off"></span></div>
-            <p>No deals found. Please create your first deal.</p>
+            <p>Brak rowerów.</p>
         </div>
     {%  endif %}
 <script>

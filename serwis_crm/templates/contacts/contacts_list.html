@@ -1,19 +1,8 @@
 {% extends "layout.html" %}
+{% set active_page = "contacts" %}
     {% block content %}
     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
         <h2 class="h4">{% if title %}{{title}}{% else %}No Title{% endif %}</h2>
-        <div class="btn-toolbar mb-2 mb-md-0">
-            {% if current_user.is_admin %}
-            <a class="btn btn-sm btn-outline-secondary mr-2" role="button" href="{{ url_for('leads.import_bulk_leads') }}">
-                <span data-feather="upload"></span>
-                  import contacts ...
-            </a>
-            {% endif %}
-            <a class="btn btn btn-sm btn-outline-primary" role="button" href="{{ url_for('contacts.new_contact') }}">
-                <span data-feather="plus"></span>
-                  New
-            </a>
-        </div>
     </div>
     {% include "contacts/filters.html" %}
     {% if contacts.items()|length > 0 %}
@@ -25,18 +14,11 @@
                       <input type="checkbox" id="select_all" value="all" />
                   </th>
                     <th width="150"></th>
-                  <th width="150" scope="col">First Name</th>
-                  <th width="150" scope="col">Last Name</th>
-                  <th width="300" scope="col">Email</th>
-                    <th width="150" scope="col">Phone</th>
-                    <th width="200" scope="col">Mobile</th>
-                    <th width="250" scope="col">Address</th>
-                    <th width="250" scope="col">State</th>
-                    <th width="200" scope="col">City</th>
-                    <th width="100" scope="col">Pincode</th>
-                    <th width="100" scope="col">Country</th>
-                    <th width="200" scope="col">Owner</th>
-                    <th width="200" scope="col">Date Created</th>
+                  <th width="150" scope="col">Imię</th>
+                  <th width="150" scope="col">Nazwisko</th>
+                    <th width="150" scope="col">Telefon</th>
+                    <th width="200" scope="col">Serwisant</th>
+                    <th width="200" scope="col">Data utworzenia</th>
                 </tr>
               </thead>
               <tbody>
@@ -50,10 +32,6 @@
                            class="btn btn-outline-secondary btn-sm mr-1" role="button">
                             <span data-feather="edit"></span>
                         </a>
-                        <a href="#" class="btn btn-outline-secondary btn-sm mr-1"
-                           data-target="#singleContactDeleteModal_{{ contact.id }}" data-toggle="modal" role="button">
-                            <span data-feather="trash"></span>
-                        </a>
                         {% with contact_id=contact.id %}
                             {% include 'contacts/single_contact_delete_modal.html' %}
                         {% endwith %}
@@ -64,14 +42,7 @@
                     </th>
                   <td>{{ contact.first_name }}</td>
                   <td>{{ contact.last_name }}</td>
-                    <td>{{ contact.email }}</td>
                     <td>{{ contact.phone }}</td>
-                    <td>{{ contact.mobile }}</td>
-                     <td>{{ contact.address_line }}</td>
-                     <td>{{ contact.addr_state }}</td>
-                     <td>{{ contact.addr_city }}</td>
-                     <td>{{ contact.pin_code }}</td>
-                     <td>{{ contact.country }}</td>
                     <td>{% with owner=contact.contact_owner %}{% include 'common/owner_cell.html' %}{% endwith %}</td>
                     <td>{{ contact.date_created.strftime('%Y-%m-%d') if contact.date_created }}</td>
                 </tr>
@@ -89,7 +60,7 @@
     {% else %}
         <div class="container text-center pt-4">
             <div><span data-feather="eye-off"></span></div>
-            <p>No contacts found. Please create your first contact.</p>
+            <p>Brak klientów. Utwórz zlecenie serwisowe aby dodać klienta.</p>
         </div>
     {%  endif %}
 <script>

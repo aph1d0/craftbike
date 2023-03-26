@@ -1,7 +1,110 @@
 {% extends "layout.html" %}
 {% set active_page = "dashboard" %}
-    {% block content %}
-<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-    <h2 class="h4">{% if title %}{{title}}{% else %}Brak tytułu{% endif %}</h2>
+{% block content %}
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h2 class="h4">{% if title %}{{title}}{% else %}No Title{% endif %}</h2>
+    </div>
+    {% if lead_statuses|length > 0 %}
+    <div class="container-fluid" style="background-color: #f1f1f1; padding: 20px;">
+        <div class="kanban-container">
+            {% for lead_status in lead_statuses %}
+
+            <div class="card outer-card">
+              <div id="cb_{{ lead_status.id }}" class="card-body"
+                   data-dropstage="{{ lead_status.id }}" ondrop="drop(event)" ondragover="allowDrop(event)">
+                    {% if lead_status.status_name == "Umówiony na serwis" %}
+                    <h5 class="card-title">Umówiony na serwis dzisiaj</h5>
+                    {% else %}
+                    <h5 class="card-title">{{ lead_status.status_name }}</h5>
+                    {% endif %}
+                  {% for lead in leads %}
+                    {% if lead.status.status_name == lead_status.status_name %}
+                        <div id="item_{{ lead.id }}" data-dealid="{{ lead.id }}" class="card inner-card bg-light mb-3"
+                             draggable="true" ondragstart="dragStart(event)">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <div class="text">{{ lead.title|truncate(35, True)}}</div>
+                                </h5>
+                                <div class="card-text">
+                                    <div><span data-feather="phone"></span> {{ lead.lead_contact.phone }}</div>
+                                    <div><span data-feather="user"></span> {{ lead.lead_contact.first_name }} {{ lead.lead_contact.last_name }}</div>
+                                    <div><span data-feather="tool"></span> {{ lead.owner.first_name }} {{ lead.owner.last_name }}</div>
+                                </div>
+                                <div class="card-actions">
+                                    <div class="ca_item" >
+                                        <a href="/leads/edit/{{ lead.id }}" class="btn btn-sm btn-outline-secondary" role="button">
+                                            <span data-feather="arrow-up-right"></span> Edytuj zlecenie
+                                        </a>
+                                    </div>
+                                    {% if lead.status.status_name == "Gotowy" %}
+                                    <div class="ca_item" >
+                                        <a href="/leads/update_stage/{{ lead.id }}/6" class="btn btn-sm btn-outline-secondary" role="button" onClick="window.location.reload();">
+                                            <span data-feather="log-out"></span> Odebrany
+                                        </a>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
 </div>
+    {% else %}
+        <div class="container text-center pt-4">
+            <div><span data-feather="eye-off"></span></div>
+            <p>Brak rowerów na serwisie!</p>
+        </div>
+    {%  endif %}
+<script>
+    function allowDrop(ev) {
+      ev.preventDefault();
+      ev.stopPropagation();
+    }
+
+    function update_deal_stage(leadId, leadStageId) {
+
+        $('.ajax_indicator')
+            .css('display', 'block')
+            .text('przetwarzam')
+            .removeClass('zrobione')
+            .addClass('przetwarzam');
+
+        $.ajax({
+            type: "POST",
+            url: "/leads/update_stage/" + leadId + "/" + leadStageId,
+            contentType: 'application/json',
+            dataType: 'json',
+            success: function(data) {
+                $('.ajax_indicator')
+                    .html("<span data-feather='check'></span> " + data.message)
+                    .removeClass('przetwarzam')
+                    .addClass('zrobione')
+                    .fadeOut(2000);
+
+            },
+        });
+    }
+
+    function drop(ev) {
+      ev.preventDefault();
+      var data = ev.dataTransfer.getData("text");
+      var node = document.getElementById(data);
+      var first_node = ev.currentTarget.children[1];
+      if (node.parentNode.id !== ev.currentTarget.id) {
+        ev.currentTarget.insertBefore(node, first_node);
+        update_deal_stage(node.dataset.dealid, ev.currentTarget.dataset.dropstage);
+      }
+      node.style.transform = 'rotate(0deg)';
+    }
+
+    function dragStart(ev) {
+      ev.dataTransfer.effectAllowed = "move";
+      ev.dataTransfer.setData("text/plain", ev.target.id);
+      ev.currentTarget.style.transform = 'rotate(3deg)';
+    }
+</script>
     {% endblock %}

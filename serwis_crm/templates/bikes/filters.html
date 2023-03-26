@@ -4,18 +4,18 @@
         <div class="mb-2"><strong>Filtry</strong></div>
         <div class="btn-toolbar mb-2 mb-md-0">
             <div class="col-md-3 pl-0">
-                {{ filters.txt_search(class="form-control from-control-lg", placeholder="search contacts ...") }}
+                {{ filters.txt_search(class="form-control from-control-lg", placeholder="search deals ...") }}
             </div>
             <div class="col-md-3 pl-0">
                 <div class="form-group text-left">
-                     {{ filters.advanced_user(class="my-select form-control") }}
+                    {{ filters.contacts(class="my-select form-control") }}
                 </div>
             </div>
         </div>
         <div class="btn-toolbar mb-1 mb-md-0">
             <div class="col-md-3 pl-0">
                 {{ filters.submit(class="btn btn-md btn-outline-info mr-2") }}
-                <a href="{{ url_for('contacts.reset_filters') }}" class="btn btn-md btn-outline-secondary" role="button">
+                <a href="{{ url_for('bikes.reset_filters') }}" class="btn btn-md btn-outline-secondary" role="button">
                     <span data-feather="x-circle"></span>
                 </a>
             </div>

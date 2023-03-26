@@ -15,8 +15,7 @@ from serwis_crm.users.utils import upload_avatar
 from serwis_crm.rbac import check_access
 
 contacts = Blueprint('contacts', __name__)
-
-
+    
 def set_filters(f_id, module):
     today = date.today()
     filter_d = True
@@ -79,49 +78,20 @@ def get_contacts_view():
         .filter(advanced_filters) \
         .order_by(Contact.date_created.desc())
 
-    return render_template("contacts/contacts_list.html", title="Contacts View",
+    return render_template("contacts/contacts_list.html", title="Przegląd klientów",
                            contacts=Paginate(query=query), filters=filters)
 
-
-@contacts.route("/contacts/new", methods=['GET', 'POST'])
+@contacts.route("/contact/new", methods=['GET', 'POST'])
 @login_required
-@check_access('contacts', 'create')
-def new_contact():
-    form = NewContact()
-    if request.method == 'POST':
-        if form.is_submitted() and form.validate():
-            contact = Contact(first_name=form.first_name.data,
-                              last_name=form.last_name.data,
-                              email=form.email.data,
-                              phone=form.phone.data,
-                              mobile=form.mobile.data,
-                              address_line=form.address_line.data,
-                              addr_state=form.addr_state.data,
-                              addr_city=form.addr_city.data,
-                              post_code=form.post_code.data,
-                              country=form.country.data,
-                              notes=form.notes.data)
-
-
-            if form.avatar.data:
-                picture_file = upload_avatar(contact, form.avatar.data)
-                contact.avatar = picture_file
-
-            if current_user.is_admin:
-                contact.contact_owner = form.assignees.data
-            else:
-                contact.contact_owner = current_user
-
-            db.session.add(contact)
-            db.session.commit()
-            flash('Contact has been successfully created!', 'success')
-            return redirect(url_for('contacts.get_contacts_view'))
-        else:
-            print(form.errors)
-
-            flash('Your form has errors! Please check the fields', 'danger')
-    return render_template("contacts/new_contact.html", title="New Contact", form=form)
-
+@check_access('contact', 'create')
+def new_contact(first_name, last_name, phone, current_user):
+    contact = Contact(first_name=first_name,
+            last_name=last_name,
+            phone=phone)
+    contact.owner_id = current_user
+    db.session.add(contact)
+    db.session.commit()
+    return contact
 
 @contacts.route("/contacts/edit/<int:contact_id>", methods=['GET', 'POST'])
 @login_required
@@ -136,18 +106,10 @@ def update_contact(contact_id):
         if form.is_submitted() and form.validate():
             contact.first_name = form.first_name.data
             contact.last_name = form.last_name.data
-            contact.email = form.email.data
             contact.phone = form.phone.data
-            contact.mobile = form.mobile.data
-            contact.address_line = form.address_line.data
-            contact.addr_state = form.addr_state.data
-            contact.addr_city = form.addr_city.data
-            contact.post_code = form.post_code.data
-            contact.country = form.country.data
-            contact.contact_owner = form.assignees.data
             contact.notes = form.notes.data
             db.session.commit()
-            flash('The contact has been successfully updated', 'success')
+            flash('Klient zaktualizowany!', 'success')
             return redirect(url_for('contacts.get_contact_view', contact_id=contact.id))
         else:
             print(form.errors)
@@ -155,18 +117,11 @@ def update_contact(contact_id):
     elif request.method == 'GET':
         form.first_name.data = contact.first_name
         form.last_name.data = contact.last_name
-        form.email.data = contact.email
         form.phone.data = contact.phone
-        form.mobile.data = contact.mobile
-        form.address_line.data = contact.address_line
-        form.addr_state.data = contact.addr_state
-        form.addr_city.data = contact.addr_city
-        form.post_code.data = contact.post_code
-        form.country.data = contact.country
         form.assignees.data = contact.contact_owner
         form.notes.data = contact.notes
-        form.submit.label = Label('update_contact', 'Update Contact')
-    return render_template("contacts/new_contact.html", title="Update Contact", form=form)
+        form.submit.label = Label('update_contact', 'Aktualizuj klienta')
+    return render_template("contacts/new_contact.html", title="AKtualizuj klienta", form=form)
 
 
 @contacts.route("/contacts/<int:contact_id>")
@@ -174,7 +129,7 @@ def update_contact(contact_id):
 @check_access('contacts', 'view')
 def get_contact_view(contact_id):
     contact = Contact.query.filter_by(id=contact_id).first()
-    return render_template("contacts/contact_view.html", title="View Contact", contact=contact)
+    return render_template("contacts/contact_view.html", title="Przegląd klienta", contact=contact)
 
 
 @contacts.route("/contacts/del/<int:contact_id>")

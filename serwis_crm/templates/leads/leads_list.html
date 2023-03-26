@@ -9,30 +9,29 @@
               <button class="btn btn-sm btn-outline-primary mr-2 dropdown-toggle bulk_assign disabled"
                       type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
                       aria-expanded="false">
-                  <span data-feather="settings"></span> Bulk Actions
+                  <span data-feather="settings"></span> Zbiorowa akcja ( ͡° ͜ʖ ͡°)
               </button>
               <div class="dropdown-menu dd-sm" aria-labelledby="dropdownMenuButton">
                   {% if current_user.is_admin %}
-                <a class="dropdown-item " href="#" data-toggle="modal" data-target="#leadOwnerAssignModal">Assign Owner</a>
-                  <a class="dropdown-item" href="#" data-toggle="modal" data-target="#leadSourceAssignModal">Assign Source</a>
-                  <a class="dropdown-item" href="#" data-toggle="modal" data-target="#leadStatusAssignModal">Assign Status</a>
+                <a class="dropdown-item " href="#" data-toggle="modal" data-target="#leadOwnerAssignModal">Przypisz serwisanta</a>
+                  <a class="dropdown-item" href="#" data-toggle="modal" data-target="#leadStatusAssignModal">Przypisz status</a>
                     <div class="dropdown-divider"></div>
                   <a class="dropdown-item" data-toggle="modal" data-target="#leadsDeleteModal" href="#">Delete</a>
                   <div class="dropdown-divider"></div>
                   {% endif %}
-                <a class="dropdown-item" id="export_leads_to_csv" href="#">Export to CSV</a>
+                <a class="dropdown-item" id="export_leads_to_csv" href="#">Export do CSV</a>
               </div>
             </div>
 
             {% if current_user.is_admin %}
             <a class="btn btn-sm btn-outline-secondary mr-2" role="button" href="{{ url_for('leads.import_bulk_leads') }}">
                 <span data-feather="upload"></span>
-                  import leads ...
+                  Importuj ...
             </a>
             {% endif %}
             <a class="btn btn btn-sm btn-outline-primary" role="button" href="{{ url_for('leads.new_lead') }}">
                 <span data-feather="plus"></span>
-                  New
+                  Nowe zlecenie serwisowe
             </a>
         </div>
     </div>
@@ -46,17 +45,15 @@
                       <input type="checkbox" id="select_all" value="all" />
                   </th>
                     <th width="150"></th>
-                    <th width="300" scope="col">Title</th>
-                  <th width="150" scope="col">First Name</th>
-                  <th width="150" scope="col">Last Name</th>
-                  <th width="300" scope="col">Email</th>
-                    <th width="250" scope="col">Company Name</th>
-                     <th width="150" scope="col">Phone</th>
-                     <th width="150" scope="col">Mobile</th>
-                    <th width="250" scope="col">Owner</th>
-                    <th width="200" scope="col">Lead Source</th>
-                     <th width="200" scope="col">Lead Status</th>
-                    <th width="200" scope="col">Date Created</th>
+                    <th width="250" scope="col">Nazwa</th>
+                  <th width="150" scope="col">Imię</th>
+                  <th width="150" scope="col">Nazwisko</th>
+                     <th width="150" scope="col">Telefon</th>
+                     <th width="150" scope="col">Marka roweru</th>
+                     <th width="150" scope="col">Model roweru</th>
+                    <th width="250" scope="col">Serwisant</th>
+                     <th width="200" scope="col">Status</th>
+                    <th width="200" scope="col">Data utworzenia</th>
                 </tr>
               </thead>
               <tbody>
@@ -85,13 +82,11 @@
                     <td>{{ lead.title }}</td>
                   <td>{{ lead.first_name }}</td>
                   <td>{{ lead.last_name }}</td>
-                    <td>{{ lead.email }}</td>
-                    <td>{{ lead.company_name }}</td>
-                    <td>{{ lead.phone }}</td>
-                    <td>{{ lead.mobile }}</td>
-                    <td>{% with owner=lead.owner %}{% include 'common/owner_cell.html' %}{% endwith %}</td>
-                    <td>{{ lead.source.source_name }}</td>
-                    <td>{{ lead.status.status_name }}</td>
+                  <td>{{ lead.phone }}</td>
+                  <td>{{ lead.manufacturer }}</td>
+                  <td>{{ lead.model }}</td>
+                    <td>{% with owner=lead.User %}{% include 'common/owner_cell.html' %}{% endwith %}</td>
+                    <td>{{ lead.status_name }}</td>
                     <td>{{ lead.date_created.strftime('%Y-%m-%d') if lead.date_created }}</td>
                 </tr>
                 {% endfor %}
@@ -108,7 +103,7 @@
     {% else %}
         <div class="container text-center pt-4">
             <div><span data-feather="eye-off"></span></div>
-            <p>No leads found. Please create your first lead.</p>
+            <p>Brak zleceń. Prosze utworzyć nowe zlecenie serwisowe.</p>
         </div>
     {%  endif %}
 <script>
@@ -167,9 +162,6 @@
 
 <!-- Lead Owner Assign Modal -->
 {% include "leads/bulk_owner_assign_modal.html" %}
-
-<!-- Lead Source Assign Modal -->
-{% include "leads/bulk_lead_source_assign_modal.html" %}
 
 <!-- Lead Status Assign Modal -->
 {% include "leads/bulk_lead_status_assign_modal.html" %}

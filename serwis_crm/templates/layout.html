@@ -6,7 +6,7 @@
     <meta name="description" content="CRM">
     <meta name="author" content="Jagjot Singh">
     <meta name="generator" content="Jekyll v3.8.5">
-    <title>serwis_crm - Open Source CRM Application</title>
+    <title>serwis_crm - Strona zarządzania serwisem Craft Bike</title>
 
     <!-- Bootstrap core CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet"
@@ -21,7 +21,12 @@
       integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
       crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
-
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
+    <script type="text/javascript" src="http://code.jquery.com/jquery-latest.js"></script>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.5/index.global.min.js'></script>
     <style>
       .bd-placeholder-img {
         font-size: 1.125rem;
@@ -54,7 +59,7 @@
       <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search">
       <ul class="navbar-nav px-3">
         <li class="nav-item text-nowrap">
-          <a class="nav-link" href="{{ url_for('users.logout') }}"><i data-feather="log-out"></i> Sign out</a>
+          <a class="nav-link" href="{{ url_for('users.logout') }}"><i data-feather="log-out"></i> Wyloguj</a>
         </li>
       </ul>
     </nav>
@@ -72,20 +77,20 @@
           </li>
           <li class="nav-item">
             <a class="{{ 'nav-link active' if active_page == 'leads' else 'nav-link' }}" href="{{ url_for('leads.get_leads_view') }}">
-              <span data-feather="file"></span>
-              Leads
+              <span data-feather="tool"></span>
+              Zlecenia serwisowe
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('contacts.get_contacts_view') }}">
+            <a class="{{ 'nav-link active' if active_page == 'contacts' else 'nav-link' }}" href="{{ url_for('contacts.get_contacts_view') }}">
               <span data-feather="users"></span>
-              Contacts
+              Klienci
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('deals.get_deals_view') }}">
+            <a class="nav-link" href="{{ url_for('bikes.get_bikes_view') }}">
               <span data-feather="dollar-sign"></span>
-              Deals
+              Rowery
             </a>
           </li>
           <li class="nav-item">

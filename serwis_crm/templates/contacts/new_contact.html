@@ -1,4 +1,5 @@
 {% extends "layout.html" %}
+{% set active_page = "contacts" %}
     {% block content %}
 <form class="form-new-account" method="POST">
     {{ form.hidden_tag() }} <!-- security 'csrf' token -->
@@ -18,7 +19,16 @@
             <div class="form-row mb-3">
                 <div class="col">
                     {{ form.first_name.label(class="form-control-label") }}
-                    {{ form.first_name(class="form-control from-control-lg", placeholder="first name ...") }}
+                    {% if form.first_name.errors %}
+                    {{ form.first_name(class="form-control form-control-lg required is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.first_name.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                        {{ form.first_name(class="form-control required from-control-lg", placeholder="Imię ...") }}
+                    {% endif %}
                 </div>
                 <div class="col">
                     {{ form.last_name.label(class="form-control-label") }}
@@ -30,58 +40,15 @@
                         {% endfor %}
                     </div>
                     {% else %}
-                        {{ form.last_name(class="form-control required from-control-lg", placeholder="last name ...") }}
+                        {{ form.last_name(class="form-control required from-control-lg", placeholder="Nazwisko ...") }}
                     {% endif %}
                 </div>
             </div>
 
             <div class="form-row mb-3">
                 <div class="col">
-                    {{ form.email.label(class="form-control-label") }}
-                  {% if form.email.errors %}
-                    {{ form.email(class="form-control form-control-lg is-invalid") }}
-                    <div class="invalid-feedback">
-                        {% for error in form.email.errors %}
-                            <span>{{ error }}</span>
-                        {% endfor %}
-                    </div>
-                  {% else %}
-                    {{ form.email(class="form-control from-control-lg", placeholder="email address ...") }}
-                  {% endif %}
-                </div>
-                <div class="col">
                     {{ form.phone.label(class="form-control-label") }}
                     {{ form.phone(class="form-control from-control-lg", placeholder="(555) 555-1234") }}
-                </div>
-            </div>
-
-            <div class="form-row">
-                 <div class="form-group col-6">
-                    {{ form.mobile.label(class="form-control-label") }}
-                    {{ form.mobile(class="form-control from-control-lg", placeholder="+91-9827666622") }}
-                 </div>
-            </div>
-
-            <div class="form-row">
-                <div class="form-group col-9">
-                    {{ form.address_line.label(class="form-control-label") }}
-                    {{ form.address_line(class="form-control from-control-lg", placeholder="address line ...") }}
-                </div>
-            </div>
-            <div class="form-row mb-4">
-                <div class="col-3">
-                        {{ form.addr_state(class="form-control from-control-lg", placeholder="state ...") }}
-                    </div>
-                    <div class="col-3">
-                        {{ form.addr_city(class="form-control from-control-lg", placeholder="city ...") }}
-                    </div>
-                    <div class="col-3">
-                        {{ form.post_code(class="form-control from-control-lg", placeholder="postcode ...") }}
-                    </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group col-6">
-                    {{ form.country(class="form-control from-control-lg", placeholder="country ...") }}
                 </div>
             </div>
 

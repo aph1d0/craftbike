@@ -4,21 +4,21 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="leadDeleteModalLabel_{{ lead_id }}">Delete Lead</h5>
+                <h5 class="modal-title" id="leadDeleteModalLabel_{{ lead_id }}">Usuń zlecenie serwisowe</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
                 <div class="alert alert-warning" role="alert">
-                  <h5 class="alert-heading">Are you sure?</h5>
-                    <p>Please note that once deleted this lead cannot be recovered</p>
+                  <h5 class="alert-heading">Jesteś pewny?</h5>
+                    <p>Usunięte zlecenie nie może zostać przywrócone</p>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary mr-2" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary mr-2" data-dismiss="modal">Zamknij</button>
                 <a class="btn btn-primary"
-                   href="{{ url_for('leads.delete_lead', lead_id=lead_id) }}">Delete Lead</a>
+                   href="{{ url_for('leads.delete_lead', lead_id=lead_id) }}">Usuń zlecenie serwisowe</a>
             </div>
         </div>
     </div>

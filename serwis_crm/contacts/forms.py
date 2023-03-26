@@ -9,41 +9,31 @@ from serwis_crm.users.models import User
 
 
 class NewContact(FlaskForm):
-    first_name = StringField('First Name')
-    last_name = StringField('First Name', validators=[DataRequired(message='Last name is mandatory')])
-    email = StringField('Email',
-                        validators=[DataRequired(message='Email address is mandatory'),
-                                    Email(message='Please enter a valid email address e.g. abc@yourcompany.com')])
-    phone = StringField('Phone')
-    mobile = StringField('Mobile')
-    avatar = FileField('Contact Avatar', validators=[FileAllowed(['jpg', 'jpeg', 'png'])])
-    address_line = StringField('Address')
-    addr_state = StringField('State')
-    addr_city = StringField('City')
-    post_code = StringField('Postcode')
-    country = StringField('Country')
-    notes = StringField('Notes', widget=TextArea())
-    assignees = QuerySelectField('Assign To', query_factory=User.user_list_query, get_pk=lambda a: a.id,
+    first_name = StringField('Imię')
+    last_name = StringField('Nazwisko')
+    phone = StringField('Telefon')
+    notes = StringField('Notatki', widget=TextArea())
+    assignees = QuerySelectField('Przypisz do', query_factory=User.user_list_query, get_pk=lambda a: a.id,
                                  get_label=User.get_label, default=User.get_current_user)
-    submit = SubmitField('Create New Contact')
+    submit = SubmitField('Stwórz klienta')
 
 
 def filter_contacts_adv_filters_query():
     return [
-        {'id': 1, 'title': 'Created Today'},
-        {'id': 2, 'title': 'Created Yesterday'},
-        {'id': 3, 'title': 'Created In Last 7 Days'},
-        {'id': 4, 'title': 'Created In Last 30 Days'}
+        {'id': 1, 'title': 'Stworzone dzisiaj'},
+        {'id': 2, 'title': 'Stworzone wczoraj'},
+        {'id': 3, 'title': 'Stworzone w ostatnich 7 dniach'},
+        {'id': 4, 'title': 'Stworzone w ostatnich 30 dniach'}
     ]
 
 
 class FilterContacts(FlaskForm):
     txt_search = StringField()
     assignees = QuerySelectField(query_factory=User.user_list_query, get_pk=lambda a: a.id,
-                                 get_label=User.get_label, allow_blank=True, blank_text='[-- Select Owner --]')
+                                 get_label=User.get_label, allow_blank=True, blank_text='[-- Wybierz serwisanta --]')
     advanced_user = QuerySelectField(query_factory=filter_contacts_adv_filters_query,
                                      get_pk=lambda a: a['id'],
                                      get_label=lambda a: a['title'],
-                                     allow_blank=True, blank_text='[-- advanced filter --]')
+                                     allow_blank=True, blank_text='[-- filtr zaawansowany --]')
 
-    submit = SubmitField('Filter Contacts')
+    submit = SubmitField('Filtruj klientów')

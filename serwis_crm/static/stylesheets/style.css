@@ -169,16 +169,15 @@ body {
 
 .kanban-container {
     display: flex;
-    justify-content: flex-start;
+    justify-content: space-between;
     flex-wrap: nowrap;
     min-height: 550px;
     overflow-x: auto;
 }
 
 .kanban-container > .card.outer-card {
+    flex: 1;
     border-top: 3px solid #e2e2e2;
-    min-width: 18em;
-    max-width: 18em;
     margin-right: 15px;
 }
 

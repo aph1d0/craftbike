@@ -1,7 +1,9 @@
 from datetime import datetime
 from serwis_crm import db
-from flask import request
+from flask import Blueprint, request
 from flask_login import current_user
+from serwis_crm.bikes.models import Bike
+
 
 
 class Contact(db.Model):
@@ -9,23 +11,12 @@ class Contact(db.Model):
     id = db.Column(db.Integer, db.Sequence('contact_id_seq'), primary_key=True)
     first_name = db.Column(db.String(20))
     last_name = db.Column(db.String(20), nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    avatar = db.Column(db.String(25))
-    phone = db.Column(db.String(20), nullable=False)
-    mobile = db.Column(db.String(20))
-    address_line = db.Column(db.String(40))
-    addr_state = db.Column(db.String(40))
-    addr_city = db.Column(db.String(40))
-    post_code = db.Column(db.String(20))
-    country = db.Column(db.String(40))
-    notes = db.Column(db.String(200))
+    phone = db.Column(db.String(30), nullable=False)
     owner_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='SET NULL'), nullable=True)
-    deals = db.relationship(
-        'Deal',
-        backref='contact',
-        lazy=True
-    )
+    notes = db.Column(db.String(300), nullable=True)
+    #bikes = db.relationship(Bike, backref='contact')
     date_created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    leads = db.relationship('LeadMain', backref='lead_contact', lazy=True)
 
     @staticmethod
     def contact_list_query():

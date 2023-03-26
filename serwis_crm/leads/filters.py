@@ -3,22 +3,22 @@ from flask_login import current_user
 from .forms import filter_leads_adv_filters_admin_query, filter_leads_adv_filters_user_query
 from datetime import date, timedelta
 from sqlalchemy import text
-from .models import LeadMain, LeadSource, LeadStatus
+from .models import LeadMain, LeadStatus
 
 
 def set_filters(f_id):
     today = date.today()
     filter_d = True
     if f_id == 1:
-        filter_d = text('Lead.owner_id IS NULL')
+        filter_d = text('lead_main.owner_id IS NULL')
     elif f_id == 2:
-        filter_d = text("date(Lead.date_created)='%s'" % today)
+        filter_d = text("date(lead_main.date_created)='%s'" % today)
     elif f_id == 3:
-        filter_d = text("date(Lead.date_created)='%s'" % (today - timedelta(1)))
+        filter_d = text("date(lead_main.date_created)='%s'" % (today - timedelta(1)))
     elif f_id == 4:
-        filter_d = text("date(Lead.date_created) > current_date - interval '7' day")
+        filter_d = text("date(lead_main.date_created) > current_date - interval '7' day")
     elif f_id == 5:
-        filter_d = text("date(Lead.date_created) > current_date - interval '30' day")
+        filter_d = text("date(lead_main.date_created) > current_date - interval '30' day")
     return filter_d
 
 
@@ -48,22 +48,6 @@ def set_date_filters(filters, key):
             else:
                 filters.advanced_user.data = filter_leads_adv_filters_user_query()[session[key] - 1]
     return filter_d
-
-
-def set_source(filters, key):
-    lead_sources_list = True
-    if request.method == 'POST':
-        if filters.lead_source.data:
-            sources_list = tuple(map(lambda a: a.id, filters.lead_source.data))
-            lead_sources_list = LeadMain.lead_source_id.in_(sources_list)
-            session[key] = sources_list
-        else:
-            session.pop(key, None)
-    else:
-        if key in session:
-            lead_sources_list = LeadMain.lead_source_id.in_(session[key])
-            filters.lead_source.data = list(map(lambda a: LeadSource.get_by_id(a), session[key]))
-    return lead_sources_list
 
 
 def set_status(filters, key):
