@@ -1,63 +1,85 @@
-{% extends "layout.html" %}
-{% set active_page = "leads" %}
-    {% block content %}
-    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-        <h2 class="h4">{% if title %}{{title}}{% else %}No Title{% endif %}</h2>
-        <div class="btn-toolbar mb-2 mb-md-0">
-            <a href="{{ url_for('leads.update_lead', lead_id=lead.id) }}"
-               class="btn btn-md btn-outline-primary mr-2" role="button">
-                <span data-feather="edit-2"></span>
-                  Edytuj
-            </a>
-            <a href="{{ url_for('leads.get_leads_view') }}" class="btn btn-md btn-outline-secondary" role="button">
-                <span data-feather="arrow-left"></span>
-                  Powrót do listy
-            </a>
+{% extends "layout.html" %} {% set active_page = "leads" %} {% block content %}
+<div
+  class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"
+>
+  <h2 class="h4">{% if title %}{{title}}{% else %}No Title{% endif %}</h2>
+  <div class="btn-toolbar mb-2 mb-md-0">
+    <a
+      href="{{ url_for('leads.update_lead', lead_id=lead.id) }}"
+      class="btn btn-md btn-outline-primary mr-2"
+      role="button"
+    >
+      <span data-feather="edit-2"></span>
+      Edytuj
+    </a>
+    <a
+      href="{{ url_for('leads.get_leads_view') }}"
+      class="btn btn-md btn-outline-secondary"
+      role="button"
+    >
+      <span data-feather="arrow-left"></span>
+      Powrót do listy
+    </a>
+  </div>
+</div>
+<div class="row">
+  <div class="col-5">
+    <ul class="list-group list-group-flush">
+      <li class="list-group-item g_field">
+        <div class="label">Nazwa</div>
+        <div class="text">{{ lead.title if lead.title else '_' }}</div>
+      </li>
+      <li class="list-group-item g_field">
+        <div class="label">Imię i Nazwisko</div>
+        <div class="text">
+          {{ contact.first_name if contact.first_name else '_' }} {{
+          contact.last_name if contact.last_name else '_' }}
         </div>
-    </div>
-    <div class="row">
-        <div class="col-5">
-            <ul class="list-group list-group-flush">
-                <li class="list-group-item g_field">
-                  <div class="label">Nazwa</div>
-                  <div class="text">{{ lead.title if lead.title else '_' }}</div>
-              </li>
-              <li class="list-group-item g_field">
-                  <div class="label">Imię i Nazwisko</div>
-                  <div class="text">{{ contact.first_name if contact.first_name else '_' }} {{ contact.last_name if contact.last_name else '_' }}</div>
-              </li>
-              <li class="list-group-item g_field">
-                <div class="label">Rower</div>
-                <div class="text">{{ bike.manufacturer if bike.manufacturer else '_' }} {{ bike.model if bike.model else '_' }}</div>
-                </li>
-                <li class="list-group-item g_field">
-                  <div class="label">Status</div>
-                  <div class="text">{{ lead.status.status_name if lead.status else '_' }}</div>
-              </li>
-                <li class="list-group-item g_field">
-                  <div class="label">Przyjmujący</div>
-                    {% if lead.owner %}
-                    <div class="text">
-                        <div class="mt-1">
-                            {% with owner=lead.owner %}{% include 'common/owner_cell.html' %}{% endwith %}
-                        </div>
-                    </div>
-                    {% else %}
-                        <div class="text">_</div>
-                    {% endif %}
-              </li>
-            </ul>
+      </li>
+      <li class="list-group-item g_field">
+        <div class="label">Rower</div>
+        <div class="text">
+          {{ bike.manufacturer if bike.manufacturer else '_' }} {{ bike.model if
+          bike.model else '_' }}
         </div>
-    </div>
-    <div class="row">
-        <div class="col-10">
-            <div></div>
-            <ul class="list-group list-group-flush">
-                <li class="list-group-item g_field col-12">
-                    <div class="label">Notatki</div>
-                    <div class="text">{{ lead.notes if lead.notes else '_' }}</div>
-                </li>
-            </ul>
+      </li>
+      <li class="list-group-item g_field">
+        <div class="label">Status</div>
+        <div class="text">
+          {{ lead.status.status_name if lead.status else '_' }}
         </div>
-    </div>
-    {% endblock %}
+      </li>
+      <li class="list-group-item g_field">
+        <div class="label">Data wizyty</div>
+        <div class="text">
+          {{ lead.date_scheduled if lead.date_scheduled else '_' }}
+        </div>
+      </li>
+      <li class="list-group-item g_field">
+        <div class="label">Przyjmujący</div>
+        {% if lead.owner %}
+        <div class="text">
+          <div class="mt-1">
+            {% with owner=lead.owner %}{% include 'common/owner_cell.html' %}{%
+            endwith %}
+          </div>
+        </div>
+        {% else %}
+        <div class="text">_</div>
+        {% endif %}
+      </li>
+    </ul>
+  </div>
+</div>
+<div class="row">
+  <div class="col-10">
+    <div></div>
+    <ul class="list-group list-group-flush">
+      <li class="list-group-item g_field col-12">
+        <div class="label">Notatki</div>
+        <div class="text">{{ lead.notes if lead.notes else '_' }}</div>
+      </li>
+    </ul>
+  </div>
+</div>
+{% endblock %}

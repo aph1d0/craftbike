@@ -179,6 +179,7 @@ body {
     flex: 1;
     border-top: 3px solid #e2e2e2;
     margin-right: 15px;
+    position: relative;
 }
 
 .kanban-container .card.outer-card:hover {
@@ -214,6 +215,7 @@ body {
 
 .kanban-container .card.inner-card {
     position: relative;
+    z-index: 1;
 }
 
 .kanban-container .card.inner-card > .card-overlay {
@@ -235,14 +237,20 @@ body {
 }
 
 .card-actions {
-    display: flex;
+    display: 1;
     margin-top: 20px;
     justify-content: center;
     align-items: center;
 }
 
 .card-actions .ca_item {
-    flex: 1;
+    flex: content;
+}
+
+.btn.btn-sm.btn-outline-secondary {
+  width: 100%; /* sets the width to 100% of the container */
+  max-width: 300px; /* sets the maximum width to 300 pixels */
+  height: auto; /* allows the height to adjust proportionally to the width */
 }
 
 .ajax_indicator {

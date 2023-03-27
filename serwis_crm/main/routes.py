@@ -1,28 +1,57 @@
 from datetime import date
-from flask import render_template, flash, url_for, redirect, Blueprint, current_app
+from flask import render_template, flash, session, url_for, redirect, Blueprint, current_app
 from serwis_crm import db
 from flask_login import login_required
 from configparser import ConfigParser
 from sqlalchemy import or_
+from serwis_crm.common.filters import CommonFilters
+from serwis_crm.leads.filters import set_date_filters
+from serwis_crm.leads.forms import FilterLeads
 from serwis_crm.leads.models import LeadMain, LeadStatus
 
 parser = ConfigParser()
 
 main = Blueprint('main', __name__)
 
+def reset_main_filters():
+    if 'lead_owner' in session:
+        session.pop('lead_owner', None)
+    if 'lead_search' in session:
+        session.pop('lead_search', None)
+    if 'lead_date_created' in session:
+        session.pop('lead_date_created', None)
+    if 'lead_contact' in session:
+        session.pop('lead_contact', None)
 
 @main.route("/")
-@main.route("/home")
+@main.route("/home", methods=['GET', 'POST'])
 @login_required
 def home():
+    filters = FilterLeads()
+    search = CommonFilters.set_search(filters, 'lead_search')
+    owner = CommonFilters.set_owner(filters, 'lead_main', 'lead_owner')
+    contact = CommonFilters.set_contacts(filters, 'lead_main', 'lead_contact')
+    advanced_filters = set_date_filters(filters, 'lead_date_created')
     good_leads = []
     statuses = LeadStatus.query.filter(LeadStatus.status_name != "Odebrany").all()
-    leads = LeadMain.query.all()
+    leads = LeadMain.query \
+        .filter(or_(
+            LeadMain.title.ilike(f'%{search}'),
+        ) if search else True) \
+        .filter(contact) \
+        .filter(owner) \
+        .filter(advanced_filters) \
+    .all()
     for lead in leads:
         if lead.status.status_name != "Odebrany" and lead.date_scheduled.date() <= date.today():
             good_leads.append(lead)
-    return render_template("index.html", title="Dashboard", leads=good_leads, lead_statuses=statuses)
+    return render_template("index.html", title="Dashboard", leads=good_leads, lead_statuses=statuses, filters=filters)
 
+@main.route("/home/reset_filters")
+@login_required
+def reset_filters():
+    reset_main_filters()
+    return redirect(url_for('main.home'))
 
 @main.route("/create_db")
 def create_db():

@@ -1,4 +1,5 @@
 from datetime import date
+import datetime
 import pandas as pd
 import requests
 from sqlalchemy import Date, cast, or_
@@ -76,6 +77,7 @@ def update_stage(lead_id, lead_stage_id):
     lead.lead_status_id = lead_stage_id
     db.session.add(lead)
     db.session.commit()
+    
     return redirect(url_for('main.home'))
 
 @leads.route('/leads/new/_autoset_title', methods=['POST'])
@@ -124,6 +126,8 @@ def new_lead():
                         status=form.lead_status.data, notes=form.notes.data)
             if form.lead_status.data.status_name == 'Umówiony na serwis':
                 lead.date_scheduled = form.date_scheduled.data
+            else:
+                lead.date_scheduled = datetime.datetime.now().strftime('%Y-%m-%d')
                 
             if current_user.is_admin:
                 lead.owner = form.assignees.data

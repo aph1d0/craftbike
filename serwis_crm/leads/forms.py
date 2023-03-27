@@ -65,6 +65,8 @@ class FilterLeads(FlaskForm):
                                     get_label='status_name', allow_blank=False)
     assignees = QuerySelectField(query_factory=User.user_list_query, get_pk=lambda a: a.id,
                                  get_label=User.get_label, allow_blank=True, blank_text='[-- Wybierz serwisanta --]')
+    contacts = QuerySelectField(query_factory=Contact.contact_list_query, get_pk=lambda a: a.id,
+                                 get_label=Contact.get_label, allow_blank=True, blank_text='[-- Wybierz klienta --]')
     advanced_admin = QuerySelectField(query_factory=filter_leads_adv_filters_admin_query,
                                 get_pk=lambda a: a['id'],
                                 get_label=lambda a: a['title'],

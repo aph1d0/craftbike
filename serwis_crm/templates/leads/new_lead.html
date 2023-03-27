@@ -1,196 +1,198 @@
-{% extends "layout.html" %}
-{% set active_page = "leads" %}
-    {% block content %}
+{% extends "layout.html" %} {% set active_page = "leads" %} {% block content %}
 
 <form class="form-new-lead" method="POST">
-    {{ form.hidden_tag() }} <!-- security 'csrf' token -->
-    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-        <h2 class="h4">{% if title %}{{title}}{% else %}No Title{% endif %}</h2>
-        <div class="btn-toolbar mb-2 mb-md-0">
-            {{ form.submit(class="btn btn-md btn-outline-info mr-2") }}
-            <input type="reset" class="btn btn-md btn-outline-secondary mr-2" />
-            <a href="{{ url_for('leads.get_leads_view') }}" class="btn btn-md btn-outline-secondary" role="button">
-                <span data-feather="arrow-left"></span>
-                  Powrót do listy zleceń
-            </a>
+  {{ form.hidden_tag() }}
+  <!-- security 'csrf' token -->
+  <div
+    class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"
+  >
+    <h2 class="h4">{% if title %}{{title}}{% else %}No Title{% endif %}</h2>
+    <div class="btn-toolbar mb-2 mb-md-0">
+      {{ form.submit(class="btn btn-md btn-outline-info mr-2") }}
+      <input type="reset" class="btn btn-md btn-outline-secondary mr-2" />
+      <a
+        href="{{ url_for('leads.get_leads_view') }}"
+        class="btn btn-md btn-outline-secondary"
+        role="button"
+      >
+        <span data-feather="arrow-left"></span>
+        Powrót do listy zleceń
+      </a>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-9">
+      <div class="form-row mb-3">
+        <div class="col">
+          {{ form.bike_manufacturer.label(class="form-control-label") }} {% if
+          form.bike_manufacturer.errors %} {{
+          form.bike_manufacturer(class="form-control form-control-lg required
+          is-invalid") }}
+          <div class="invalid-feedback">
+            {% for error in form.first_name.errors %}
+            <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+          {% else %} {{ form.bike_manufacturer(class="form-control required
+          from-control-lg", placeholder="Marka roweru ...") }} {% endif %}
         </div>
+        <div class="col">
+          {{ form.bike_model.label(class="form-control-label") }} {% if
+          form.bike_model.errors %} {{ form.bike_model(class="form-control
+          form-control-lg required is-invalid") }}
+          <div class="invalid-feedback">
+            {% for error in form.bike_model.errors %}
+            <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+          {% else %} {{ form.bike_model(class="form-control required
+          from-control-lg", placeholder="Model roweru ...") }} {% endif %}
+        </div>
+      </div>
+      <div class="form-group">
+        {{ form.title.label(class="form-control-label") }} {{
+        form.title(class="form-control from-control-lg") }}
+        <script>
+          $(document).ready(function () {
+            $("#bike_manufacturer, #bike_model").on("input", function () {
+              $.ajax({
+                url: "/leads/new/_autoset_title",
+                data: {
+                  bike_manufacturer: $("#bike_manufacturer").val(),
+                  bike_model: $("#bike_model").val(),
+                },
+                type: "POST",
+                success: function (response) {
+                  $("#title").val(response.new_value);
+                },
+                error: function (error) {
+                  console.log(error);
+                },
+              });
+            });
+          });
+        </script>
+      </div>
+
+      <div class="form-row mb-3">
+        <div class="col">
+          {{ form.first_name.label(class="form-control-label") }} {% if
+          form.first_name.errors %} {{ form.first_name(class="form-control
+          form-control-lg required is-invalid") }}
+          <div class="invalid-feedback">
+            {% for error in form.first_name.errors %}
+            <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+          {% else %} {{ form.first_name(class="form-control required
+          from-control-lg", placeholder="Imię ...") }} {% endif %}
+        </div>
+        <div class="col">
+          {{ form.last_name.label(class="form-control-label") }} {% if
+          form.last_name.errors %} {{ form.last_name(class="form-control
+          form-control-lg required is-invalid") }}
+          <div class="invalid-feedback">
+            {% for error in form.last_name.errors %}
+            <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+          {% else %} {{ form.last_name(class="form-control required
+          from-control-lg", placeholder="Nazwisko ...") }} {% endif %}
+        </div>
+      </div>
+
+      <div class="form-row mb-3">
+        <div class="col">
+          {{ form.phone.label(class="form-control-label") }} {% if
+          form.phone.errors %} {{ form.phone(class="form-control form-control-lg
+          required is-invalid") }}
+          <div class="invalid-feedback">
+            {% for error in form.phone.errors %}
+            <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+          {% else %} {% if not form.phone.data %} {{
+          form.phone(class="form-control required from-control-lg",
+          placeholder="Telefon ...", value="+48") }} {% else %} {{
+          form.phone(class="form-control required from-control-lg",
+          placeholder="Telefon ...") }} {% endif %} {% endif %}
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group col-6">
+          {{ form.lead_status.label(class="form-control-label") }} {{
+          form.lead_status(class="form-control from-control-lg") }}
+        </div>
+        <div class="form-group col-6">
+          {{ form.date_scheduled.label(class="form-control-label") }} {{
+          form.date_scheduled(class="form-control from-control-lg") }}
+        </div>
+        <script>
+          window.handleDropdownChange = function () {
+            var dropdown = document.getElementById("lead_status");
+            var selectedValue = dropdown.options[dropdown.selectedIndex].value;
+            var calendarEl = document.getElementById("calendar");
+            var calendar_row = document.getElementById("calendar_row");
+            var date_scheduled = document.getElementById("date_scheduled");
+            date_scheduled.value = "";
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+              //plugins: [ interactionPlugin, dayGridPlugin ],
+              initialView: "dayGridWeek",
+              locale: "pl",
+              selectable: true,
+              height: 400,
+              select: function (info) {
+                // Get the selected date and format it as yyyy-mm-dd
+                var selectedDate = moment(info.start).format("YYYY-MM-DD");
+
+                // Store the selected date in a hidden input field
+                document.getElementById("date_scheduled").value = selectedDate;
+              },
+              events: {
+                url: "/leads/get_scheduled",
+                method: "GET",
+              },
+            });
+            if (selectedValue === "2") {
+              calendar_row.style.display = "block";
+              calendar.render();
+            } else {
+              if (calendar) {
+                calendar.render();
+                calendar.destroy();
+                calendar_row.style.display = "none";
+              }
+            }
+          };
+        </script>
+        <script>
+          var dropdown = document.getElementById("lead_status");
+          dropdown.addEventListener("change", window.handleDropdownChange);
+        </script>
+      </div>
+      <div class="form-row" id="calendar_row" style="display: none">
+        <div class="col">
+          <label for="calendar">Kalendarz:</label>
+          <div id="calendar"></div>
+          <br />
+        </div>
+      </div>
+
+      {% if current_user.is_admin %}
+      <div class="form-row">
+        <div class="form-group col-6">
+          {{ form.assignees.label(class="form-control-label") }} {{
+          form.assignees(class="form-control from-control-lg") }}
+        </div>
+      </div>
+      {% endif %}
+
+      <div class="form-group">
+        {{ form.notes.label(class="form-control-label") }} {{
+        form.notes(class="form-control from-control-lg") }}
+      </div>
     </div>
-    <div class="row">
-        <div class="col-9">
-            <div class="form-row mb-3">
-                <div class="col">
-                    {{ form.bike_manufacturer.label(class="form-control-label") }}
-                    {% if form.bike_manufacturer.errors %}
-                        {{ form.bike_manufacturer(class="form-control form-control-lg required is-invalid") }}
-                        <div class="invalid-feedback">
-                            {% for error in form.first_name.errors %}
-                                <span>{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                      {% else %}
-                        {{ form.bike_manufacturer(class="form-control required from-control-lg", placeholder="Marka roweru ...") }}
-                      {% endif %}
-                    </div>
-                <div class="col">
-                    {{ form.bike_model.label(class="form-control-label") }}
-                    {% if form.bike_model.errors %}
-                        {{ form.bike_model(class="form-control form-control-lg required is-invalid") }}
-                        <div class="invalid-feedback">
-                            {% for error in form.bike_model.errors %}
-                                <span>{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                      {% else %}
-                        {{ form.bike_model(class="form-control required from-control-lg", placeholder="Model roweru ...") }}
-                      {% endif %}
-                </div>
-            </div>             
-            <div class="form-group">
-                {{ form.title.label(class="form-control-label") }}
-                {{ form.title(class="form-control from-control-lg") }}
-                <script>
-                    $(document).ready(function(){
-                      $('#bike_manufacturer, #bike_model').on('input', function() {
-                        $.ajax({
-                          url: '/leads/new/_autoset_title',
-                          data: {'bike_manufacturer': $('#bike_manufacturer').val(), 'bike_model': $('#bike_model').val()},
-                          type: 'POST',
-                          success: function(response) {
-                            $('#title').val(response.new_value);
-                          },
-                          error: function(error) {
-                            console.log(error);
-                          }
-                        });
-                      });
-                    });
-                  </script>
-            </div>
-
-            <div class="form-row mb-3">
-                <div class="col">
-                    {{ form.first_name.label(class="form-control-label") }}
-                    {% if form.first_name.errors %}
-                        {{ form.first_name(class="form-control form-control-lg required is-invalid") }}
-                        <div class="invalid-feedback">
-                            {% for error in form.first_name.errors %}
-                                <span>{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                      {% else %}
-                        {{ form.first_name(class="form-control required from-control-lg", placeholder="Imię ...") }}
-                      {% endif %}
-                </div>
-                <div class="col">
-                    {{ form.last_name.label(class="form-control-label") }}
-                    {% if form.last_name.errors %}
-                        {{ form.last_name(class="form-control form-control-lg required is-invalid") }}
-                        <div class="invalid-feedback">
-                            {% for error in form.last_name.errors %}
-                                <span>{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                      {% else %}
-                        {{ form.last_name(class="form-control required from-control-lg", placeholder="Nazwisko ...") }}
-                      {% endif %}
-                </div>
-            </div>
-
-            <div class="form-row mb-3">
-                <div class="col">
-                    {{ form.phone.label(class="form-control-label") }}
-                    {% if form.phone.errors %}
-                        {{ form.phone(class="form-control form-control-lg required is-invalid") }}
-                        <div class="invalid-feedback">
-                            {% for error in form.phone.errors %}
-                                <span>{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                      {% else %}
-                        {% if not form.phone.data %}
-                            {{ form.phone(class="form-control required from-control-lg", placeholder="Telefon ...", value="+48") }}
-                        {% else %}
-                            {{ form.phone(class="form-control required from-control-lg", placeholder="Telefon ...") }}
-                        {% endif %}
-                      {% endif %}
-                </div>
-            </div>
-
-            <div class="form-row">
-                <div class="form-group col-6">
-                    {{ form.lead_status.label(class="form-control-label") }}
-                    {{ form.lead_status(class="form-control from-control-lg") }}
-                 </div>
-                 <div class="form-group col-6">
-                  {{ form.date_scheduled.label(class="form-control-label") }}
-                  {{ form.date_scheduled(class="form-control from-control-lg") }}
-                </div>
-                 <script>
-                  window.handleDropdownChange = function () {
-                  var dropdown = document.getElementById("lead_status");
-                  var selectedValue = dropdown.options[dropdown.selectedIndex].value;
-                  var calendarEl = document.getElementById('calendar');
-                  var calendar_row = document.getElementById('calendar_row')
-                  var date_scheduled = document.getElementById('date_scheduled')
-                  date_scheduled.value = ''
-                  var calendar = new FullCalendar.Calendar(calendarEl, {
-                    //plugins: [ interactionPlugin, dayGridPlugin ],
-                    initialView: 'dayGridWeek',
-                    locale: 'pl',
-                    selectable: true,
-                    height: 400,
-                    select: function(info)  {
-                    // Get the selected date and format it as yyyy-mm-dd
-                    var selectedDate = moment(info.start).format('YYYY-MM-DD');
-
-                    // Store the selected date in a hidden input field
-                    document.getElementById('date_scheduled').value = selectedDate;
-                    },
-                    events: {
-                      url: '/leads/get_scheduled',
-                      method: 'GET'
-                    }
-
-                  });
-                  if (selectedValue === "2") {
-                      calendar_row.style.display = "block"
-                      calendar.render();
-                  }
-                  else {
-                    if (calendar){
-                      calendar.render();
-                      calendar.destroy();
-                      calendar_row.style.display = "none"
-                    }
-                  } 
-                }
-                </script>
-                 <script>
-                  var dropdown = document.getElementById("lead_status");
-                  dropdown.addEventListener("change", window.handleDropdownChange);
-                </script>
-            </div>
-            <div class="form-row" id="calendar_row" style="display: none">
-                <div class="col">
-                  <label for="calendar">Kalendarz:</label>
-                    <div id=calendar></div><br>
-                </div>
-            </div>
-
-            {% if current_user.is_admin %}
-            <div class="form-row">
-                 <div class="form-group col-6">
-                     {{ form.assignees.label(class="form-control-label") }}
-                    {{ form.assignees(class="form-control from-control-lg") }}
-                 </div>
-            </div>
-            {% endif %}
-
-            <div class="form-group">
-                {{ form.notes.label(class="form-control-label") }}
-                {{ form.notes(class="form-control from-control-lg") }}
-            </div>
-    </div>
-    </div>
+  </div>
 </form>
-    {% endblock %}
+{% endblock %}
