@@ -1,52 +1,27 @@
 from flask import session, request
+from flask_login import current_user
 from .forms import filter_bikes_adv_filters_query
 from datetime import date, timedelta
 from sqlalchemy import text
 
-
-def set_filters(f_id, module):
+def set_filters(f_id):
     today = date.today()
     filter_d = True
     if f_id == 1:
-        filter_d = text("current_timestamp > Deal.expected_close_date")
+        filter_d = text('bike.contact_id IS NULL')
     elif f_id == 2:
-        filter_d = text("current_timestamp <= Deal.expected_close_date OR "
-                        "Date(Deal.expected_close_date) IS NULL")
+        filter_d = text('bike.manufacturer IS NULL')
     elif f_id == 3:
-        filter_d = text("expected_close_date "
-                        "BETWEEN date_trunc('day', current_timestamp) AND "
-                        "date_trunc('day', current_timestamp) + "
-                        "interval '1 day' - interval '1 second'")
-    elif f_id == 4:
-        filter_d = text("expected_close_date "
-                        "BETWEEN date_trunc('day', current_timestamp) + interval '1 day' AND "
-                        "date_trunc('day', current_timestamp) + interval '7 day' - interval '1 second'")
-    elif f_id == 5:
-        filter_d = text("expected_close_date "
-                        "BETWEEN date_trunc('day', current_timestamp) + interval '1 day' AND "
-                        "date_trunc('day', current_timestamp)"
-                        " + interval '30 day' - interval '1 second'")
-    elif f_id == 6:
-        filter_d = text("date(%s.date_created)='%s'" % (module, today))
-    elif f_id == 7:
-        filter_d = text("date(%s.date_created)='%s'" % (module, (today - timedelta(1))))
-    elif f_id == 8:
-        filter_d = text("date(%s.date_created) > current_date - interval '7' day" % module)
-    elif f_id == 9:
-        filter_d = text("date(%s.date_created) > current_date - interval '30' day" % module)
+        filter_d = text('bike.model IS NULL')
+
     return filter_d
 
-
-def set_date_filters(filters, module, key):
+def assign_filter(filter_obj, key):
     filter_d = True
-    if request.method == 'POST':
-        if filters.advanced_user.data:
-            filter_d = set_filters(filters.advanced_user.data['id'], module)
-            session[key] = filters.advanced_user.data['id']
-        else:
-            session.pop(key, None)
+    if filter_obj.data:
+        filter_d = set_filters(filter_obj.data['id'])
+        session[key] = filter_obj.data['id']
     else:
         if key in session:
-            filter_d = set_filters(session[key], module)
-            filters.advanced_user.data = filter_deals_adv_filters_query()[session[key] - 1]
+            session.pop(key, None)
     return filter_d

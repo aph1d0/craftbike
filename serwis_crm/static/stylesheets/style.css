@@ -247,11 +247,6 @@ body {
     flex: content;
 }
 
-.btn.btn-sm.btn-outline-secondary {
-  width: 100%; /* sets the width to 100% of the container */
-  max-width: 300px; /* sets the maximum width to 300 pixels */
-  height: auto; /* allows the height to adjust proportionally to the width */
-}
 
 .ajax_indicator {
     position: fixed;

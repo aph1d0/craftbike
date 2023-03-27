@@ -192,6 +192,85 @@
         {{ form.notes.label(class="form-control-label") }} {{
         form.notes(class="form-control from-control-lg") }}
       </div>
+      <div id="inputs-container"></div>
+      <button class="btn btn-md btn-outline-secondary" id="add-input-button">
+        Dodaj czynność serwisową
+      </button>
+      <script>
+        $(document).ready(function () {
+          $("#add-input-button").on("click", function () {
+            var inputId = "search-input-" + Date.now();
+            var inputWithDropdownHtml =
+              '<div class="search-container">' +
+              '<div class="form-row">'+
+              '<div class="form-group col-6">'+
+              '<input class="form-control from-control-lg" type="text" id="' +
+              inputId +
+              '" placeholder="Szukaj...">' +
+              '</div>'+
+              '<div class="form-group col-6">'+
+              '<input class="form-control from-control-lg" type="text" id="' +
+              inputId + 
+              '-price" style="max-width:50px;">' +
+              '</div>'+
+              '<div class="form-group col-3">'+
+              ' zł' +
+              '</div>'+
+              '</div>'+
+              '<div class="dropdown" id="' +
+              inputId +
+              '-dropdown"></div>' +
+              "<br></div>";
+            $("#inputs-container").append(inputWithDropdownHtml);
+            $("#" + inputId).on("input", function () {
+              var query = $(this).val();
+              if (query.length >= 3) {
+                $.ajax({
+                  url: "/leads/new/suggest_service",
+                  data: { query: query },
+                  success: function (response) {
+                    var dropdown = $("#" + inputId + "-dropdown");
+                    dropdown.html("");
+                    if (response.length > 0) {
+                      for (var i = 0; i < response.length; i++) {
+                        dropdown.append(
+                          '<a class="dropdown-item" href="#">' +
+                            response[i] +
+                            "</a>"
+                        );
+                      }
+                      dropdown.addClass("show");
+                    } else {
+                      dropdown.removeClass("show");
+                    }
+                  },
+                });
+              } else {
+                $("#" + inputId + "-dropdown").removeClass("show");
+              }
+            });
+
+            // Toggle the 'show' class on the dropdown element when it's clicked
+            $("#" + inputId + "-dropdown").on(
+              "click",
+              ".dropdown-item",
+              function () {
+                var selectedValue = $(this).text();
+                $.ajax({
+                  url: "/leads/new/get_service_price",
+                  data: { query: selectedValue },
+                  success: function (response) {
+                      $("#" + inputId + '-price').val(response);
+                  },
+                });
+                $("#" + inputId).val(selectedValue);
+                var dd = $("#" + inputId + "-dropdown");
+                dd[0].style.display = 'none';
+              }
+            );
+          });
+        });
+      </script>
     </div>
   </div>
 </form>

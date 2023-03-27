@@ -1,87 +1,77 @@
-{% extends "layout.html" %}
-    {% block content %}
-    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-        <h2 class="h4">{% if title %}{{title}}{% else %}No Title{% endif %}</h2>
-        <div class="btn-toolbar mb-2 mb-md-0">
-            <a class="btn btn btn-sm btn-outline-primary mr-2" role="button" href="{{ url_for('bikes.get_bikes_view') }}?view_t=kanban">
-                <span data-feather="trello"></span>
-            </a>
-        </div>
-    </div>
-    {% include "bikes/filters.html" %}
-    {% if bikes.items()|length > 0 %}
-        <div class="table-responsive">
-            <table class="table table-striped table-hover fixed-layout-table">
-              <thead class="thead-light">
-                <tr>
-                  <th width="40" scope="col">
-                      <input type="checkbox" id="select_all" value="all" />
-                  </th>
-                    <th width="250"></th>
-                    <th width="350" scope="col">Title</th>
-                  <th width="200" scope="col">Expected Close Price</th>
-                  <th width="200" scope="col">Expected Close Date</th>
-                  <th width="300" scope="col">Account</th>
-                    <th width="250" scope="col">Contact</th>
-                    <th width="200" scope="col">Deal Stage</th>
-                    <th width="250" scope="col">Owner</th>
-                    <th width="200" scope="col">Date Created</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for bike in bikes.items() %}
-                <tr>
-                  <th scope="row">
-                      <input class="cb" type="checkbox" value="{{ deal.id }}" />
-                  </th>
-                    <th>
-                        <a href="{{ url_for('bikes.update_bike', deal_id=deal.id) }}" class="btn btn-outline-secondary btn-sm mr-1" role="button">
-                            <span data-feather="edit"></span>
-                        </a>
-                        <a href="#" class="btn btn-outline-secondary btn-sm mr-1" role="button">
+{% extends "layout.html" %} {% set active_page = "bikes" %} {% block content %}
+<div
+  class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"
+>
+  <h2 class="h4">{% if title %}{{title}}{% else %}No Title{% endif %}</h2>
+</div>
+{% include "bikes/filters.html" %} {% if bikes.items()|length > 0 %}
+<div class="table-responsive">
+  <table class="table table-striped table-hover fixed-layout-table">
+    <thead class="thead-light">
+      <tr>
+        <th width="40" scope="col">
+          <input type="checkbox" id="select_all" value="all" />
+        </th>
+        <th width="150"></th>
+        <th width="150" scope="col">Marka</th>
+        <th width="100" scope="col">Model</th>
+        <th width="100" scope="col">Klient</th>
+        <th width="100" scope="col">Kontakt do klienta</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for bike in bikes.items() %}
+      <tr>
+        <th scope="row">
+          <input class="cb" type="checkbox" value="{{ bike.id }}" />
+        </th>
+        <th>
+          <a
+            href="{{ url_for('bikes.update_bike', bike_id=bike.id) }}"
+            class="btn btn-outline-secondary btn-sm mr-1"
+            role="button"
+          >
+            <span data-feather="edit"></span>
+          </a>
+          <!-- <a href="#" class="btn btn-outline-secondary btn-sm mr-1" role="button">
                             <span data-feather="trash"></span>
-                        </a>
-                        <a href="{{ url_for('bikes.get_bike_view', deal_id=deal.id) }}"
-                           class="btn btn-outline-secondary btn-sm mr-1" role="button">
-                            <span data-feather="arrow-up-right"></span>
-                        </a>
-                    </th>
-                    <td>{{ bike.title }}</td>
-                  <td>{{ config.def_currency.symbol }} {{ "{:,.2f}".format(deal.expected_close_price) }}</td>
-                    <td>{% if deal.is_expired() %}<span class="icon-warning" data-feather="alert-circle"></span>{%endif%}
-                        {{ deal.expected_close_date.strftime('%Y-%m-%d %I:%M %p').lower() if deal.expected_close_date }}</td>
-                    <td>{{ deal.account.name }}</td>
-                    <td>{{ deal.contact.first_name }} {{ deal.contact.last_name }}</td>
-                     <td>{{ deal.dealstage.stage_name }}</td>
-                    <td>{% with owner=deal.deal_owner %}{% include 'common/owner_cell.html' %}{% endwith %}</td>
-                    <td>{{ deal.date_created.strftime('%Y-%m-%d') if deal.date_created }}</td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-        </div>
+                        </a> -->
+          <a
+            href="{{ url_for('bikes.get_bike_view', bike_id=bike.id) }}"
+            class="btn btn-outline-secondary btn-sm mr-1"
+            role="button"
+          >
+            <span data-feather="arrow-up-right"></span>
+          </a>
+        </th>
+        <td>{{ bike.manufacturer }}</td>
+        <td>{{ bike.model }}</td>
+        <td>{{ bike.contact.first_name }} {{ bike.contact.last_name }}</td>
+        <td>{{ bike.contact.phone }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
 
-        <!-- pagination -->
-        {% if bikes.total_records > 10 %}
-            {% with view_id="bikes.get_bikes_view", items=bikes %}
-                {% include "common/pagination.html" %}
-            {% endwith %}
-        {% endif %}
-    {% else %}
-        <div class="container text-center pt-4">
-            <div><span data-feather="eye-off"></span></div>
-            <p>Brak rowerów.</p>
-        </div>
-    {%  endif %}
+<!-- pagination -->
+{% if bikes.total_records > 10 %} {% with view_id="bikes.get_bikes_view",
+items=bikes %} {% include "common/pagination.html" %} {% endwith %} {% endif %}
+{% else %}
+<div class="container text-center pt-4">
+  <div><span data-feather="eye-off"></span></div>
+  <p>Brak rowerów.</p>
+</div>
+{% endif %}
 <script>
-    $(document).ready(function() {
-        $('#select_all').on('click', function() {
-            if ($(this).is(':checked')) {
-                $('.cb').prop('checked', true);
-            } else {
-                $('.cb').prop('checked', false);
-            }
-        });
+  $(document).ready(function () {
+    $("#select_all").on("click", function () {
+      if ($(this).is(":checked")) {
+        $(".cb").prop("checked", true);
+      } else {
+        $(".cb").prop("checked", false);
+      }
     });
+  });
 </script>
 {% endblock %}

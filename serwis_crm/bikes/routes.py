@@ -2,15 +2,13 @@ from flask import Blueprint, session
 from flask_login import current_user, login_required
 from flask import render_template, flash, url_for, redirect, request
 from sqlalchemy import or_
-import json
 from wtforms import Label
 
 from serwis_crm import db
 from .models import Bike
 from serwis_crm.common.paginate import Paginate
 from serwis_crm.common.filters import CommonFilters
-from .forms import NewBike, FilterBikes
-from .filters import set_date_filters
+from .forms import FilterBikes, NewBike
 
 from serwis_crm.rbac import check_access
 
@@ -28,27 +26,20 @@ def reset_bike_filters():
 @login_required
 @check_access('bikes', 'view')
 def get_bikes_view():
-    view_t = request.args.get('view_t', 'list', type=str)
     filters = FilterBikes()
 
     search = CommonFilters.set_search(filters, 'bikes_search')
-    contact = CommonFilters.set_contacts(filters, 'Bike', 'bikes_contacts_owner')
-    advanced_filters = set_date_filters(filters, 'Bike', 'bikes_date_created')
+    contact = CommonFilters.set_contacts(filters, 'bikes', 'bikes_contacts_owner')
 
     query = Bike.query.filter(or_(
-        Bike.title.ilike(f'%{search}%')
+        Bike.manufacturer.ilike(f'%{search}%'),
+        Bike.model.ilike(f'%{search}%'),
     ) if search else True) \
         .filter(contact) \
-        .filter(advanced_filters) \
         .order_by(Bike.date_created.desc())
 
-    if view_t == 'kanban':
-        return render_template("bikes/kanban_view.html", title="Rowery",
-                               deals=query.all(),
-                               filters=filters)
-    else:
-        return render_template("bikes/bike_list.html", title="Rowery",
-                               deals=Paginate(query), filters=filters)
+    return render_template("bikes/bike_list.html", title="Rowery",
+                               bikes=Paginate(query), filters=filters)
 
 
 @bikes.route("/bikes/<int:bike_id>")
@@ -56,9 +47,8 @@ def get_bikes_view():
 @check_access('bikes', 'view')
 def get_bike_view(bike_id):
     bike = Bike.query.filter_by(id=bike_id).first()
-    print(bike.contact)
+    #print(bike.contact)
     return render_template("bikes/bike_view.html", title="Rowery", bike=bike)
-
 
 @bikes.route("/bikes/new", methods=['GET', 'POST'])
 @login_required
@@ -69,8 +59,7 @@ def new_bike(bike_manufacturer, bike_model, client_id):
     db.session.commit()
     return bike
 
-
-@bikes.route("/bikes/edit/<int:bikes_id>", methods=['GET', 'POST'])
+@bikes.route("/bikes/edit/<int:bike_id>", methods=['GET', 'POST'])
 @login_required
 @check_access('bikes', 'update')
 def update_bike(bike_id):

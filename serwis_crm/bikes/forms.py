@@ -28,5 +28,9 @@ class FilterBikes(FlaskForm):
 
     contacts = QuerySelectField(query_factory=Contact.contact_list_query, get_pk=lambda a: a.id,
                                 get_label=Contact.get_label, blank_text='[-- Wybierz klienta --]', allow_blank=True)
+    manufacturer = QuerySelectField(query_factory=Bike.bike_list_query, get_pk=lambda a: a.id,
+                                get_label=Bike.get_label, blank_text='[-- Wybierz producenta --]', allow_blank=True)
+    model = QuerySelectField(query_factory=Bike.bike_list_query, get_pk=lambda a: a.id,
+                                get_label=Bike.get_label, blank_text='[-- Wybierz model --]', allow_blank=True)
 
     submit = SubmitField('Filtruj rowery')

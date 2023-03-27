@@ -9,11 +9,11 @@ from flask import Blueprint, jsonify, session, Response
 from flask_login import current_user, login_required
 from flask import render_template, flash, url_for, redirect, request
 
-from serwis_crm import db
+from serwis_crm import config, db
 from serwis_crm.bikes.models import Bike
 from serwis_crm.bikes.routes import new_bike
 from serwis_crm.users.models import User
-from .models import LeadMain, LeadStatus
+from .models import LeadMain, LeadStatus, Services
 from serwis_crm.contacts.models import Contact
 from serwis_crm.contacts.routes import new_contact
 from serwis_crm.common.paginate import Paginate
@@ -71,15 +71,17 @@ def get_leads_view():
     return render_template("leads/leads_list.html", title="Widok zleceń serwisowych",
                            leads=Paginate(query), filters=filters, bulk_form=bulk_form)
 
+@login_required
 @leads.route('/leads/update_stage/<int:lead_id>/<int:lead_stage_id>', methods=['POST'])
 def update_stage(lead_id, lead_stage_id):
     lead = LeadMain.query.filter(LeadMain.id == lead_id).first()
     lead.lead_status_id = lead_stage_id
     db.session.add(lead)
     db.session.commit()
-    
+
     return redirect(url_for('main.home'))
 
+@login_required
 @leads.route('/leads/new/_autoset_title', methods=['POST'])
 def autoset():
     input_1_value = request.form['bike_manufacturer']
@@ -89,6 +91,7 @@ def autoset():
     return jsonify({'new_value': new_value})
 
 @check_access('leads', 'view')
+@login_required
 @leads.route('/leads/get_scheduled', methods=['GET'])
 def get_scheduled():
     json_scheduled_serwices = []
@@ -102,6 +105,27 @@ def get_scheduled():
             )
         #a = jsonify(json_scheduled_serwices)
     return json_scheduled_serwices
+
+@leads.route("/leads/new/suggest_service", methods=['GET', 'POST'])
+@login_required
+@check_access('leads', 'create')
+def suggest_service():
+    query = request.args.get('query')
+    if not query:
+        return jsonify([])
+    items = Services.query.filter(Services.name.ilike(f'%{query}%')).all()
+    suggestions = [item.name for item in items]
+    return jsonify(suggestions)
+
+@leads.route("/leads/new/get_service_price", methods=['GET', 'POST'])
+@login_required
+@check_access('leads', 'create')
+def get_service_price():
+    query = request.args.get('query')
+    if not query:
+        return jsonify([])
+    price = Services.query.filter(Services.name == query).first()
+    return jsonify(price.price)
 
 @leads.route("/leads/new", methods=['GET', 'POST'])
 @login_required

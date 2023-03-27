@@ -14,6 +14,14 @@ class Bike(db.Model):
     @staticmethod
     def get_bike(bike_id):
         return Bike.query.filter_by(id=bike_id).first()
+        
+    @staticmethod
+    def get_label(bike):
+        return bike.manufacturer + ' ' + bike.model
+    
+    @staticmethod
+    def bike_list_query():
+        return Bike.query
 
     def __repr__(self):
         return f"Bike('{self.manufacturer}', '{self.model}', '{self.contact_id}')"
