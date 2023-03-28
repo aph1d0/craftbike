@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Hard-to-Close Popup</title>
+	<style>
+		/* Style the modal window */
+		.modal {
+			display: none;
+			position: fixed;
+			z-index: 1;
+			padding-top: 100px;
+			left: 0;
+			top: 0;
+			width: 100%;
+			height: 100%;
+			overflow: auto;
+			background-color: rgb(0,0,0);
+			background-color: rgba(0,0,0,0.4);
+		}
+
+		/* Style the modal content */
+		.modal-content {
+			background-color: #fefefe;
+			margin: auto;
+			padding: 20px;
+			border: 1px solid #888;
+			width: 80%;
+		}
+
+		/* Style the close button */
+		.close {
+			color: #aaa;
+			float: right;
+			font-size: 28px;
+			font-weight: bold;
+		}
+
+		.close:hover,
+		.close:focus {
+			color: black;
+			text-decoration: none;
+			cursor: pointer;
+		}
+	</style>
+</head>
+<body>
+	<!-- Button to open the modal -->
+	<button onclick="openModal()">Open Modal</button>
+
+	<!-- Modal window -->
+	<div id="myModal" class="modal">
+		<!-- Modal content -->
+		<div class="modal-content">
+			<!-- Close button -->
+			<span class="close" onclick="closeModal()">&times;</span>
+			<!-- GIF image -->
+			<img src="https://media.tenor.com/jUtFo4_LXssAAAAC/meat-spin-meat.gif">
+            <!-- Music player -->
+			<audio src="https://dzwoneknatelefon.com/wp-content/uploads/2023/03/Cieple-Dranie.mp3" autoplay loop></audio>
+		</div>
+	</div>
+
+	<script>
+		// Get the modal
+		var modal = document.getElementById("myModal");
+        // Get the audio element
+		var audio = modal.querySelector("audio");
+		// Open the modal
+		function openModal() {
+			modal.style.display = "block";
+            audio.play();
+		}
+
+		// Close the modal
+		function closeModal() {
+			// Do nothing
+		}
+
+		// Prevent the user from closing the window using keyboard or mouse
+		window.addEventListener("keydown", function(e) {
+			if (e.key === "Escape") {
+				e.preventDefault();
+			}
+		});
+
+		window.addEventListener("mousedown", function(e) {
+			if (e.button === 0 && e.target === modal) {
+				e.preventDefault();
+			}
+		});
+	</script>
+</body>
+</html>
+

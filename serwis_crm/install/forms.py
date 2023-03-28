@@ -7,8 +7,8 @@ from serwis_crm.settings.models import Currency, TimeZone
 
 
 class NewSystemUser(FlaskForm):
-    first_name = StringField('First Name', validators=[DataRequired(message='Please enter your first name')])
-    last_name = StringField('Last Name',
+    first_name = StringField('Imię', validators=[DataRequired(message='Please enter your first name')])
+    last_name = StringField('Nazwisko',
                             validators=[DataRequired(message='Please enter your last name'), Length(min=2, max=20)])
     email = StringField('Email',
                         validators=[DataRequired(

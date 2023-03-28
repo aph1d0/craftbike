@@ -195,6 +195,17 @@
         form.notes(class="form-control from-control-lg") }}
       </div>
       <div class="form-row">
+        <label>Cena całkowita serwisu:</label>
+      </div>
+      <div class="form-row">
+        <div class="form-group col-6">
+          <input class="form-control from-control-lg" id="total-service-price" value='{{ form.total_price }}'>
+        </div>
+        <div class="form-group col-6", style="display: table-cell;vertical-align: middle;font-size: 20px;">
+          zł
+        </div>
+      </div>           
+      <div class="form-row">
         <label>Czynnośći serwisowe:</label>
       </div>
       <div id="inputs-container"></div>
@@ -267,6 +278,10 @@
               search.value = ''
               var input_row = document.getElementById(inputId + '-row')
               input_row.style.display = "none";
+              var total_price = parseFloat(document.getElementById("total-service-price").value);
+              var deleted_price = parseFloat(document.getElementById(inputId + "-price").value)
+              total_price -= deleted_price 
+              document.getElementById("total-service-price").value = total_price
             });
             $("#" + inputId).on("input", function () {
               var query = $(this).val();
@@ -307,6 +322,12 @@
                   data: { query: selectedValue },
                   success: function (response) {
                       $("#" + inputId + '-price').val(response);
+                      var total_price = parseFloat(document.getElementById("total-service-price").value)
+                      if (!total_price){
+                        total_price = 0
+                      } 
+                      total_price += parseFloat(response)  
+                      document.getElementById("total-service-price").value = total_price
                   },
                 });
                 $("#" + inputId).val(selectedValue);
@@ -321,11 +342,11 @@
       $(document).ready(function () {
           lead_id = "{{ lead_id }}"
           if (lead_id){
-                var inputId = "search-input-" + Date.now();
                 $.ajax({
                   url: "/leads/{{ lead_id }}/get_services",
                   success: function (response) {
                     for (const service of response) {
+                      var inputId = "search-input-" + Date.now();
                       var inputWithDropdownHtml = generateForm(inputId, service.name, service.price)
                       $("#inputs-container").append(inputWithDropdownHtml);
                     }
@@ -334,6 +355,10 @@
                       search.value = ''
                       var input_row = document.getElementById(inputId + '-row')
                       input_row.style.display = "none";
+                      var total_price = parseFloat(document.getElementById("total-service-price").value);
+                      var deleted_price = parseFloat(document.getElementById(inputId + "-price").value)
+                      total_price -= deleted_price 
+                      document.getElementById("total-service-price").value = total_price
                     });
                   },
                 });

@@ -53,6 +53,15 @@ class LeadMain(db.Model):
     @staticmethod
     def get_by_id(lead_id):
         return LeadMain.query.filter_by(id=lead_id).first()
+    
+    def get_total_price(lead_id):
+        total=0
+        lead = LeadMain.query.filter_by(id=lead_id).first()
+        if lead.services:
+            for service in lead.services:
+                total += float(service.price)
+        return total
+
 
     def __repr__(self):
         return f"Lead('{self.last_name}')"

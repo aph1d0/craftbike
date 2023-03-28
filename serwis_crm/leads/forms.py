@@ -39,6 +39,7 @@ class NewLead(FlaskForm):
                                  validators=[Length(max=10, message='Cos sie data nie zgadza.')])
     service_name = StringField('Czynność serwisowa')
     service_price = FloatField('Cena czynnośći serwisowej') 
+    total_price = FloatField('Cena całkowita serwisu') 
     submit = SubmitField('Utwórz nowe zlecenie serwisowe')
 
 class EditLead(NewLead):
@@ -90,52 +91,22 @@ class ImportLeads(FlaskForm):
     submit = SubmitField('Create Leads')
 
 
-# class ConvertLead(FlaskForm):
-#     title = StringField('Deal Title', validators=[DataRequired('Deal title is mandatory')])
-#     use_account_information = BooleanField('Use Account Information', default=True)
-#     account_name = StringField('Account Name')
-#     account_email = StringField('Account Email')
-
-#     use_contact_information = BooleanField('Use Contact Information', default=False)
-#     contact_first_name = StringField('Contact First Name')
-#     contact_last_name = StringField('Contact Last Name')
-#     contact_email = StringField('Contact Email',
-#                                 validators=[Optional(), Email(message='Invalid email address!')])
-#     contact_phone = StringField('Contact Phone')
-#     contacts = QuerySelectField('Contact', query_factory=Contact.contact_list_query, get_pk=lambda a: a.id,
-#                                 get_label=Contact.get_label, blank_text='Select A Contact', allow_blank=True)
-
-#     create_deal = BooleanField('Create Deal', default=True)
-
-#     expected_close_price = FloatField('Expected Close Price',
-#                                       validators=[DataRequired('Expected Close Price is mandatory')])
-#     expected_close_date = DateField('Expected Close Date', format='%Y-%m-%d',
-#                                     validators=[Optional()])
-#     deal_stages = QuerySelectField('Deal Stage', query_factory=DealStage.deal_stage_list_query, get_pk=lambda a: a.id,
-#                                    get_label=DealStage.get_label, allow_blank=False,
-#                                    validators=[DataRequired(message='Please select deal stage')])
-
-#     assignees = QuerySelectField('Assign To', query_factory=User.user_list_query, get_pk=lambda a: a.id,
-#                                  get_label=User.get_label, default=User.get_current_user)
-#     submit = SubmitField('Covert Lead')
-
-
 class BulkOwnerAssign(FlaskForm):
-    owners_list = QuerySelectField('Assign Owner', query_factory=User.user_list_query, get_pk=lambda a: a.id,
+    owners_list = QuerySelectField('Przypisz serwisanta', query_factory=User.user_list_query, get_pk=lambda a: a.id,
                                    get_label=User.get_label, default=User.get_current_user, allow_blank=False,
                                    validators=[DataRequired(message='Prosze wybrać serwisanta')])
-    submit = SubmitField('Assign Owner')
+    submit = SubmitField('Przypisz serwisanta')
 
 
 class BulkLeadStatusAssign(FlaskForm):
     lead_status_list = QuerySelectField(query_factory=LeadStatus.lead_status_query, get_pk=lambda a: a.id,
                                         get_label='status_name', allow_blank=False,
                                         validators=[DataRequired(message='Prosze wybrać status zlecenia')])
-    submit = SubmitField('Assign Lead Status')
+    submit = SubmitField('Przypisz status')
 
 
 class BulkDelete(FlaskForm):
-    submit = SubmitField('Delete Selected Leads')
+    submit = SubmitField('Usuń zaznaczone zlecenia')
 
 
 

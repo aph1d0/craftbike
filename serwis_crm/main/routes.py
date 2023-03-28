@@ -26,7 +26,7 @@ def reset_main_filters():
 
 @main.route("/")
 @main.route("/home", methods=['GET', 'POST'])
-@check_access('leads', 'view')
+#@check_access('leads', 'view')
 @login_required
 def home():
     filters = FilterLeads()
@@ -57,6 +57,7 @@ def reset_filters():
     reset_main_filters()
     return redirect(url_for('main.home'))
 
+@login_required
 @main.route("/create_db")
 def create_db():
     db.create_all()

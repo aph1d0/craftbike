@@ -8,51 +8,51 @@ from .models import User, Role
 
 
 class Register(FlaskForm):
-    first_name = StringField('First Name')
-    last_name = StringField('Last Name',
-                            validators=[DataRequired(message='Please enter the last name'), Length(min=2, max=20)])
+    first_name = StringField('Imię')
+    last_name = StringField('Nazwisko',
+                            validators=[DataRequired(message='Proszę podać nazwisko!'), Length(min=2, max=20)])
     email = StringField('Email',
                         validators=[DataRequired(
-                            message='Email address is mandatory'),
-                            Email(message='Please enter a valid email address e.g. abc@yourcompany.com')])
-    password = PasswordField('Password',
-                             validators=[DataRequired(message='Password is mandatory')])
-    confirm_password = PasswordField('Confirm Password',
+                            message='Email jest wymagany!'),
+                            Email(message='Proszę podać poprawny adres email np. abc@yourcompany.com')])
+    password = PasswordField('Hasło',
+                             validators=[DataRequired(message='Hasło jest wymagane')])
+    confirm_password = PasswordField('Potwierdź hasło',
                                      validators=[DataRequired(
-                                         message='Confirm Password is mandatory'),
-                                         EqualTo('password', 'Passwords do not match')])
-    is_admin = BooleanField('Set Admin')
-    submit = SubmitField('Next: Setup Company Details')
+                                         message='Hasło jest wymagane'),
+                                         EqualTo('password', 'Hasła nie pasują!')])
+    is_admin = BooleanField('Ustaw jako admina')
+    submit = SubmitField('Nstepny krok: szczególy firmy')
 
     def validate_username(self, username):
         user = User.query.filter_by(username=username.data).first()
         if user:
-            raise ValidationError('Username already exists! Please choose a different one')
+            raise ValidationError('Użytnik już istnieje! Prosze wybrać inna nazwe użytnika.')
 
     def validate_email(self, email):
         user = User.query.filter_by(email=email.data).first()
         if user:
-            raise ValidationError('Email already exists! Please choose a different one')
+            raise ValidationError('Email już istnieje! Prosze wybrać inny email.')
 
 
 class Login(FlaskForm):
     email = StringField('Email',
                         validators=[DataRequired(), Email()])
-    password = PasswordField('Password',
+    password = PasswordField('Hasło',
                              validators=[DataRequired()])
-    remember = BooleanField('Remember Me')
+    remember = BooleanField('Zapamiętaj mnie')
     submit = SubmitField('Login')
 
 
 class UpdateProfile(FlaskForm):
-    first_name = StringField('First Name')
-    last_name = StringField('Last Name',
+    first_name = StringField('Imię')
+    last_name = StringField('Nazwisko',
                             validators=[DataRequired(), Length(min=2, max=20)])
     email = StringField('Email',
                         validators=[DataRequired(), Email()])
-
-    picture = FileField('Update Avatar', validators=[FileAllowed(['jpg', 'jpeg', 'png'])])
-    submit = SubmitField('Update')
+    password = PasswordField('Hasło')
+    picture = FileField('Aktualizuj avatar', validators=[FileAllowed(['jpg', 'jpeg', 'png'])])
+    submit = SubmitField('Aktualizuj')
 
 
 class ResourceForm(FlaskForm):
@@ -87,15 +87,15 @@ class UpdateRoleForm(FlaskForm):
 
 
 class UpdateUser(FlaskForm):
-    first_name = StringField('First Name')
-    last_name = StringField('Last Name',
+    first_name = StringField('Imię')
+    last_name = StringField('Nazwisko',
                             validators=[DataRequired(message='Please enter the last name'), Length(min=2, max=20)])
     email = StringField('Email',
                         validators=[DataRequired(
                             message='Email address is mandatory'),
                             Email(message='Please enter a valid email address e.g. abc@yourcompany.com')])
     password = PasswordField('Password')
-    picture = FileField('Update Avatar',
+    picture = FileField('Aktualizuj avatar',
                         validators=[FileAllowed(['jpg', 'jpeg', 'png'])])
     role = QuerySelectField(query_factory=lambda: Role.query, get_pk=lambda a: a.id,
                             get_label='name', allow_blank=False,

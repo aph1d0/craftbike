@@ -54,9 +54,20 @@
                   class="btn btn-sm btn-outline-secondary"
                   role="button"
                 >
-                  <span data-feather="arrow-up-right"></span> Edytuj zlecenie
+                  <span data-feather="edit"></span> Edytuj zlecenie
                 </a>
               </div>
+              <div class="card-actions">
+              <div class="ca_item">
+                <a
+                  href="/leads/{{ lead.id }}"
+                  class="btn btn-sm btn-outline-secondary"
+                  role="button"
+                >
+                  <span data-feather="arrow-up-right"></span> Szczególy zlecenia
+                </a>
+              </div>
+            </div>
               {% if lead.status.status_name == "Gotowy" %}
               <div class="card-actions">
                 <div class="ca_item">

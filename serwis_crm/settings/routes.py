@@ -25,6 +25,8 @@ def settings_profile():
             current_user.first_name = form.first_name.data
             current_user.last_name = form.last_name.data
             current_user.email = form.email.data
+            hashed_pwd = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+            current_user.password = hashed_pwd
             db.session.commit()
             flash('Twoje konto zostało zatualizowane', 'success')
             return redirect(url_for('settings.settings_profile'))

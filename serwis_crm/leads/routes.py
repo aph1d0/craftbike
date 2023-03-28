@@ -241,6 +241,7 @@ def update_lead(lead_id):
         form.lead_status.data = lead.status
         form.date_scheduled.data = lead.date_scheduled.strftime('%Y-%m-%d')
         form.notes.data = lead.notes
+        form.total_price = LeadMain.get_total_price(lead.id)
         form.submit.label = Label('update_lead', 'Aktualizuj zlecenie')
     return render_template("leads/new_lead.html", title="Aktualizuj zlecenie", form=form, lead_id=lead.id)
 
@@ -252,6 +253,7 @@ def get_lead_view(lead_id):
     lead = LeadMain.query.filter_by(id=lead_id).first()
     bike = Bike.get_bike(lead.bike_id)
     contact = Contact.get_contact(lead.contact_id)
+    lead.total_price = LeadMain.get_total_price(lead.id)
     return render_template("leads/lead_view.html", title="Przegląd zlecenia", lead=lead, bike=bike, contact=contact)
 
 
@@ -331,28 +333,6 @@ def bulk_owner_assign():
     return redirect(url_for('leads.get_leads_view'))
 
 
-@leads.route("/leads/bulk_lead_source_assign", methods=['POST'])
-@login_required
-@is_admin
-def bulk_lead_source_assign():
-    form = BulkLeadSourceAssign()
-    if request.method == 'POST':
-        if form.is_submitted() and form.validate():
-            if form.lead_source_list.data:
-                ids = [int(x) for x in request.form['leads_source'].split(',')]
-                LeadMain.query \
-                    .filter(LeadMain.id.in_(ids)) \
-                    .update({
-                        LeadMain.lead_source_id: form.lead_source_list.data.id
-                    }, synchronize_session=False)
-                db.session.commit()
-                flash(f'Lead Source `{form.lead_source_list.data.source_name}` has been '
-                      f'assigned to {len(ids)} lead(s) successfully!', 'success')
-        else:
-            print(form.errors)
-    return redirect(url_for('leads.get_leads_view'))
-
-
 @leads.route("/leads/bulk_lead_status_assign", methods=['POST'])
 @login_required
 @is_admin
@@ -398,7 +378,7 @@ def write_to_csv():
     ids = [int(x) for x in request.args.get('lead_ids').split(',')]
     query = LeadMain.query \
         .filter(LeadMain.id.in_(ids))
-    csv = 'Title,Last Name,Email,Company Name,Phone,' \
+    csv = 'Title,Nazwisko,Email,Company Name,Phone,' \
           'Mobile,Owner,Lead Source,Lead Status,Date Created\n'
     for lead in query.all():
         csv += f'{lead.title},{lead.first_name},' \
@@ -411,3 +391,8 @@ def write_to_csv():
                     mimetype='text/csv',
                     headers={"Content-disposition":
                              "attachment; filename=leads.csv"})
+
+@login_required
+@leads.route("/leads/easter_egg")
+def easter_egg():
+    return render_template("easter_egg.html")

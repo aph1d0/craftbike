@@ -16,7 +16,6 @@
         <span data-feather="settings"></span> Zbiorowa akcja ( ͡° ͜ʖ ͡°)
       </button>
       <div class="dropdown-menu dd-sm" aria-labelledby="dropdownMenuButton">
-        {% if current_user.is_admin %}
         <a
           class="dropdown-item"
           href="#"
@@ -40,9 +39,14 @@
           >Usuń</a
         >
         <div class="dropdown-divider"></div>
-        {% endif %}
         <a class="dropdown-item" id="export_leads_to_csv" href="#"
           >Export do CSV</a
+        >
+        <div class="dropdown-divider"></div>
+        <a
+          class="dropdown-item"
+          href="/leads/easter_egg"
+          >TUTAJ KLIKNIJ</a
         >
       </div>
     </div>
@@ -183,7 +187,7 @@ items=leads %} {% include "common/pagination.html" %} {% endwith %} {% endif %}
       // do something...
       $(".modal-notif-area").html(`
                 <div class="alert alert-success" role="alert">
-                  You have selected <strong>${items.length}</strong> leads for bulk assignment.
+                  Wybrałeś <strong>${items.length}</strong> zleceń do masowej akcji.
                 </div>`);
 
       // store the values
