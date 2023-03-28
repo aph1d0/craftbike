@@ -21,13 +21,12 @@ class Contact(db.Model):
     @staticmethod
     def contact_list_query():
         account = request.args.get('acc', None, type=int)
-        if current_user.is_admin:
-            contacts = Contact.query\
+        contacts = Contact.query\
                 .filter(Contact.account_id == account if account else True)
-        else:
-            contacts = Contact.query \
-                .filter(Contact.account_id == account if account else True) \
-                .filter(Contact.owner_id == current_user.id)
+        # else:
+        #     contacts = Contact.query \
+        #         .filter(Contact.account_id == account if account else True) \
+        #         .filter(Contact.owner_id == current_user.id)
         return contacts
 
     @staticmethod

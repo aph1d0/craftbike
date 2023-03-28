@@ -19,13 +19,15 @@ from serwis_crm.contacts.routes import new_contact
 from serwis_crm.common.paginate import Paginate
 from serwis_crm.common.filters import CommonFilters
 from .filters import set_date_filters, set_status
-from .forms import NewLead, ImportLeads, \
+from .forms import EditLead, NewLead, ImportLeads, \
     FilterLeads, BulkOwnerAssign, BulkLeadStatusAssign, BulkDelete
 
 from serwis_crm.rbac import check_access, is_admin
 
 leads = Blueprint('leads', __name__)
 
+def new_service(service):
+    Services.query
 
 def reset_lead_filters():
     if 'lead_owner' in session:
@@ -72,9 +74,12 @@ def get_leads_view():
                            leads=Paginate(query), filters=filters, bulk_form=bulk_form)
 
 @login_required
+@check_access('leads', 'update')
 @leads.route('/leads/update_stage/<int:lead_id>/<int:lead_stage_id>', methods=['POST'])
 def update_stage(lead_id, lead_stage_id):
     lead = LeadMain.query.filter(LeadMain.id == lead_id).first()
+    owner = User.get_current_user()
+    lead.owner = owner
     lead.lead_status_id = lead_stage_id
     db.session.add(lead)
     db.session.commit()
@@ -82,6 +87,22 @@ def update_stage(lead_id, lead_stage_id):
     return redirect(url_for('main.home'))
 
 @login_required
+@check_access('leads', 'view')
+@leads.route("/leads/<int:lead_id>/get_services", methods=['GET'])
+def get_services(lead_id):
+    json_services = []
+    lead = LeadMain.query.filter(LeadMain.id == lead_id).first()
+    for service in lead.services:
+        json_services.append({
+            'id' : service.id,
+            'name' : service.name,
+            'price' : service.price
+        }
+        )
+    return json_services
+
+@login_required
+@check_access('leads', 'view')
 @leads.route('/leads/new/_autoset_title', methods=['POST'])
 def autoset():
     input_1_value = request.form['bike_manufacturer']
@@ -94,17 +115,17 @@ def autoset():
 @login_required
 @leads.route('/leads/get_scheduled', methods=['GET'])
 def get_scheduled():
-    json_scheduled_serwices = []
-    scheduled_serwices = LeadMain.query.filter(cast(LeadMain.date_scheduled,Date) >= date.today()).all()
-    for scheduled_service in scheduled_serwices:
-        json_scheduled_serwices.append({
+    json_scheduled_services = []
+    scheduled_services = LeadMain.query.filter(cast(LeadMain.date_scheduled,Date) >= date.today()).all()
+    for scheduled_service in scheduled_services:
+        json_scheduled_services.append({
             'id' : scheduled_service.id,
             'title' : scheduled_service.title,
             'start' : scheduled_service.date_scheduled.strftime('%Y-%m-%d')
         }
             )
         #a = jsonify(json_scheduled_serwices)
-    return json_scheduled_serwices
+    return json_scheduled_services
 
 @leads.route("/leads/new/suggest_service", methods=['GET', 'POST'])
 @login_required
@@ -148,6 +169,10 @@ def new_lead():
                     bike = new_bike(bike_manufacturer=str(form.bike_manufacturer.data).lower(), bike_model=str(form.bike_model.data).lower(), client_id=client.id)
             lead = LeadMain(title=form.title.data,
                         status=form.lead_status.data, notes=form.notes.data)
+            for service in form.service_name.raw_data:
+                service_obj = Services.query.filter(Services.name == service).first()
+                if service_obj:
+                    lead.services.append(service_obj)
             if form.lead_status.data.status_name == 'Umówiony na serwis':
                 lead.date_scheduled = form.date_scheduled.data
             else:
@@ -180,7 +205,7 @@ def update_lead(lead_id):
     if not lead:
         return redirect(url_for('leads.get_leads_view'))
 
-    form = NewLead()
+    form = EditLead()
     if request.method == 'POST':
         if form.is_submitted() and form.validate():
             lead.title = form.title.data
@@ -193,6 +218,12 @@ def update_lead(lead_id):
             lead.status = form.lead_status.data
             lead.date_scheduled = form.date_scheduled.data
             lead.notes = form.notes.data
+            services = []
+            for service in form.service_name.raw_data:
+                service_obj = Services.query.filter(Services.name == service).first()
+                if service_obj:
+                    services.append(service_obj)
+            lead.services = services
             db.session.commit()
             flash('Zlecenie uaktualnione poprawnie!', 'success')
             return redirect(url_for('leads.get_lead_view', lead_id=lead.id))
@@ -211,7 +242,7 @@ def update_lead(lead_id):
         form.date_scheduled.data = lead.date_scheduled.strftime('%Y-%m-%d')
         form.notes.data = lead.notes
         form.submit.label = Label('update_lead', 'Aktualizuj zlecenie')
-    return render_template("leads/new_lead.html", title="Aktualizuj zlecenie", form=form)
+    return render_template("leads/new_lead.html", title="Aktualizuj zlecenie", form=form, lead_id=lead.id)
 
 
 @leads.route("/leads/<int:lead_id>")
@@ -232,6 +263,11 @@ def delete_lead(lead_id):
     if not lead:
         flash('Zlecenie nie istnieje :(', 'danger')
     else:
+        #LeadMain.query.filter_by(id=lead_id).delete()
+        lead = LeadMain.query.filter_by(id=lead_id).first()
+        for service in lead.services:
+            lead.services.remove(service)
+        db.session.commit()
         LeadMain.query.filter_by(id=lead_id).delete()
         db.session.commit()
         flash('Zlecenie usunięte poprawnie', 'success')

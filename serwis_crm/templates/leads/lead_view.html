@@ -1,22 +1,13 @@
 {% extends "layout.html" %} {% set active_page = "leads" %} {% block content %}
-<div
-  class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"
->
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
   <h2 class="h4">{% if title %}{{title}}{% else %}No Title{% endif %}</h2>
   <div class="btn-toolbar mb-2 mb-md-0">
-    <a
-      href="{{ url_for('leads.update_lead', lead_id=lead.id) }}"
-      class="btn btn-md btn-outline-primary mr-2"
-      role="button"
-    >
+    <a href="{{ url_for('leads.update_lead', lead_id=lead.id) }}" class="btn btn-md btn-outline-primary mr-2"
+      role="button">
       <span data-feather="edit-2"></span>
       Edytuj
     </a>
-    <a
-      href="{{ url_for('leads.get_leads_view') }}"
-      class="btn btn-md btn-outline-secondary"
-      role="button"
-    >
+    <a href="{{ url_for('leads.get_leads_view') }}" class="btn btn-md btn-outline-secondary" role="button">
       <span data-feather="arrow-left"></span>
       Powrót do listy
     </a>
@@ -56,7 +47,7 @@
         </div>
       </li>
       <li class="list-group-item g_field">
-        <div class="label">Przyjmujący</div>
+        <div class="label">Serwisant</div>
         {% if lead.owner %}
         <div class="text">
           <div class="mt-1">
@@ -73,11 +64,28 @@
 </div>
 <div class="row">
   <div class="col-10">
-    <div></div>
     <ul class="list-group list-group-flush">
       <li class="list-group-item g_field col-12">
         <div class="label">Notatki</div>
         <div class="text">{{ lead.notes if lead.notes else '_' }}</div>
+      </li>
+    </ul>
+  </div>
+</div>
+<div class="row">
+  <div class="col-10">
+    <ul class="list-group list-group-flush">
+      <li class="list-group-item g_field col-12">
+        <div class="label">Czynnośći serwisowe</div>
+        <div class="text">
+          {% if lead.services %}
+          {% for service in lead.services %}
+            {{ service.name }} - {{ service.price }} zł <br>
+          {% endfor %}
+          {% else %}
+            _
+          {% endif %}
+        </div>
       </li>
     </ul>
   </div>

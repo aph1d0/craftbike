@@ -26,13 +26,13 @@ def settings_profile():
             current_user.last_name = form.last_name.data
             current_user.email = form.email.data
             db.session.commit()
-            flash('Your account information has been successfully updated', 'success')
+            flash('Twoje konto zostało zatualizowane', 'success')
             return redirect(url_for('settings.settings_profile'))
     elif request.method == 'GET':
         form.first_name.data = current_user.first_name
         form.last_name.data = current_user.last_name
         form.email.data = current_user.email
-    return render_template("settings/profile.html", title="My Profile", form=form)
+    return render_template("settings/profile.html", title="Mój profil", form=form)
 
 
 # get all users except the current one (admin)
@@ -46,7 +46,7 @@ def settings_staff_list():
         .filter(User.id != current_user.id)\
         .order_by(User.id.asc())\
         .paginate(per_page=per_page, page=page)
-    return render_template("settings/staff_list.html", title="User Management", users=users)
+    return render_template("settings/staff_list.html", title="Zarządzanie personelem", users=users)
 
 
 @settings.route("/settings/staff/<int:user_id>")
@@ -54,7 +54,7 @@ def settings_staff_list():
 @check_access("staff", "view")
 def settings_staff_view(user_id):
     user = User.query.filter(User.id == user_id).first()
-    return render_template("settings/staff_view.html", title="View Staff", user=user)
+    return render_template("settings/staff_view.html", title="Przegląd pracownika", user=user)
 
 
 @settings.route("/settings/staff/edit/<int:user_id>", methods=['GET', 'POST'])
@@ -128,7 +128,7 @@ def settings_staff_update(user_id):
             resource_form.can_delete = l.can_delete
             form.permissions.append_entry(resource_form)
 
-    return render_template("settings/staff_update.html", title="Update Staff", form=form)
+    return render_template("settings/staff_update.html", title="Aktualizuj personel", form=form)
 
 
 @settings.route("/settings/staff/new", methods=['GET', 'POST'])
@@ -158,7 +158,7 @@ def settings_staff_new():
         else:
             print(form.errors)
             flash(f'Failed to register user!', 'danger')
-    return render_template("settings/new_user.html", title="New Staff Member", form=form)
+    return render_template("settings/new_user.html", title="Nowy pracownik", form=form)
 
 
 @settings.route("/settings/staff/del/<int:user_id>")

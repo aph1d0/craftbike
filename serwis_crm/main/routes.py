@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, timedelta
 from flask import render_template, flash, session, url_for, redirect, Blueprint, current_app
 from serwis_crm import db
 from flask_login import login_required
@@ -8,6 +8,7 @@ from serwis_crm.common.filters import CommonFilters
 from serwis_crm.leads.filters import set_date_filters
 from serwis_crm.leads.forms import FilterLeads
 from serwis_crm.leads.models import LeadMain, LeadStatus
+from serwis_crm.rbac import check_access
 
 parser = ConfigParser()
 
@@ -25,6 +26,7 @@ def reset_main_filters():
 
 @main.route("/")
 @main.route("/home", methods=['GET', 'POST'])
+@check_access('leads', 'view')
 @login_required
 def home():
     filters = FilterLeads()
@@ -45,9 +47,11 @@ def home():
     for lead in leads:
         if lead.status.status_name != "Odebrany" and lead.date_scheduled.date() <= date.today():
             good_leads.append(lead)
+            
     return render_template("index.html", title="Dashboard", leads=good_leads, lead_statuses=statuses, filters=filters)
 
 @main.route("/home/reset_filters")
+@check_access('leads', 'view')
 @login_required
 def reset_filters():
     reset_main_filters()

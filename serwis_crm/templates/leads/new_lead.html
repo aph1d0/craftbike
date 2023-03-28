@@ -9,7 +9,9 @@
     <h2 class="h4">{% if title %}{{title}}{% else %}No Title{% endif %}</h2>
     <div class="btn-toolbar mb-2 mb-md-0">
       {{ form.submit(class="btn btn-md btn-outline-info mr-2") }}
+      {% if not lead_id %}
       <input type="reset" class="btn btn-md btn-outline-secondary mr-2" />
+      {% endif %}
       <a
         href="{{ url_for('leads.get_leads_view') }}"
         class="btn btn-md btn-outline-secondary"
@@ -192,36 +194,80 @@
         {{ form.notes.label(class="form-control-label") }} {{
         form.notes(class="form-control from-control-lg") }}
       </div>
+      <div class="form-row">
+        <label>Czynnośći serwisowe:</label>
+      </div>
       <div id="inputs-container"></div>
-      <button class="btn btn-md btn-outline-secondary" id="add-input-button">
+      <button class="btn btn-md btn-outline-secondary" id="add-input-button", type="button">
         Dodaj czynność serwisową
       </button>
       <script>
+        function generateForm(inputId, service_name=null, service_price=null) {
+
+            const search = document.createElement('input');
+            search.type = 'text';
+            search.className = "form-control required from-control-lg"
+            search.id = inputId;
+            search.name ='service_name';
+            search.value = service_name
+            const search_input_div = document.createElement('div')
+            search_input_div.className = "form-group col-6"
+            search_input_div.appendChild(search)
+
+            const price = document.createElement('input');
+            price.type = 'text';
+            price.className = "form-control required from-control-lg"
+            price.id = inputId + '-price';
+            price.name = 'service_price';
+            price.value=service_price
+            const price_input_div = document.createElement('div')
+            price_input_div.className = "form-group col-1"
+            price_input_div.appendChild(price)
+
+            const search_container_div = document.createElement('div');
+            search_container_div.className = "search-container"
+            const form_row_div = document.createElement('div');
+            form_row_div.className = "form-row"
+            form_row_div.id = inputId + '-row'
+
+            const currency_div = document.createElement('div');
+            currency_div.className = "form-group col-1"
+            currency_div.innerHTML = 'zł'
+            currency_div.style = "display: table-cell;vertical-align: middle;font-size: 20px;"
+
+            
+            const delete_button = document.createElement('a');
+            delete_button.id = inputId + '-del-button';
+            delete_button.className = "btn btn-md btn-outline-secondary"
+            delete_button.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x-circle"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>'
+            delete_button.type = "button"
+            const delete_button_div = document.createElement('div')
+            delete_button_div.className = "form-group col-1"
+            delete_button_div.appendChild(delete_button)
+
+            const dropdown_div = document.createElement('div');
+            dropdown_div.id = inputId + '-dropdown';
+
+            form_row_div.appendChild(search_input_div);
+            form_row_div.appendChild(price_input_div)
+            form_row_div.appendChild(currency_div)
+            form_row_div.appendChild(delete_button_div)
+            search_container_div.appendChild(form_row_div)
+            search_container_div.appendChild(dropdown_div)
+
+            return search_container_div
+        }
         $(document).ready(function () {
           $("#add-input-button").on("click", function () {
             var inputId = "search-input-" + Date.now();
-            var inputWithDropdownHtml =
-              '<div class="search-container">' +
-              '<div class="form-row">'+
-              '<div class="form-group col-6">'+
-              '<input class="form-control from-control-lg" type="text" id="' +
-              inputId +
-              '" placeholder="Szukaj...">' +
-              '</div>'+
-              '<div class="form-group col-6">'+
-              '<input class="form-control from-control-lg" type="text" id="' +
-              inputId + 
-              '-price" style="max-width:50px;">' +
-              '</div>'+
-              '<div class="form-group col-3">'+
-              ' zł' +
-              '</div>'+
-              '</div>'+
-              '<div class="dropdown" id="' +
-              inputId +
-              '-dropdown"></div>' +
-              "<br></div>";
+            var inputWithDropdownHtml = generateForm(inputId)
             $("#inputs-container").append(inputWithDropdownHtml);
+            $("#" + inputId + "-del-button").on("click", function () {
+              var search = document.getElementById(inputId)
+              search.value = ''
+              var input_row = document.getElementById(inputId + '-row')
+              input_row.style.display = "none";
+            });
             $("#" + inputId).on("input", function () {
               var query = $(this).val();
               if (query.length >= 3) {
@@ -270,6 +316,30 @@
             );
           });
         });
+      </script>
+      <script>
+      $(document).ready(function () {
+          lead_id = "{{ lead_id }}"
+          if (lead_id){
+                var inputId = "search-input-" + Date.now();
+                $.ajax({
+                  url: "/leads/{{ lead_id }}/get_services",
+                  success: function (response) {
+                    for (const service of response) {
+                      var inputWithDropdownHtml = generateForm(inputId, service.name, service.price)
+                      $("#inputs-container").append(inputWithDropdownHtml);
+                    }
+                    $("#" + inputId + "-del-button").on("click", function () {
+                      var search = document.getElementById(inputId)
+                      search.value = ''
+                      var input_row = document.getElementById(inputId + '-row')
+                      input_row.style.display = "none";
+                    });
+                  },
+                });
+
+          }
+              });
       </script>
     </div>
   </div>

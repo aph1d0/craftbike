@@ -37,8 +37,13 @@ class NewLead(FlaskForm):
                                  get_label=User.get_label, default=User.get_current_user)
     date_scheduled = StringField('Data wizyty', id='date_scheduled', default=datetime.datetime.now().strftime('%Y-%m-%d'),
                                  validators=[Length(max=10, message='Cos sie data nie zgadza.')])
+    service_name = StringField('Czynność serwisowa')
+    service_price = FloatField('Cena czynnośći serwisowej') 
     submit = SubmitField('Utwórz nowe zlecenie serwisowe')
 
+class EditLead(NewLead):
+        lead_status = QuerySelectField('Status', query_factory=LeadStatus.lead_status_query, get_pk=lambda a: a.id,
+                                   get_label='status_name', default=LeadStatus.get_by_id(2), allow_blank=False, blank_text='Wybierz status zlecenia')
 
 def filter_leads_adv_filters_admin_query():
     return [

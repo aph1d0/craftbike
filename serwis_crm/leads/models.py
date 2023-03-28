@@ -11,7 +11,6 @@ class Services(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(500))
     price = db.Column(db.Float(2))
-    leads = db.relationship('LeadMain', secondary=lead_service, backref='service')
 
     def __repr__(self):
         return f'Service("{self.name}")'    
@@ -49,6 +48,7 @@ class LeadMain(db.Model):
     owner_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='SET NULL'), nullable=True)
     date_created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     date_scheduled= db.Column(db.DateTime, nullable=True)
+    services = db.relationship('Services', secondary=lead_service, backref='leads')
 
     @staticmethod
     def get_by_id(lead_id):
