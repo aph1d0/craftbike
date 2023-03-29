@@ -1,0 +1,28 @@
+<div class="modal fade ba_modal" id="servicesDeleteModal" tabindex="-1" role="dialog"
+     aria-labelledby="servicesDeleteModalLabel"
+     aria-hidden="true">
+    <form class="bulk-assign-service-form" method="POST" action="{{ url_for('services.bulk_delete') }}">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="servicesDeleteModalLabel">Usuń czynnośći serwisowe</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-warning" role="alert">
+                  <h5 class="alert-heading">Na pewno?</h5>
+                    <p>Usunięte czynnośći serwisowe nie mogą być przywrócone.</p>
+                </div>
+                {{ bulk_form.delete.hidden_tag() }} <!-- security 'csrf' token -->
+                <input type="hidden" class="services_data" name="services_to_delete">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Zamknij</button>
+                {{ bulk_form.delete.submit(id="bulk-service-submit", class="btn btn-primary") }}
+            </div>
+        </div>
+    </div>
+     </form>
+</div>

@@ -1,0 +1,57 @@
+{% extends "layout.html" %} {% set active_page = "services" %} {% block content %}
+
+<form class="form-new-service" method="POST">
+  {{ form.hidden_tag() }}
+  <!-- security 'csrf' token -->
+  <div
+    class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"
+  >
+    <h2 class="h4">{% if title %}{{title}}{% else %}No Title{% endif %}</h2>
+    <div class="btn-toolbar mb-2 mb-md-0">
+      {{ form.submit(class="btn btn-md btn-outline-info mr-2") }}
+      <input type="reset" class="btn btn-md btn-outline-secondary mr-2" />
+      <a
+        href="{{ url_for('services.get_services_view') }}"
+        class="btn btn-md btn-outline-secondary"
+        role="button"
+      >
+        <span data-feather="arrow-left"></span>
+        Powrót do listy czynnośći serwisowych
+      </a>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-9">
+      <div class="form-row mb-3">
+        <div class="col">
+          {{ form.service_name.label(class="form-control-label") }} {% if
+          form.service_name.errors %} {{
+          form.service_name(class="form-control form-control-lg required
+          is-invalid") }}
+          <div class="invalid-feedback">
+            {% for error in form.service_name.errors %}
+            <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+          {% else %} {{ form.service_name(class="form-control required
+          from-control-lg", placeholder="Nazwa czynności serwisowej ...") }} {% endif %}
+        </div>
+    </div>
+    <div class="form-row mb-3">
+      <div class="col">
+        {{ form.service_price.label(class="form-control-label") }} {% if
+        form.service_price.errors %} {{
+        form.service_price(class="form-control form-control-lg required
+        is-invalid") }}
+        <div class="invalid-feedback">
+          {% for error in form.service_price.errors %}
+          <span>{{ error }}</span>
+          {% endfor %}
+        </div>
+        {% else %} {{ form.service_price(class="form-control required
+        from-control-lg", placeholder="Cena czynności serwisowej ...") }} {% endif %}
+      </div>
+  </div>
+  </div>
+</form>
+{% endblock %}

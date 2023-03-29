@@ -1,4 +1,4 @@
-{% extends "layout.html" %} {% set active_page = "leads" %} {% block content %}
+{% extends "layout.html" %} {% set active_page = "services" %} {% block content %}
 <div
   class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"
 >
@@ -16,39 +16,26 @@
         <span data-feather="settings"></span> Zbiorowa akcja ( ͡° ͜ʖ ͡°)
       </button>
       <div class="dropdown-menu dd-sm" aria-labelledby="dropdownMenuButton">
-        <a
-          class="dropdown-item"
-          href="#"
-          data-toggle="modal"
-          data-target="#leadOwnerAssignModal"
-          >Przypisz serwisanta</a
-        >
-        <a
-          class="dropdown-item"
-          href="#"
-          data-toggle="modal"
-          data-target="#leadStatusAssignModal"
-          >Przypisz status</a
-        >
         <div class="dropdown-divider"></div>
         <a
           class="dropdown-item"
           data-toggle="modal"
-          data-target="#leadsDeleteModal"
+          data-target="#servicesDeleteModal"
           href="#"
           >Usuń</a
         >
         <div class="dropdown-divider"></div>
-        <a class="dropdown-item" id="export_leads_to_csv" href="#"
+        <a class="dropdown-item" id="export_services_to_csv" href="#"
           >Export do CSV</a
         >
+      </div>
     </div>
 
     {% if current_user.is_admin %}
     <a
       class="btn btn-sm btn-outline-secondary mr-2"
       role="button"
-      href="{{ url_for('leads.import_bulk_leads') }}"
+      href="{{ url_for('services.import_bulk_services') }}"
     >
       <span data-feather="upload"></span>
       Importuj ...
@@ -57,14 +44,14 @@
     <a
       class="btn btn btn-sm btn-outline-primary"
       role="button"
-      href="{{ url_for('leads.new_lead') }}"
+      href="{{ url_for('services.new_service') }}"
     >
       <span data-feather="plus"></span>
-      Nowe zlecenie serwisowe
+      Nowa czynność serwisowa
     </a>
   </div>
 </div>
-{% include "leads/filters.html" %} {% if leads.items()|length > 0 %}
+{% include "services/filters.html" %} {% if services.items()|length > 0 %}
 <div class="table-responsive">
   <table class="table table-striped table-hover fixed-layout-table">
     <thead class="thead-light">
@@ -74,23 +61,18 @@
         </th>
         <th width="150"></th>
         <th width="250" scope="col">Nazwa</th>
-        <th width="150" scope="col">Telefon</th>
-        <th width="150" scope="col">Marka roweru</th>
-        <th width="150" scope="col">Model roweru</th>
-        <th width="250" scope="col">Serwisant</th>
-        <th width="200" scope="col">Status</th>
-        <th width="200" scope="col">Data utworzenia</th>
+        <th width="150" scope="col">Cena</th>
       </tr>
     </thead>
     <tbody>
-      {% for lead in leads.items() %}
+      {% for service in services.items() %}
       <tr>
         <th scope="row">
-          <input class="cb" type="checkbox" value="{{ lead.id }}" />
+          <input class="cb" type="checkbox" value="{{ service.id }}" />
         </th>
         <th>
           <a
-            href="{{ url_for('leads.update_lead', lead_id=lead.id) }}"
+            href="{{ url_for('services.update_service', service_id=service.id) }}"
             class="btn btn-outline-secondary btn-sm mr-1"
             role="button"
           >
@@ -99,34 +81,24 @@
           <a
             href="#"
             data-toggle="modal"
-            data-target="#singleLeadDeleteModal_{{ lead.id }}"
+            data-target="#singleServiceDeleteModal_{{ service.id }}"
             class="btn btn-outline-secondary btn-sm mr-1"
             role="button"
           >
             <span data-feather="trash"></span>
           </a>
-          {% with lead_id=lead.id %} {% include
-          'leads/single_lead_delete_modal.html' %} {% endwith %}
+          {% with service_id=service.id %} {% include
+          'services/single_service_delete_modal.html' %} {% endwith %}
           <a
-            href="{{ url_for('leads.get_lead_view', lead_id=lead.id) }}"
+            href="{{ url_for('services.get_service_view', service_id=service.id) }}"
             class="btn btn-outline-secondary btn-sm mr-1"
             role="button"
           >
             <span data-feather="arrow-up-right"></span>
           </a>
         </th>
-        <td>{{ lead.title }}</td>
-        <td>{{ lead.phone }}</td>
-        <td>{{ lead.manufacturer }}</td>
-        <td>{{ lead.model }}</td>
-        <td>
-          {% with owner=lead.User %}{% include 'common/owner_cell.html' %}{%
-          endwith %}
-        </td>
-        <td>{{ lead.status_name }}</td>
-        <td>
-          {{ lead.date_created.strftime('%Y-%m-%d') if lead.date_created }}
-        </td>
+        <td>{{ service.name }}</td>
+        <td>{{ service.price }} zł</td>
       </tr>
       {% endfor %}
     </tbody>
@@ -134,12 +106,12 @@
 </div>
 
 <!-- pagination -->
-{% if leads.total_records > 10 %} {% with view_id="leads.get_leads_view",
-items=leads %} {% include "common/pagination.html" %} {% endwith %} {% endif %}
+{% if services.total_records > 10 %} {% with view_id="services.get_services_view",
+items=services %} {% include "common/pagination.html" %} {% endwith %} {% endif %}
 {% else %}
 <div class="container text-center pt-4">
   <div><span data-feather="eye-off"></span></div>
-  <p>Brak zleceń. Prosze utworzyć nowe zlecenie serwisowe.</p>
+  <p>Brak czynnośći serwisowych. Prosze utworzyć nową czynność serwisową.</p>
 </div>
 {% endif %}
 <script>
@@ -180,26 +152,20 @@ items=leads %} {% include "common/pagination.html" %} {% endwith %} {% endif %}
       // do something...
       $(".modal-notif-area").html(`
                 <div class="alert alert-success" role="alert">
-                  Wybrałeś <strong>${items.length}</strong> zleceń do masowej akcji.
+                  Wybrałeś <strong>${items.length}</strong> czynnośći serwisowych do masowej akcji.
                 </div>`);
 
       // store the values
       console.log(items);
-      $(".leads_data").val(items);
+      $(".services_data").val(items);
     });
 
-    $("#export_leads_to_csv").on("click", function (e) {
+    $("#export_services_to_csv").on("click", function (e) {
       e.preventDefault();
-      window.location = "{{ url_for('leads.write_to_csv') }}?lead_ids=" + items;
+      window.location = "{{ url_for('services.write_to_csv') }}?service_ids=" + items;
     });
   });
 </script>
 
-<!-- Lead Owner Assign Modal -->
-{% include "leads/bulk_owner_assign_modal.html" %}
-
-<!-- Lead Status Assign Modal -->
-{% include "leads/bulk_lead_status_assign_modal.html" %}
-
-<!-- Lead Bulk Delete Modal -->
-{% include "leads/bulk_lead_delete_modal.html" %} {% endblock %}
+<!-- Service Bulk Delete Modal -->
+{% include "services/bulk_service_delete_modal.html" %} {% endblock %}

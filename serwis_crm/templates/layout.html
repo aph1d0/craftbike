@@ -3,9 +3,8 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="CRM">
-    <meta name="author" content="Jagjot Singh">
-    <meta name="generator" content="Jekyll v3.8.5">
+    <meta name="description" content="CraftBike-CRM">
+    <meta name="author" content="Filip Smoliński">
     <title>serwis_crm - Strona zarządzania serwisem Craft Bike</title>
 
     <!-- Bootstrap core CSS -->
@@ -90,6 +89,12 @@
             <a class="{{ 'nav-link active' if active_page == 'bikes' else 'nav-link' }}" href="{{ url_for('bikes.get_bikes_view') }}">
               <span data-feather="zap"></span>
               Rowery
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="{{ 'nav-link active' if active_page == 'services' else 'nav-link' }}" href="{{ url_for('services.get_services_view') }}">
+              <span data-feather="tag"></span>
+              Czynnośći serwisowe
             </a>
           </li>
           <li class="nav-item">

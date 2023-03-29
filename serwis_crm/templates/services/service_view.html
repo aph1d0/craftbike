@@ -1,0 +1,32 @@
+{% extends "layout.html" %} {% set active_page = "services" %} {% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+  <h2 class="h4">{% if title %}{{title}}{% else %}No Title{% endif %}</h2>
+  <div class="btn-toolbar mb-2 mb-md-0">
+    <a href="{{ url_for('services.update_service', service_id=service.id) }}" class="btn btn-md btn-outline-primary mr-2"
+      role="button">
+      <span data-feather="edit-2"></span>
+      Edytuj
+    </a>
+    <a href="{{ url_for('services.get_services_view') }}" class="btn btn-md btn-outline-secondary" role="button">
+      <span data-feather="arrow-left"></span>
+      Powrót do listy
+    </a>
+  </div>
+</div>
+<div class="row">
+  <div class="col-5">
+    <ul class="list-group list-group-flush">
+      <li class="list-group-item g_field">
+        <div class="label">Nazwa</div>
+        <div class="text">{{ service.name if service.name else '_' }}</div>
+      </li>
+      <li class="list-group-item g_field">
+        <div class="label">Cena</div>
+        <div class="text">
+          {{ service.price if service.price else '_' }}
+        </div>
+      </li>
+    </ul>
+  </div>
+</div>
+{% endblock %}

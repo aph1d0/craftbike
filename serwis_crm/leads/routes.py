@@ -1,7 +1,7 @@
 from datetime import date
 import datetime
+import boto3
 import pandas as pd
-import requests
 from sqlalchemy import Date, cast, or_
 from wtforms import Label
 
@@ -13,7 +13,8 @@ from serwis_crm import config, db
 from serwis_crm.bikes.models import Bike
 from serwis_crm.bikes.routes import new_bike
 from serwis_crm.users.models import User
-from .models import LeadMain, LeadStatus, Services
+from serwis_crm.leads.models import LeadMain, LeadStatus
+from serwis_crm.services.models import Services
 from serwis_crm.contacts.models import Contact
 from serwis_crm.contacts.routes import new_contact
 from serwis_crm.common.paginate import Paginate
@@ -21,13 +22,11 @@ from serwis_crm.common.filters import CommonFilters
 from .filters import set_date_filters, set_status
 from .forms import EditLead, NewLead, ImportLeads, \
     FilterLeads, BulkOwnerAssign, BulkLeadStatusAssign, BulkDelete
+from .sms_notification import SnsWrapper
 
 from serwis_crm.rbac import check_access, is_admin
 
 leads = Blueprint('leads', __name__)
-
-def new_service(service):
-    Services.query
 
 def reset_lead_filters():
     if 'lead_owner' in session:
@@ -75,7 +74,7 @@ def get_leads_view():
 
 @login_required
 @check_access('leads', 'update')
-@leads.route('/leads/update_stage/<int:lead_id>/<int:lead_stage_id>', methods=['POST'])
+@leads.route('/leads/update_stage/<int:lead_id>/<int:lead_stage_id>', methods=['GET','POST'])
 def update_stage(lead_id, lead_stage_id):
     lead = LeadMain.query.filter(LeadMain.id == lead_id).first()
     owner = User.get_current_user()
@@ -83,6 +82,11 @@ def update_stage(lead_id, lead_stage_id):
     lead.lead_status_id = lead_stage_id
     db.session.add(lead)
     db.session.commit()
+    if lead_stage_id == 5:
+        sns = boto3.resource('sns')
+        sms_notif = SnsWrapper(sns)
+        message = "Dzień dobry! Tu serwis rowerowy CraftBike. Twój rower jest już gotowy do odbioru. Zapraszamy do naszego serwisu w tygodniu 10-18 oraz w soboty 10-14."
+        sms_notif.publish_text_message(phone_number=lead.lead_contact.phone, message=message)
 
     return redirect(url_for('main.home'))
 
@@ -225,6 +229,7 @@ def update_lead(lead_id):
                     services.append(service_obj)
             lead.services = services
             db.session.commit()
+            up_stage = update_stage(lead_id=lead.id, lead_stage_id=lead.status.id)
             flash('Zlecenie uaktualnione poprawnie!', 'success')
             return redirect(url_for('leads.get_lead_view', lead_id=lead.id))
         else:
@@ -241,7 +246,7 @@ def update_lead(lead_id):
         form.lead_status.data = lead.status
         form.date_scheduled.data = lead.date_scheduled.strftime('%Y-%m-%d')
         form.notes.data = lead.notes
-        form.total_price = LeadMain.get_total_price(lead.id)
+        form.total_price.data = LeadMain.get_total_price(lead.id)
         form.submit.label = Label('update_lead', 'Aktualizuj zlecenie')
     return render_template("leads/new_lead.html", title="Aktualizuj zlecenie", form=form, lead_id=lead.id)
 
@@ -391,8 +396,3 @@ def write_to_csv():
                     mimetype='text/csv',
                     headers={"Content-disposition":
                              "attachment; filename=leads.csv"})
-
-@login_required
-@leads.route("/leads/easter_egg")
-def easter_egg():
-    return render_template("easter_egg.html")

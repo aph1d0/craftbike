@@ -137,7 +137,7 @@
             var calendarEl = document.getElementById("calendar");
             var calendar_row = document.getElementById("calendar_row");
             var date_scheduled = document.getElementById("date_scheduled");
-            date_scheduled.value = "";
+            //date_scheduled.value = "";
             var calendar = new FullCalendar.Calendar(calendarEl, {
               //plugins: [ interactionPlugin, dayGridPlugin ],
               initialView: "dayGridWeek",
@@ -199,7 +199,7 @@
       </div>
       <div class="form-row">
         <div class="form-group col-6">
-          <input class="form-control from-control-lg" id="total-service-price" value='{{ form.total_price }}'>
+          <div class="form-control from-control-lg" id="total-service-price">{{ form.total_price.data if form.total_price.data else '0' }}</div> 
         </div>
         <div class="form-group col-6", style="display: table-cell;vertical-align: middle;font-size: 20px;">
           zł
@@ -278,10 +278,10 @@
               search.value = ''
               var input_row = document.getElementById(inputId + '-row')
               input_row.style.display = "none";
-              var total_price = parseFloat(document.getElementById("total-service-price").value);
-              var deleted_price = parseFloat(document.getElementById(inputId + "-price").value)
+              var total_price = Math.round(parseFloat(document.getElementById("total-service-price").innerHTML) * 1000 / 1000);
+              var deleted_price = Math.round(parseFloat(document.getElementById(inputId + "-price").value) * 1000 / 1000);
               total_price -= deleted_price 
-              document.getElementById("total-service-price").value = total_price
+              document.getElementById("total-service-price").innerHTML = total_price
             });
             $("#" + inputId).on("input", function () {
               var query = $(this).val();
@@ -322,12 +322,12 @@
                   data: { query: selectedValue },
                   success: function (response) {
                       $("#" + inputId + '-price').val(response);
-                      var total_price = parseFloat(document.getElementById("total-service-price").value)
+                      var total_price = Math.round(parseFloat(document.getElementById("total-service-price").innerHTML) * 1000 / 1000);
                       if (!total_price){
                         total_price = 0
                       } 
-                      total_price += parseFloat(response)  
-                      document.getElementById("total-service-price").value = total_price
+                      total_price += Math.round(parseFloat(response) * 1000 / 1000);
+                      document.getElementById("total-service-price").innerHTML = total_price
                   },
                 });
                 $("#" + inputId).val(selectedValue);
@@ -355,10 +355,10 @@
                       search.value = ''
                       var input_row = document.getElementById(inputId + '-row')
                       input_row.style.display = "none";
-                      var total_price = parseFloat(document.getElementById("total-service-price").value);
-                      var deleted_price = parseFloat(document.getElementById(inputId + "-price").value)
+                      var total_price = Math.round(parseFloat(document.getElementById("total-service-price").innerHTML) * 1000 / 1000);
+                      var deleted_price = Math.round(parseFloat(document.getElementById(inputId + "-price").value) * 1000 / 1000);
                       total_price -= deleted_price 
-                      document.getElementById("total-service-price").value = total_price
+                      document.getElementById("total-service-price").innerHTML = total_price
                     });
                   },
                 });

@@ -47,6 +47,8 @@ def home():
     for lead in leads:
         if lead.status.status_name != "Odebrany" and lead.date_scheduled.date() <= date.today():
             good_leads.append(lead)
+        if lead.status.status_name == "Umówiony na serwis" and lead.date_scheduled.date() != date.today():
+            good_leads.remove(lead)
             
     return render_template("index.html", title="Dashboard", leads=good_leads, lead_statuses=statuses, filters=filters)
 
