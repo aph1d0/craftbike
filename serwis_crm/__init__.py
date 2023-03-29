@@ -73,7 +73,6 @@ def create_app(config_class=ProductionConfig):
         from serwis_crm.bikes.routes import bikes
         from serwis_crm.settings.routes import settings
         from serwis_crm.settings.app_routes import app_config
-        from serwis_crm.reports.routes import reports
         from serwis_crm.services.routes import services
 
         # register routes with blueprint
@@ -85,7 +84,6 @@ def create_app(config_class=ProductionConfig):
         app.register_blueprint(contacts)
         app.register_blueprint(bikes)
         app.register_blueprint(services)
-        app.register_blueprint(reports)
         return app
 
 
