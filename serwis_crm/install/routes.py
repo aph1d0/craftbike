@@ -95,17 +95,17 @@ def empty_setup():
         Resource(
             name='leads',
             can_view=True,
-            can_edit=False,
+            can_edit=True,
             can_create=True,
-            can_delete=False
+            can_delete=True
         )
     )
 
     role.resources.append(
         Resource(
-            name='accounts',
+            name='bikes',
             can_view=True,
-            can_edit=False,
+            can_edit=True,
             can_create=True,
             can_delete=False
         )
@@ -123,11 +123,11 @@ def empty_setup():
 
     role.resources.append(
         Resource(
-            name='deals',
+            name='services',
             can_view=True,
-            can_edit=False,
+            can_edit=True,
             can_create=True,
-            can_delete=False
+            can_delete=True
         )
     )
 
@@ -143,10 +143,6 @@ def empty_setup():
 
     db.session.add(role)
     db.session.add(user)
-
-    # add system deal stages
-    db.session.add(DealStage(stage_name="Deal Won", display_order=1, close_type='won'))
-    db.session.add(DealStage(stage_name="Deal Lost", display_order=2, close_type='lost'))
 
 
 @install.route("/install/finish", methods=['GET', 'POST'])
