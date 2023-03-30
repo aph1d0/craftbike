@@ -40,6 +40,7 @@ jobs:
         image: craft-bike-ecr:${{ steps.get_branch_name.outputs.branch_name }}.${{ github.sha }}, craft-bike-ecr:latest
 
   deploy:
+    needs: push_to_ecr
     runs-on: ubuntu-latest # the operating system your job will run on
     steps:
       - name: Checkout Latest Repo
