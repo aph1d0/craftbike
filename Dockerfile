@@ -1,4 +1,4 @@
-FROM python:3.10 as build
+FROM python:3.10-alpine as build
 
 # Copy the entire directory to the temporary build stage
 COPY . /serwis_crm_app
@@ -6,7 +6,7 @@ COPY . /serwis_crm_app
 # Remove the .git folder from the build directory
 RUN rm -rf /serwis_crm_app/.git
 
-FROM python:3.10
+FROM python:3.10-alpine
 ENV PYTHONUNBUFFERED 1
 COPY requirements.txt /
 RUN pip3 install -r /requirements.txt
