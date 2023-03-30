@@ -20,7 +20,7 @@ jobs:
         context: .
         push: false
         platforms: linux/amd64
-        tags: craft-bike-ecr/craft-bike-crm:${{ steps.get_branch_name.outputs.branch_name }}.${{ github.sha }}
+        tags: craft-bike-ecr:${{ steps.get_branch_name.outputs.branch_name }}.${{ github.sha }}
         build-args: |
             AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
             AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -36,4 +36,4 @@ jobs:
         access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         region: eu-central-1
-        image: craft-bike-ecr/craft-bike-crm:${{ steps.get_branch_name.outputs.branch_name }}.${{ github.sha }}
+        image: craft-bike-ecr:${{ steps.get_branch_name.outputs.branch_name }}.${{ github.sha }}
