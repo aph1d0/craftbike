@@ -8,6 +8,11 @@ RUN rm -rf /serwis_crm_app/.git
 
 FROM python:3.10-alpine
 ENV PYTHONUNBUFFERED 1
+ENV AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+ENV AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+
+RUN apk update && apk add --no-cache python3-dev py3-pip gcc musl-dev
+
 COPY requirements.txt /
 RUN pip3 install -r /requirements.txt
 
@@ -20,7 +25,6 @@ RUN cp serwis_crm/config_vars.example serwis_crm/config_vars.py && \
     sed -i 's/<database_password>/${MYSQL_PASSWORD}/g' serwis_crm/config_vars.py && \
     sed -i 's/<database_name>/${MYSQL_DB_NAME}/g' serwis_crm/config_vars.py 
 
-ENV AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-ENV AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+
 
 ENTRYPOINT ["./gunicorn_starter.sh"]
