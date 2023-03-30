@@ -36,4 +36,4 @@ jobs:
         access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         region: eu-central-1
-        image: craft-bike-crm:${{ github.head_ref }}.${{ github.sha }}
+        image: craft-bike-crm:${{ steps.get_branch_name.outputs.branch_name }}.${{ github.sha }}
