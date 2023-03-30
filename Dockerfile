@@ -1,9 +1,17 @@
+FROM python:3.10 as build
+
+# Copy the entire directory to the temporary build stage
+COPY . /serwis_crm
+
+# Remove the .git folder from the build directory
+RUN rm -rf /serwis_crm/.git
+
 FROM python:3.10
 ENV PYTHONUNBUFFERED 1
 COPY requirements.txt /
 RUN pip3 install -r /requirements.txt
 
-COPY --exclude=.git . /serwis_crm
+COPY --from=build /serwis_crm /serwis_crm
 WORKDIR /serwis_crm
 
 RUN cp config_vars.example config_vars.py && \
