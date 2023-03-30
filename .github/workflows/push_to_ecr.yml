@@ -6,7 +6,7 @@ on:
 
 permissions:
   contents: read
-  jobs:
+jobs:
   push_to_ecr:
     runs-on: ubuntu-latest
     steps:
