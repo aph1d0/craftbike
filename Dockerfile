@@ -1,4 +1,4 @@
-FROM python:3.10-alpine as build
+FROM python:3.10-slim as build
 
 # Copy the entire directory to the temporary build stage
 COPY . /serwis_crm_app
@@ -6,12 +6,12 @@ COPY . /serwis_crm_app
 # Remove the .git folder from the build directory
 RUN rm -rf /serwis_crm_app/.git
 
-FROM python:3.10-alpine
+FROM python:3.10-slim
 ENV PYTHONUNBUFFERED 1
 ENV AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
 ENV AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
 
-RUN apk update && apk add --no-cache python3-dev py3-pip gcc musl-dev mariadb-connector-c-dev
+# RUN apk update && apk add --no-cache python3-dev py3-pip gcc musl-dev mariadb-connector-c-dev
 
 COPY requirements.txt /
 RUN pip3 install -r /requirements.txt

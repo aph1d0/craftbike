@@ -1,0 +1,73 @@
+
+name: Docker Build, Push to ECR and deploy
+on:
+  push:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+jobs:
+  push_to_ecr:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Get current branch name
+      id: get_branch_name
+      run: echo ::set-output name=branch_name::${GITHUB_REF#refs/heads/}
+    - name: Build
+      uses: docker/build-push-action@v4
+      with:
+        context: .
+        push: false
+        platforms: linux/amd64
+        tags: craft-bike-ecr:${{ steps.get_branch_name.outputs.branch_name }}.${{ github.sha }}
+        build-args: |
+            AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            MYSQL_HOST=${{ secrets.MYSQL_HOST }}
+            MYSQL_USER=${{ secrets.MYSQL_USER }}
+            MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}
+            MYSQL_DB_NAME=serwis-crm
+
+    - name: Push to ECR
+      id: ecr
+      uses: jwalton/gh-ecr-push@v1
+      with:
+        access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        region: eu-central-1
+        local-image: 
+        image: craft-bike-ecr:${{ steps.get_branch_name.outputs.branch_name }}.${{ github.sha }}, craft-bike-ecr:latest
+
+  deploy:
+    runs-on: ubuntu-latest # the operating system your job will run on
+    steps:
+      - name: Checkout Latest Repo
+        # checks out your repository under the GitHub workspace so that your workflow can access it
+        uses: actions/checkout@master
+      
+      - name: Get timestamp
+        uses: gerred/actions/current-time@master
+        id: current-time
+        
+      - name: Run string replace
+        uses: frabert/replace-string-action@master
+        id: format-time
+        with:
+          # replaces '[:\.]+' in the timestamp with '-'
+          pattern: '[:\.]+'
+          string: "${{ steps.current-time.outputs.time }}"
+          replace-with: '-'
+          flags: 'g'
+          
+      - name: Deploy to EB
+        uses: einaregilsson/beanstalk-deploy@v21
+        with:
+					# Input the credentials you used to setup AWS CLI and credentials for the application environment
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: craftbike-crm
+          environment_name: craftbike-crm-prod
+          version_label: "${{ steps.format-time.outputs.replaced }}"
+          region: eu-central-1
+          deployment_package: Dockerrun.aws.json
