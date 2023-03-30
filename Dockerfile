@@ -13,6 +13,8 @@ ENV AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
 
 # RUN apk update && apk add --no-cache python3-dev py3-pip gcc musl-dev mariadb-connector-c-dev
 
+RUN apt-get update && apt apt-get install libmysqlclient-dev 
+
 COPY requirements.txt /
 RUN pip3 install -r /requirements.txt
 
