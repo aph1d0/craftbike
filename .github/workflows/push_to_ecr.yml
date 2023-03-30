@@ -11,17 +11,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - name: Get current branch name
-      run: echo ${GITHUB_REF#refs/heads/}
-      env:
-        CURRENT_BRANCH: ${{GITHUB_REF#refs/heads/}}
     - name: Build
       uses: docker/build-push-action@v4
       with:
         context: .
         push: false
         platforms: linux/amd64,linux/arm64
-        tags: craft-bike-crm:${{ CURRENT_BRANCH }}.${{ github.sha }}
+        tags: craft-bike-crm:${{ GITHUB_REF#refs/heads/ }}.${{ github.sha }}
         build-args: |
             AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
             AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
