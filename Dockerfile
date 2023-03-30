@@ -11,7 +11,7 @@ ENV PYTHONUNBUFFERED 1
 ENV AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
 ENV AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
 
-RUN apk update && apk add --no-cache python3-dev py3-pip gcc musl-dev
+RUN apk update && apk add --no-cache python3-dev py3-pip gcc musl-dev mariadb-connector-c-dev
 
 COPY requirements.txt /
 RUN pip3 install -r /requirements.txt
