@@ -7,7 +7,6 @@ from tzlocal import get_localzone
 
 from serwis_crm.settings.models import Currency, TimeZone, AppConfig
 from serwis_crm.leads.models import LeadStatus, LeadMain
-from serwis_crm.contacts.models import Contact
 from serwis_crm.users.models import Role, Resource, User
 
 from serwis_crm.install.forms import NewSystemUser, CurrencyTz, FinishInstall
@@ -138,9 +137,18 @@ def empty_setup():
                 is_first_login=True,
                 is_user_active=True
                 )
-
+    
+    status_1 = LeadStatus(id=1, status_name='Przyjęty na serwis', is_final=False)
+    db.session.add(status_1)
+    status_2 = LeadStatus(id=2, status_name='Umówiony na serwis', is_final=False)
+    db.session.add(status_2)
+    status_5 = LeadStatus(id=5, status_name='Gotowy', is_final=True)
+    db.session.add(status_5)
+    status_6 = LeadStatus(id=6, status_name='Odebrany', is_final=True)
+    db.session.add(status_6)
     db.session.add(role)
     db.session.add(user)
+
 
 
 @install.route("/install/finish", methods=['GET', 'POST'])
