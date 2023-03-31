@@ -1,6 +1,7 @@
 from datetime import datetime
 from serwis_crm import db
-from sqlalchemy.orm import relationship   
+from sqlalchemy.orm import relationship
+from serwis_crm.contacts.models import Contact   
 from serwis_crm.services.models import lead_service
 
 class LeadStatus(db.Model):
@@ -29,7 +30,7 @@ class LeadStatus(db.Model):
 class LeadMain(db.Model):
     id = db.Column(db.Integer, db.Sequence('lead_id_seq'), primary_key=True)
     title = db.Column(db.String(100), nullable=True)
-    contact_id = db.Column(db.Integer, db.ForeignKey('contact.id'), nullable=False)
+    contact_id = db.Column(db.Integer, db.ForeignKey(Contact.id), nullable=False)
     bike_id = db.Column(db.Integer, db.ForeignKey('bikes.id'), nullable=False)
     notes = db.Column(db.String(200), nullable=True)
     lead_status_id = db.Column(db.Integer, db.ForeignKey('lead_status.id', ondelete='SET NULL'), nullable=True)

@@ -4,8 +4,6 @@ from flask import Blueprint, request
 from flask_login import current_user
 from serwis_crm.bikes.models import Bike
 
-
-
 class Contact(db.Model):
     __tablename__ = "contact"
     id = db.Column(db.Integer, db.Sequence('contact_id_seq'), primary_key=True)
@@ -44,4 +42,4 @@ class Contact(db.Model):
             return None
 
     def __repr__(self):
-        return f"Account('{self.last_name}', '{self.email}', '{self.phone}')"
+        return f"Contact('{self.last_name}', '{self.phone}')"
