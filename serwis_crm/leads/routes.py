@@ -86,8 +86,11 @@ def update_stage(lead_id, lead_stage_id):
         sns = boto3.resource('sns')
         sms_notif = SnsWrapper(sns)
         message = "Dzień dobry! Tu serwis rowerowy CraftBike. Twój rower jest już gotowy do odbioru. Zapraszamy do naszego serwisu w tygodniu 10-18 oraz w soboty 10-14."
-        sms_notif.publish_text_message(phone_number=lead.lead_contact.phone, message=message)
-
+        msg_id = sms_notif.publish_text_message(phone_number=lead.lead_contact.phone, message=message)
+        if msg_id:
+            flash('Sms o gotowości rowery został wysłany', 'success')
+        else:
+            flash('Problem z wysłaniem sms o gotowości rowru', 'success')
     return redirect(url_for('main.home'))
 
 @login_required
