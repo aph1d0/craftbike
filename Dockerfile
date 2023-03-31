@@ -27,6 +27,6 @@ RUN cp serwis_crm/config_vars.example serwis_crm/config_vars.py && \
     sed -i 's/<database_password>/${MYSQL_PASSWORD}/g' serwis_crm/config_vars.py && \
     sed -i 's/<database_name>/${MYSQL_DB_NAME}/g' serwis_crm/config_vars.py 
 
-
+RUN chmod +x ./gunicorn_starter.sh
 
 ENTRYPOINT ["./gunicorn_starter.sh"]
