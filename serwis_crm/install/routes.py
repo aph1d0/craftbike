@@ -12,7 +12,6 @@ from serwis_crm.users.models import Role, Resource, User
 
 from serwis_crm.install.forms import NewSystemUser, CurrencyTz, FinishInstall
 from serwis_crm.install.data.currency_timezone import INSERT_SQL
-from serwis_crm.install.data.sample_data import SAMPLE_DATA
 
 install = Blueprint('install', __name__)
 
@@ -154,14 +153,7 @@ def finish():
     if request.method == 'POST':
         if form.is_submitted() and form.validate():
 
-            if form.import_sample_data.data:
-                db.session.execute(SAMPLE_DATA % (
-                    session['admin_first_name'],
-                    session['admin_last_name'],
-                    session['admin_email'],
-                    session['admin_password']))
-            else:
-                empty_setup()
+            empty_setup()
 
             # create configuration
             app_cfg = AppConfig(

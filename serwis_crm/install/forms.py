@@ -34,6 +34,5 @@ class CurrencyTz(FlaskForm):
 
 
 class FinishInstall(FlaskForm):
-    import_sample_data = BooleanField('Install Sample Data')
     submit = SubmitField('Complete Installation')
 

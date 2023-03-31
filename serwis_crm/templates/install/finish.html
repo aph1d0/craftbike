@@ -17,11 +17,6 @@
         <form method="POST">
             {{ form.hidden_tag() }} <!-- security 'csrf' token -->
 
-            <div class="form-check">
-                {{ form.import_sample_data(class="form-check-input") }}
-                {{ form.import_sample_data.label(class="form-check-label ml-2") }}
-            </div>
-
             <div class="form-group">
                 <a class="btn btn-outline-info mt-3 mr-2"
                         href="{{ url_for('install.ex_settings') }}"
