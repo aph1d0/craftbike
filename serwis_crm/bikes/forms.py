@@ -20,7 +20,7 @@ def filter_bikes_adv_filters_query():
 class NewBike(FlaskForm):
     bike_manufacturer = StringField('Marka roweru', validators=[DataRequired('Marka roweru jest obowiazkowa')])
     bike_model = StringField('Model roweru', validators=[DataRequired('Model roweru jest obowiazkowy')])
-    submit = SubmitField('Create New Deal')
+    submit = SubmitField('Dodaj nowy rower')
 
 
 class FilterBikes(FlaskForm):

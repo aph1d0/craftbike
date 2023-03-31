@@ -27,8 +27,15 @@ class SnsWrapper:
         :return: The ID of the message.
         """
         try:
+            sender_id="CraftBike"
+            msg_attrs={
+                    'AWS.SNS.SMS.SenderID': {
+                        'DataType': 'String',
+                        'StringValue': sender_id
+                    }
+                }
             response = self.sns_resource.meta.client.publish(
-                PhoneNumber=phone_number, Message=message)
+                PhoneNumber=phone_number, Message=message, MessageAttributes=msg_attrs)
             message_id = response['MessageId']
             app.logger.info("Published message to %s.", phone_number)
         except ClientError:
