@@ -293,19 +293,18 @@ def import_bulk_leads():
             data = pd.read_csv(form.csv_file.data)
 
             for _, row in data.iterrows():
-                lead = LeadMain(first_name=row['first_name'], last_name=row['last_name'],
-                            email=row['email'], company_name=row['company_name'])
+                lead = LeadMain(title=row['title'], contact_id=row['contact_id'],
+                            bike_id=row['bike_id'], notes=row['notes'], lead_status_id=row['lead_status_id'],
+                            owner_id=row['owner_id'], date_created=row['date_created'], date_scheduled=row['date_scheduled'])
                 lead.owner = current_user
-                if form.lead_source.data:
-                    lead.source = form.lead_source.data
                 db.session.add(lead)
                 ind = ind + 1
 
             db.session.commit()
-            flash(f'{ind} new lead(s) has been successfully imported!', 'success')
+            flash(f'{ind} nowych zleceń zostało poprawnie zaimportowanych!', 'success')
         else:
             flash('Błednie wypełniony formularz. Sprawdz go ponownie baranie!', 'danger')
-    return render_template("leads/leads_import.html", title="Import Leads", form=form)
+    return render_template("leads/leads_import.html", title="Importuj zlecenia", form=form)
 
 
 @leads.route("/leads/reset_filters")
@@ -383,16 +382,14 @@ def write_to_csv():
     ids = [int(x) for x in request.args.get('lead_ids').split(',')]
     query = LeadMain.query \
         .filter(LeadMain.id.in_(ids))
-    csv = 'Title,Nazwisko,Email,Company Name,Phone,' \
-          'Mobile,Owner,Lead Source,Lead Status,Date Created\n'
+    csv = 'Title,contact_id,bike_id,Notes,lead_status_id,' \
+          'owner_id,date_created,date_scheduled\n'
     for lead in query.all():
-        csv += f'{lead.title},{lead.first_name},' \
-               f'{lead.last_name},{lead.email},' \
-               f'{lead.company_name},{lead.phone},{lead.mobile},' \
-               f'{lead.owner.first_name} {lead.owner.last_name},' \
-               f'{lead.source.source_name},{lead.status.status_name},' \
-               f'{lead.date_created}\n'
+        csv += f'{lead.title},{lead.contact_id},' \
+               f'{lead.bike_id},{lead.notes},' \
+               f'{lead.lead_status_id},{lead.owner_id},{lead.date_created},' \
+               f'{lead.date_scheduled}\n'
     return Response(csv,
                     mimetype='text/csv',
                     headers={"Content-disposition":
-                             "attachment; filename=leads.csv"})
+                             "attachment; filename=services.csv"})

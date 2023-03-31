@@ -88,7 +88,7 @@ class FilterLeads(FlaskForm):
 
 class ImportLeads(FlaskForm):
     csv_file = FileField('CSV File', validators=[FileAllowed(['csv'])])
-    submit = SubmitField('Create Leads')
+    submit = SubmitField('Utwórz zlecenia')
 
 
 class BulkOwnerAssign(FlaskForm):
