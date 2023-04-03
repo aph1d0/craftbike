@@ -3,20 +3,14 @@
 <form class="form-new-lead" method="POST">
   {{ form.hidden_tag() }}
   <!-- security 'csrf' token -->
-  <div
-    class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"
-  >
+  <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
     <h2 class="h4">{% if title %}{{title}}{% else %}No Title{% endif %}</h2>
     <div class="btn-toolbar mb-2 mb-md-0">
       {{ form.submit(class="btn btn-md btn-outline-info mr-2") }}
       {% if not lead_id %}
       <input type="reset" class="btn btn-md btn-outline-secondary mr-2" />
       {% endif %}
-      <a
-        href="{{ url_for('leads.get_leads_view') }}"
-        class="btn btn-md btn-outline-secondary"
-        role="button"
-      >
+      <a href="{{ url_for('leads.get_leads_view') }}" class="btn btn-md btn-outline-secondary" role="button">
         <span data-feather="arrow-left"></span>
         Powrót do listy zleceń
       </a>
@@ -54,6 +48,7 @@
       <div class="form-group">
         {{ form.title.label(class="form-control-label") }} {{
         form.title(class="form-control from-control-lg") }}
+        <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
         <script>
           $(document).ready(function () {
             $("#bike_manufacturer, #bike_model").on("input", function () {
@@ -78,28 +73,14 @@
 
       <div class="form-row mb-3">
         <div class="col">
-          {{ form.first_name.label(class="form-control-label") }} {% if
-          form.first_name.errors %} {{ form.first_name(class="form-control
-          form-control-lg required is-invalid") }}
-          <div class="invalid-feedback">
-            {% for error in form.first_name.errors %}
-            <span>{{ error }}</span>
-            {% endfor %}
-          </div>
-          {% else %} {{ form.first_name(class="form-control required
-          from-control-lg", placeholder="Imię ...") }} {% endif %}
+          {{ form.first_name.label(class="form-control-label") }}
+          {{ form.first_name(class="form-control
+          from-control-lg", placeholder="Imię ...") }}
         </div>
         <div class="col">
-          {{ form.last_name.label(class="form-control-label") }} {% if
-          form.last_name.errors %} {{ form.last_name(class="form-control
-          form-control-lg required is-invalid") }}
-          <div class="invalid-feedback">
-            {% for error in form.last_name.errors %}
-            <span>{{ error }}</span>
-            {% endfor %}
-          </div>
-          {% else %} {{ form.last_name(class="form-control required
-          from-control-lg", placeholder="Nazwisko ...") }} {% endif %}
+          {{ form.last_name.label(class="form-control-label") }}
+          {{ form.last_name(class="form-control
+          from-control-lg", placeholder="Nazwisko ...") }}
         </div>
       </div>
 
@@ -139,7 +120,6 @@
             var date_scheduled = document.getElementById("date_scheduled");
             //date_scheduled.value = "";
             var calendar = new FullCalendar.Calendar(calendarEl, {
-              //plugins: [ interactionPlugin, dayGridPlugin ],
               initialView: "dayGridWeek",
               locale: "pl",
               selectable: true,
@@ -159,6 +139,30 @@
             if (selectedValue === "2") {
               calendar_row.style.display = "block";
               calendar.render();
+              // Check if we're on a mobile device
+              if (/Mobi/.test(navigator.userAgent)) {
+                // Add touch events for mobile devices
+                var dayGridWrapper = calendarEl.querySelector('.fc-daygrid-body');
+                var touchStartX = null;
+
+                dayGridWrapper.addEventListener('touchstart', function (e) {
+                  touchStartX = e.touches[0].clientX;
+                });
+
+                dayGridWrapper.addEventListener('touchend', function (e) {
+                  var touchEndX = e.changedTouches[0].clientX;
+                  var touchDistanceX = touchEndX - touchStartX;
+
+                  if (Math.abs(touchDistanceX) < 10) {
+                    // Tap detected, select the day
+                    var dayEl = e.target.closest('.fc-daygrid-day');
+                    if (dayEl) {
+                      var date = dayEl.getAttribute('data-date');
+                      calendar.select(date);
+                    }
+                  }
+                });
+              }
             } else {
               if (calendar) {
                 calendar.render();
@@ -199,172 +203,171 @@
       </div>
       <div class="form-row">
         <div class="form-group col-6">
-          <div class="form-control from-control-lg" id="total-service-price">{{ form.total_price.data if form.total_price.data else '0' }}</div> 
+          <div class="form-control from-control-lg" id="total-service-price">{{ form.total_price.data if
+            form.total_price.data else '0' }}</div>
         </div>
-        <div class="form-group col-6", style="display: table-cell;vertical-align: middle;font-size: 20px;">
+        <div class="form-group col-6" , style="display: table-cell;vertical-align: middle;font-size: 20px;">
           zł
         </div>
-      </div>           
+      </div>
       <div class="form-row">
         <label>Czynnośći serwisowe:</label>
       </div>
       <div id="inputs-container"></div>
-      <button class="btn btn-md btn-outline-secondary" id="add-input-button", type="button">
+      <button class="btn btn-md btn-outline-secondary" id="add-input-button" , type="button">
         Dodaj czynność serwisową
       </button>
       <script>
-        function generateForm(inputId, service_name=null, service_price=null) {
+        function closeModal() {
+          const modal = document.querySelector('.modal');
+          modal.remove();
+        }
+        function updateTotalServicePrice(service_id) {
+          var price = document.getElementById(service_id + '-price').innerHTML;
+          price = Number(price.replace(/\D/g, ""));
+          var total_price = Number(document.getElementById('total-service-price').innerHTML);
+          total_price += price
+          document.getElementById('total-service-price').innerHTML = total_price
 
-            const search = document.createElement('input');
-            search.type = 'text';
-            search.className = "form-control required from-control-lg"
-            search.id = inputId;
-            search.name ='service_name';
-            search.value = service_name
-            const search_input_div = document.createElement('div')
-            search_input_div.className = "form-group col-6"
-            search_input_div.appendChild(search)
-
-            const price = document.createElement('input');
-            price.type = 'text';
-            price.className = "form-control required from-control-lg"
-            price.id = inputId + '-price';
-            price.name = 'service_price';
-            price.value=service_price
-            const price_input_div = document.createElement('div')
-            price_input_div.className = "form-group col-1"
-            price_input_div.appendChild(price)
-
-            const search_container_div = document.createElement('div');
-            search_container_div.className = "search-container"
-            const form_row_div = document.createElement('div');
-            form_row_div.className = "form-row"
-            form_row_div.id = inputId + '-row'
-
-            const currency_div = document.createElement('div');
-            currency_div.className = "form-group col-1"
-            currency_div.innerHTML = 'zł'
-            currency_div.style = "display: table-cell;vertical-align: middle;font-size: 20px;"
-
-            
-            const delete_button = document.createElement('a');
-            delete_button.id = inputId + '-del-button';
-            delete_button.className = "btn btn-md btn-outline-secondary"
-            delete_button.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x-circle"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>'
-            delete_button.type = "button"
-            const delete_button_div = document.createElement('div')
-            delete_button_div.className = "form-group col-1"
-            delete_button_div.appendChild(delete_button)
-
-            const dropdown_div = document.createElement('div');
-            dropdown_div.id = inputId + '-dropdown';
-
-            form_row_div.appendChild(search_input_div);
-            form_row_div.appendChild(price_input_div)
-            form_row_div.appendChild(currency_div)
-            form_row_div.appendChild(delete_button_div)
-            search_container_div.appendChild(form_row_div)
-            search_container_div.appendChild(dropdown_div)
-
-            return search_container_div
+        }
+        function getServices(lead_id){
+          fetch('/leads/' + lead_id  + '/get_services')
+          .then(response => response.json())
+          .then(data => {
+          }
+          )
         }
         $(document).ready(function () {
-          $("#add-input-button").on("click", function () {
-            var inputId = "search-input-" + Date.now();
-            var inputWithDropdownHtml = generateForm(inputId)
-            $("#inputs-container").append(inputWithDropdownHtml);
-            $("#" + inputId + "-del-button").on("click", function () {
-              var search = document.getElementById(inputId)
-              search.value = ''
-              var input_row = document.getElementById(inputId + '-row')
-              input_row.style.display = "none";
-              var total_price = Math.round(parseFloat(document.getElementById("total-service-price").innerHTML) * 1000 / 1000);
-              var deleted_price = Math.round(parseFloat(document.getElementById(inputId + "-price").value) * 1000 / 1000);
-              total_price -= deleted_price 
-              document.getElementById("total-service-price").innerHTML = total_price
-            });
-            $("#" + inputId).on("input", function () {
-              var query = $(this).val();
-              if (query.length >= 3) {
-                $.ajax({
-                  url: "/leads/new/suggest_service",
-                  data: { query: query },
-                  success: function (response) {
-                    var dropdown = $("#" + inputId + "-dropdown");
-                    dropdown.html("");
-                    if (response.length > 0) {
-                      for (var i = 0; i < response.length; i++) {
-                        dropdown.append(
-                          '<a class="dropdown-item" href="#">' +
-                            response[i] +
-                            "</a>"
-                        );
-                      }
-                      dropdown.addClass("show");
-                    } else {
-                      dropdown.removeClass("show");
-                    }
-                  },
-                });
-              } else {
-                $("#" + inputId + "-dropdown").removeClass("show");
-              }
-            });
+          
+          function addServiceAction(service_id, service_name, service_price) {
+            const new_service_row = document.createElement('div');
+            const new_service_name_div = document.createElement('div');
+            const new_service_price_div = document.createElement('div');
+            const new_service_del_button_div = document.createElement('div');
+            const new_service_name = document.createElement('div');
+            const new_service_price = document.createElement('div');
+            const new_service_del_button = document.createElement('button');
+            const new_service_del_button_span = document.createElement('span');
 
-            // Toggle the 'show' class on the dropdown element when it's clicked
-            $("#" + inputId + "-dropdown").on(
-              "click",
-              ".dropdown-item",
-              function () {
-                var selectedValue = $(this).text();
-                $.ajax({
-                  url: "/leads/new/get_service_price",
-                  data: { query: selectedValue },
-                  success: function (response) {
-                      $("#" + inputId + '-price').val(response);
-                      var total_price = Math.round(parseFloat(document.getElementById("total-service-price").innerHTML) * 1000 / 1000);
-                      if (!total_price){
-                        total_price = 0
-                      } 
-                      total_price += Math.round(parseFloat(response) * 1000 / 1000);
-                      document.getElementById("total-service-price").innerHTML = total_price
-                  },
+            new_service_name_div.className = "form-group col-6"
+            new_service_price_div.className = "form-group col-3"
+            new_service_del_button_div.className = "form-group col-3"
+
+            new_service_name.setAttribute('id', service_id + '-name')
+            new_service_price.setAttribute('id', service_id + '-price')
+            new_service_name.innerText = service_name
+            new_service_price.innerText = service_price + " zł"
+            new_service_name.className = "form"
+            new_service_price.className = "form"
+
+            new_service_del_button_span.setAttribute("data-feather", "trash-2");
+            new_service_del_button.setAttribute("id", service_id + '-del')
+            new_service_del_button.className = "btn btn-md btn-outline-secondary"
+            new_service_del_button.appendChild(new_service_del_button_span)
+
+            const service_inputs = document.getElementById('inputs-container');
+            new_service_row.className = "form-row"
+            new_service_name_div.appendChild(new_service_name)
+            new_service_price_div.appendChild(new_service_price)
+            new_service_del_button_div.appendChild(new_service_del_button)
+            new_service_row.appendChild(new_service_name_div)
+            new_service_row.appendChild(new_service_price_div)
+            new_service_row.appendChild(new_service_del_button_div)
+            service_inputs.appendChild(new_service_row)
+            feather.replace();
+            updateTotalServicePrice(service_id)
+            if (modal){
+              closeModal()
+            }
+          }
+          $("#add-input-button").on("click", function () {
+            const modal = document.createElement('div');
+            modal.classList.add('modal');
+            modal.setAttribute('style', 'display:flex;')
+            const modal_content = document.createElement('div');
+            modal_content.className = 'modal-content'
+            modal_content.innerHTML = '<h2>Dodaj czynność serwisową</h2>'
+            const newRow = document.createElement('div');
+            newRow.classList.add('tiles-container');
+            fetch('/services/get_main_categories')
+              .then(response => response.json())
+              .then(data => {
+                data.forEach(item => {
+                  const newButton = document.createElement('tile');
+                  const tile_content = document.createElement('div')
+                  tile_content.textContent = item.name;
+                  tile_content.className = 'tile-content'
+                  newButton.id = item.id;
+                  newButton.name = item.name
+                  newButton.className = "clickable-tile";
+                  newButton.addEventListener('click', () => {
+                    getSubcategoriesButtons(item.id, item.name)
+                  });
+                  newButton.appendChild(tile_content)
+                  newRow.appendChild(newButton);
                 });
-                $("#" + inputId).val(selectedValue);
-                var dd = $("#" + inputId + "-dropdown");
-                dd[0].style.display = 'none';
-              }
-            );
+
+              });
+            modal_content.innerHTML += '<br>'
+            modal_content.appendChild(newRow);
+            modal.appendChild(modal_content)
+            document.body.appendChild(modal);
+
+            function getSubcategoriesButtons(category_id, category_name) {
+              const newCatRow = document.createElement('div');
+              newCatRow.classList.add('tiles-container');
+              fetch('/services/get_subcategories/' + parseInt(category_id))
+                .then(response => response.json())
+                .then(data => {
+                  if (data.length === 0) {
+                    fetch('/services/get_action/' + parseInt(category_id))
+                      .then(response => response.json())
+                      .then(data => {
+                        if (Object.keys(data).length !== 0) {
+                          const new_tile = document.createElement('tile');
+                          new_tile.className = 'clickable-tile'
+                          const tile_content = document.createElement('div')
+                          tile_content.innerHTML = data.name + "<br> cena: " + data.price + " zł";
+                          tile_content.className = 'tile-content'
+                          new_tile.id = data.id
+                          new_tile.name = data.name
+                          new_tile.price = data.price
+                          new_tile.addEventListener('click', () => {
+                            addServiceAction(data.id, data.name, data.price)
+                          });
+                          new_tile.appendChild(tile_content)
+                          newCatRow.appendChild(new_tile);
+                        }
+                        else {
+                          closeModal()
+                        }
+                      }
+                      )
+                  }
+                  else {
+                    data.forEach(item => {
+                      const newCatButton = document.createElement('tile');
+                      const tile_content = document.createElement('div')
+                      tile_content.textContent = item.name;
+                      tile_content.className = 'tile-content'
+                      newCatButton.id = item.id;
+                      newCatButton.name = item.name
+                      newCatButton.className = "clickable-tile";
+                      newCatButton.addEventListener('click', () => {
+                        getSubcategoriesButtons(item.id, item.name)
+                      });
+                      newCatButton.appendChild(tile_content)
+                      newCatRow.appendChild(newCatButton);
+                    });
+                  }
+                });
+              modal_content.innerHTML += '<br>'
+              modal_content.appendChild(newCatRow);
+              modal.appendChild(modal_content)
+              document.body.appendChild(modal);
+            };
           });
         });
-      </script>
-      <script>
-      $(document).ready(function () {
-          lead_id = "{{ lead_id }}"
-          if (lead_id){
-                $.ajax({
-                  url: "/leads/{{ lead_id }}/get_services",
-                  success: function (response) {
-                    for (const service of response) {
-                      var inputId = "search-input-" + Date.now();
-                      var inputWithDropdownHtml = generateForm(inputId, service.name, service.price)
-                      $("#inputs-container").append(inputWithDropdownHtml);
-                    }
-                    $("#" + inputId + "-del-button").on("click", function () {
-                      var search = document.getElementById(inputId)
-                      search.value = ''
-                      var input_row = document.getElementById(inputId + '-row')
-                      input_row.style.display = "none";
-                      var total_price = Math.round(parseFloat(document.getElementById("total-service-price").innerHTML) * 1000 / 1000);
-                      var deleted_price = Math.round(parseFloat(document.getElementById(inputId + "-price").value) * 1000 / 1000);
-                      total_price -= deleted_price 
-                      document.getElementById("total-service-price").innerHTML = total_price
-                    });
-                  },
-                });
-
-          }
-              });
       </script>
     </div>
   </div>

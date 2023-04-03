@@ -2,7 +2,7 @@ import json
 import logging
 import time
 import boto3
-from botocore.exceptions import ClientError
+from botocore.exceptions import ClientError, NoRegionError
 from flask import Flask
 
 app = Flask(__name__)
@@ -38,7 +38,7 @@ class SnsWrapper:
                 PhoneNumber=phone_number, Message=message, MessageAttributes=msg_attrs)
             message_id = response['MessageId']
             app.logger.info("Published message to %s.", phone_number)
-        except ClientError:
+        except ClientError or NoRegionError:
             app.logger.error("Couldn't publish message to %s.", phone_number)
             raise
         else:

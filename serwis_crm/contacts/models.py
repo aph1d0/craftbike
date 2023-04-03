@@ -8,8 +8,8 @@ class Contact(db.Model):
     __tablename__ = "contact"
     id = db.Column(db.Integer, db.Sequence('contact_id_seq'), primary_key=True)
     first_name = db.Column(db.String(20))
-    last_name = db.Column(db.String(20), nullable=False)
-    phone = db.Column(db.String(30), nullable=False)
+    last_name = db.Column(db.String(20), nullable=True)
+    phone = db.Column(db.String(30), nullable=True)
     owner_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='SET NULL'), nullable=True)
     notes = db.Column(db.String(300), nullable=True)
     #bikes = db.relationship(Bike, backref='contact')

@@ -12,6 +12,12 @@ body {
  * Sidebar
  */
 
+@media (min-width: 768px) {
+  .navbar-collapse.collapse.show  {
+    margin-top: 48px; /* Space for fixed navbar */
+  }
+}
+
 .sidebar {
   position: fixed;
   top: 0;
@@ -26,16 +32,9 @@ body {
   position: relative;
   top: 0;
   height: calc(100vh - 48px);
-  padding-top: .5rem;
+  padding-top: 83px;
   overflow-x: hidden;
   overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
-}
-
-@supports ((position: -webkit-sticky) or (position: sticky)) {
-  .sidebar-sticky {
-    position: -webkit-sticky;
-    position: sticky;
-  }
 }
 
 .sidebar .nav-link {
@@ -182,6 +181,12 @@ body {
     position: relative;
 }
 
+@media (max-width: 767px) { /* add a media query for smaller screens */
+  .kanban-container {
+      flex-direction: column; /* change to column */
+  }
+}
+
 .kanban-container .card.outer-card:hover {
     border-top: 3px solid #007bff;
 }
@@ -254,10 +259,12 @@ body {
     top: 0;
     left: 50%;
     margin-left: -75px; /* negative half of width. */
-    z-index: 10000;
+    z-index: 1000000000;
     text-align: center;
     padding: 5px 15px 8px;
     width: 150px;
+    opacity: 0.9;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
 }
 
 .ajax_indicator.processing {
@@ -266,6 +273,10 @@ body {
 
 .ajax_indicator.done {
     background-color: green;
+}
+
+.ajax_indicator.error {
+  background-color: red;
 }
 
 .icon-warning {
@@ -282,4 +293,109 @@ body {
     font-size: 14px;
 }
 
+.tiles-container {
+  display: flex;
+  flex-wrap: wrap;
+}
 
+.clickable-tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100px;
+  height: 100px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+  margin-right: 10px; /* Optional margin between tiles */
+  margin-bottom: 10px; /* Optional margin between rows */
+}
+
+.clickable-tile.add {
+  border: 2px solid #0676f7;
+}
+
+.clickable-tile:hover {
+  background-color: #f0f0f0;
+}
+
+.tile-content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
+  height: 100%;
+}
+
+.text-container {
+  margin-bottom: 10px;
+}
+
+.button-container {
+  margin-top: 10px;
+}
+
+.delete-button {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  font-size: 12px;
+  color: #ccc;
+  cursor: pointer;
+}
+
+.delete-button:hover {
+  color: #ff0000;
+}
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+}
+
+.modal-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.modal h2 {
+  margin: 0 0 20px;
+}
+
+.modal-button {
+  display: flex;
+  flex-direction: column;
+  background-color: #f44336;
+  color: #fff;
+  font-size: 16px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  margin: 0 10px;
+}
+.modal-button.yes-button {
+  background-color: #5cf436a4;
+}
+
+.modal-button:hover {
+  background-color: #d32f2f9c;
+}

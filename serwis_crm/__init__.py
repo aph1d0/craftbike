@@ -49,6 +49,7 @@ def create_app(config_class=ProductionConfig):
         # check if the config table exists, otherwise run install
         db.create_all()
         engine = db.engine
+        #engine.echo = True
         #if not engine.dialect.has_table(engine, 'app_config'):
         if not inspect(engine).has_table('app_config'):
             return run_install(app)

@@ -108,8 +108,8 @@
     $(".ajax_indicator")
       .css("display", "block")
       .text("przetwarzam")
-      .removeClass("zrobione")
-      .addClass("przetwarzam");
+      .removeClass("done")
+      .addClass("processing");
 
     $.ajax({
       type: "POST",
@@ -119,11 +119,30 @@
       success: function (data) {
         $(".ajax_indicator")
           .html("<span data-feather='check'></span> " + data.message)
-          .removeClass("przetwarzam")
-          .addClass("zrobione")
+          .removeClass("processing")
+          .addClass("done")
           .fadeOut(2000);
       },
+      error: function (data) {
+        if (data.responseJSON){
+          $(".ajax_indicator")
+          .html("<span data-feather='check'></span> " + data.responseJSON.message)
+          .removeClass("processing")
+          .addClass("error")
+          .fadeOut(2000);
+        } else {
+          $(".ajax_indicator")
+          .html("<span data-feather='check'></span> " + data.statusText)
+          .removeClass("processing")
+          .addClass("error")
+          .fadeOut(2000);
+        }
+
+      },
     });
+    setTimeout(function(){
+      window.location.reload();
+   }, 3000);
   }
 
   function getDragAfterElement(column, y) {

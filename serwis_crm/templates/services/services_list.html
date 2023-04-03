@@ -3,169 +3,372 @@
   class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"
 >
   <h2 class="h4">{% if title %}{{title}}{% else %}No Title{% endif %}</h2>
-  <div class="btn-toolbar mb-2 mb-md-0">
-    <div class="dropdown">
-      <button
-        class="btn btn-sm btn-outline-primary mr-2 dropdown-toggle bulk_assign disabled"
-        type="button"
-        id="dropdownMenuButton"
-        data-toggle="dropdown"
-        aria-haspopup="true"
-        aria-expanded="false"
-      >
-        <span data-feather="settings"></span> Zbiorowa akcja ( ͡° ͜ʖ ͡°)
-      </button>
-      <div class="dropdown-menu dd-sm" aria-labelledby="dropdownMenuButton">
-        <div class="dropdown-divider"></div>
-        <a
-          class="dropdown-item"
-          data-toggle="modal"
-          data-target="#servicesDeleteModal"
-          href="#"
-          >Usuń</a
-        >
-        <div class="dropdown-divider"></div>
-        <a class="dropdown-item" id="export_services_to_csv" href="#"
-          >Export do CSV</a
-        >
-      </div>
-    </div>
-
-    {% if current_user.is_admin %}
-    <a
-      class="btn btn-sm btn-outline-secondary mr-2"
-      role="button"
-      href="{{ url_for('services.import_bulk_services') }}"
-    >
-      <span data-feather="upload"></span>
-      Importuj ...
-    </a>
-    {% endif %}
-    <a
-      class="btn btn btn-sm btn-outline-primary"
-      role="button"
-      href="{{ url_for('services.new_service') }}"
-    >
-      <span data-feather="plus"></span>
-      Nowa czynność serwisowa
-    </a>
+</div>
+<div class="tiles-container">
+{% for service_cat in service_categories %}
+  <a
+    class="clickable-tile"
+    role="button"
+    id="{{ service_cat.id }}"
+    onclick='getSubcategoriesButtons("{{ service_cat.id }}",main_cat=true);resetButtonContainer()'
+  >
+  <div class="tile-content">
+  {{ service_cat.name }}
   </div>
+  </a>
+{% endfor %}
+<a
+class="clickable-tile add"
+role="button"
+onclick="addMainCategory()"
+>
+<span data-feather="plus"></span>
+</a>
 </div>
-{% include "services/filters.html" %} {% if services.items()|length > 0 %}
-<div class="table-responsive">
-  <table class="table table-striped table-hover fixed-layout-table">
-    <thead class="thead-light">
-      <tr>
-        <th width="40" scope="col">
-          <input type="checkbox" id="select_all" value="all" />
-        </th>
-        <th width="150"></th>
-        <th width="250" scope="col">Nazwa</th>
-        <th width="150" scope="col">Cena</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for service in services.items() %}
-      <tr>
-        <th scope="row">
-          <input class="cb" type="checkbox" value="{{ service.id }}" />
-        </th>
-        <th>
-          <a
-            href="{{ url_for('services.update_service', service_id=service.id) }}"
-            class="btn btn-outline-secondary btn-sm mr-1"
-            role="button"
-          >
-            <span data-feather="edit"></span>
-          </a>
-          <a
-            href="#"
-            data-toggle="modal"
-            data-target="#singleServiceDeleteModal_{{ service.id }}"
-            class="btn btn-outline-secondary btn-sm mr-1"
-            role="button"
-          >
-            <span data-feather="trash"></span>
-          </a>
-          {% with service_id=service.id %} {% include
-          'services/single_service_delete_modal.html' %} {% endwith %}
-          <a
-            href="{{ url_for('services.get_service_view', service_id=service.id) }}"
-            class="btn btn-outline-secondary btn-sm mr-1"
-            role="button"
-          >
-            <span data-feather="arrow-up-right"></span>
-          </a>
-        </th>
-        <td>{{ service.name }}</td>
-        <td>{{ service.price }} zł</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+<div class="button-container">
 </div>
-
-<!-- pagination -->
-{% if services.total_records > 10 %} {% with view_id="services.get_services_view",
-items=services %} {% include "common/pagination.html" %} {% endwith %} {% endif %}
-{% else %}
-<div class="container text-center pt-4">
-  <div><span data-feather="eye-off"></span></div>
-  <p>Brak czynnośći serwisowych. Prosze utworzyć nową czynność serwisową.</p>
-</div>
-{% endif %}
 <script>
-  $(document).ready(function () {
-    var items = [];
-
-    $("#select_all").on("click", function () {
-      if ($(this).is(":checked")) {
-        $(".cb").prop("checked", true);
-      } else {
-        $(".cb").prop("checked", false);
-      }
-      toggle_convert_lead_btn();
-    });
-
-    $(".cb").on("click", function () {
-      toggle_convert_lead_btn();
-    });
-
-    function toggle_convert_lead_btn() {
-      items = [];
-      $(".cb").each(function () {
-        if ($(this).is(":checked")) {
-          items.push($(this).val());
-        }
-      });
-
-      if (items.length > 0) {
-        $("#convert_lead").removeClass("disabled");
-        $(".bulk_assign").removeClass("disabled");
-      } else {
-        $("#convert_lead").addClass("disabled");
-        $(".bulk_assign").addClass("disabled");
-      }
+  let selected_categories_name_cascade = ''
+  function getSubcategoriesButtons(category_id, main_cat, category_name=null) {
+    if (!main_cat){
+      selected_categories_name_cascade += category_name + " "
     }
+    // Send a GET request to the Flask URL
+    fetch('/services/get_subcategories/' + parseInt(category_id))
+      .then(response => response.json())
+      .then(data => {
+        // Create a new row for the buttons
+        const newRow = document.createElement('div');
+        newRow.classList.add('tiles-container');
+        // If there is no more subcategories
+        if (data.length === 0){
+          fetch('/services/get_action/' + parseInt(category_id))
+          .then(response => response.json())
+          .then(data => {
+            if (Object.keys(data).length !== 0){
+              const new_tile = document.createElement('tile');
+              new_tile.className = 'clickable-tile' 
+              const tile_content = document.createElement('div')
+              tile_content.innerHTML = data.name + "<br> cena: " + data.price + " zł";
+              tile_content.className = 'tile-content'
+              new_tile.id = data.id
+              new_tile.name = data.name
+              new_tile.price = data.price
+              var item_id = data.id
+              new_tile.addEventListener('click', editServiceAction);
+              const delButton = document.createElement('div');
+              delButton.innerHTML = "X"
+              delButton.addEventListener('click', deleteServiceAction);
+              delButton.addEventListener('touchend', handleActionTouchEnd);
+              delButton.className="delete-button"
+              tile_content.appendChild(delButton)
+              new_tile.appendChild(tile_content)
+              newRow.appendChild(new_tile);
+          } else {
+              const add_span = document.createElement('span');
+              add_span.setAttribute("data-feather", "plus");
+              // no data -> add new service action or new subcategory
+              if (!main_cat) {
+              const newAddActionButton = document.createElement('tile');
+              newAddActionButton.className = 'clickable-tile add' 
+              const action_tile_content = document.createElement('div')
+              action_tile_content.className = 'tile-content'
+              newAddActionButton.appendChild(add_span);
+              newAddActionButton.addEventListener('click', () => {
+                addServiceAction(category_id, selected_categories_name_cascade)
+              });
+              var buttonText = document.createTextNode(" Czynność serwisowa");
+              newAddActionButton.appendChild(buttonText);
+              newRow.appendChild(newAddActionButton)
+              feather.replace();
+              }
+              const newAddSubCategoryButton = document.createElement('tile');
+              newAddSubCategoryButton.className = 'clickable-tile add' 
+              const subcategory_tile_content = document.createElement('div')
+              subcategory_tile_content.className = 'tile-content'
+              newAddSubCategoryButton.appendChild(add_span);
+              newAddSubCategoryButton.addEventListener('click', () => {
+                addNewSubcategory(category_id)
+              });
+              var buttonText = document.createTextNode(" Podkategoria");
+              
+              newAddSubCategoryButton.appendChild(buttonText);
+              newRow.appendChild(newAddSubCategoryButton)
+              feather.replace();
+          }
+          });
+        }
+        else {
+  
+        // Add a button for each item in the response
+        data.forEach(item => {
+          const newButton = document.createElement('tile');
+          const tile_content = document.createElement('div')
+          tile_content.textContent = item.name;
+          tile_content.className = 'tile-content'
+          newButton.id = item.id;
+          newButton.name = item.name
+          newButton.className="clickable-tile";
+          newButton.addEventListener('click', () => {
+            getSubcategoriesButtons(item.id, main_cat=false, item.name)
+          });
+          const delButton = document.createElement('div');
+          delButton.innerHTML = "X"
+          delButton.addEventListener('click', deleteSubcategory);
+          delButton.addEventListener('touchend', handleTouchEnd);
+          delButton.className="delete-button"
+          tile_content.appendChild(delButton);
+          newButton.appendChild(tile_content)
+          newRow.appendChild(newButton);
+        });
+        const newAddButton = document.createElement('a');
+        const add_span = document.createElement('span');
+        add_span.setAttribute("data-feather", "plus");
+        newAddButton.appendChild(add_span);
+        newAddButton.role = 'button'
+        newAddButton.className="clickable-tile add";
 
-    $(".ba_modal").on("show.bs.modal", function (e) {
-      // do something...
-      $(".modal-notif-area").html(`
-                <div class="alert alert-success" role="alert">
-                  Wybrałeś <strong>${items.length}</strong> czynnośći serwisowych do masowej akcji.
-                </div>`);
-
-      // store the values
-      console.log(items);
-      $(".services_data").val(items);
-    });
-
-    $("#export_services_to_csv").on("click", function (e) {
-      e.preventDefault();
-      window.location = "{{ url_for('services.write_to_csv') }}?service_ids=" + items;
-    });
-  });
+        newAddButton.addEventListener('click', () => {
+          addNewSubcategory(category_id)
+        });
+        // create a text node with the text content of the button
+        //var buttonText = document.createTextNode(" Dodaj nową podkategorie");
+        // append the text node to the button
+        //newAddButton.appendChild(buttonText);
+        newRow.appendChild(newAddButton)
+      }
+        // Add the new row to the page
+        const container = document.querySelector('.button-container');
+        container.innerHTML += '<br>'
+        container.appendChild(newRow);
+        feather.replace();
+        
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+  }
 </script>
+<script>
+  function resetButtonContainer(){
+      selected_categories_name_cascade = ''
+      document.querySelector('.button-container').innerHTML = "";
+  }
+</script>
+<script>
+  function addServiceAction(category_id, service_name){
+    const modal = document.createElement('div');
+    modal.classList.add('modal');
+    modal.setAttribute('style','display:flex;')
+    modal.innerHTML = `
+      <div class="modal-content">
+        <h2>Dodaj nową czynność serwisową</h2>
+        <br>
+        Nazwa: <input class=service_name></input>
+        <br>
+        Cena: <input class=service_price></input>
+        <button class="modal-button yes-button">Dodaj</button>
+        <br>
+        <button class="modal-button no-button">Wróc</button>
+      </div>
+    `;
+    document.body.appendChild(modal);
+    modal.querySelector('.service_name').value = service_name
+    const yesButton = modal.querySelector('.yes-button');
+    const noButton = modal.querySelector('.no-button');
+    yesButton.addEventListener('click', () => {
+      const new_category_name = modal.querySelector('.category_name').value;
+      fetch(`/services/categories/new/${new_category_name}`, { method: 'POST' })
+        .then(response => {
+          if (response.ok) {
+            location.reload();
+          } else {
+            console.error(`Failed to delete tile with ID ${tileId}: ${response.status} ${response.statusText}`);
+          }
+        })
+        .catch(error => {
+          console.error(`Failed to delete tile with ID ${tileId}: ${error}`);
+        });
+    });
+    noButton.addEventListener('click', () => {
+      modal.remove();
+    });
+  }
+  function addMainCategory(){
+    const modal = document.createElement('div');
+    modal.classList.add('modal');
+    modal.setAttribute('style','display:flex;')
+    modal.innerHTML = `
+      <div class="modal-content">
+        <h2>Dodaj nową główną kategorię</h2>
+        <br>
+        Nazwa: <input class=category_name></input>
+        <br>
+        <button class="modal-button yes-button">Dodaj</button>
+        <br>
+        <button class="modal-button no-button">Wróc</button>
+      </div>
+    `;
+    document.body.appendChild(modal);
+    const yesButton = modal.querySelector('.yes-button');
+    const noButton = modal.querySelector('.no-button');
+    yesButton.addEventListener('click', () => {
+      const new_category_name = modal.querySelector('.category_name').value;
+      fetch(`/services/categories/new/${new_category_name}`, { method: 'POST' })
+        .then(response => {
+          if (response.ok) {
+            location.reload();
+          } else {
+            console.error(`Failed to delete tile with ID ${tileId}: ${response.status} ${response.statusText}`);
+          }
+        })
+        .catch(error => {
+          console.error(`Failed to delete tile with ID ${tileId}: ${error}`);
+        });
+    });
+    noButton.addEventListener('click', () => {
+      modal.remove();
+    });
+  };  
+  function addNewSubcategory(category_id) {
+    const modal = document.createElement('div');
+    modal.classList.add('modal');
+    modal.setAttribute('style','display:flex;')
+    modal.innerHTML = `
+      <div class="modal-content">
+        <h2>Dodaj nową podkategorię</h2>
+        <br>
+        Nazwa: <input class=subcategory_name></input>
+        <br>
+        <button class="modal-button yes-button">Ok</button>
+        <br>
+        <button class="modal-button no-button">Wróc</button>
+      </div>
+    `;
+    document.body.appendChild(modal);
+    const yesButton = modal.querySelector('.yes-button');
+    const noButton = modal.querySelector('.no-button');
+    yesButton.addEventListener('click', () => {
+      const new_subcategory_name = modal.querySelector('.subcategory_name').value;
+      fetch(`/services/subcategories/new/${category_id}/${new_subcategory_name}`, { method: 'POST' })
+        .then(response => {
+          if (response.ok) {
+            location.reload();
+          } else {
+            console.error(`Failed to delete tile with ID ${tileId}: ${response.status} ${response.statusText}`);
+          }
+        })
+        .catch(error => {
+          console.error(`Failed to delete tile with ID ${tileId}: ${error}`);
+        });
+    });
+    noButton.addEventListener('click', () => {
+      modal.remove();
+    });
+  };  
+  let touchTimeout;
+  function handleTouchEnd(event) {
+    clearTimeout(touchTimeout);
+    touchTimeout = setTimeout(() => {
+      deleteSubcategory(event);
+    }, 300); // 300ms delay before registering click
+  }
+  function handleActionTouchEnd(event) {
+    clearTimeout(touchTimeout);
+    touchTimeout = setTimeout(() => {
+      deleteServiceAction(event);
+    }, 300); // 300ms delay before registering click
+  }
+  function deleteServiceAction(event) {
 
-<!-- Service Bulk Delete Modal -->
-{% include "services/bulk_service_delete_modal.html" %} {% endblock %}
+  }
+  function editServiceAction(event){
+    const tile = event.target.closest('.clickable-tile');
+    const tileId = tile.id;
+    const tileName = tile.name;
+    const tilePrice = tile.price
+    const modal = document.createElement('div');
+    modal.classList.add('modal');
+    modal.setAttribute('style','display:flex;')
+    modal.innerHTML = `
+      <div class="modal-content">
+        <h2>Edycja ` + tileName + `</h2>
+        <br>
+        Nazwa: <input class=tile_name></input>
+        <br>
+        Cena: <input class=tile_price></input>
+        <br>
+        <button class="modal-button yes-button">Ok</button>
+        <br>
+        <button class="modal-button no-button">Wróc</button>
+      </div>
+    `;
+    modal.querySelector('.tile_name').value = tileName
+    modal.querySelector('.tile_price').value = tilePrice
+    document.body.appendChild(modal);
+    const yesButton = modal.querySelector('.yes-button');
+    const noButton = modal.querySelector('.no-button');
+    yesButton.addEventListener('click', () => {
+      const new_tile_name = modal.querySelector('.tile_name').value;
+      const new_tile_price = modal.querySelector('.tile_price').value;
+      fetch(`/services/actions/edit/${tileId}/${new_tile_name}/${new_tile_price}`, { method: 'POST' })
+        .then(response => {
+          if (response.ok) {
+            location.reload();
+          } else {
+            console.error(`Failed to delete tile with ID ${tileId}: ${response.status} ${response.statusText}`);
+          }
+        })
+        .catch(error => {
+          console.error(`Failed to delete tile with ID ${tileId}: ${error}`);
+        });
+    });
+    noButton.addEventListener('click', () => {
+      modal.remove();
+    });
+  };
+  function deleteSubcategory(event) {
+    const tile = event.target.closest('.clickable-tile');
+    const tileId = tile.id;
+    const tileName = tile.name;
+    const modal = document.createElement('div');
+    modal.setAttribute('style','display:flex;')
+    modal.classList.add('modal');
+    modal.innerHTML = `
+      <div class="modal-content">
+        <h2>Czy jestes pewny ze chcesz usunać ` + tileName + `?</h2>
+        <br>
+        <button class="modal-button yes-button">Tak</button>
+        <br>
+        <button class="modal-button no-button">Nie</button>
+      </div>
+    `;
+    document.body.appendChild(modal);
+    const yesButton = modal.querySelector('.yes-button');
+    const noButton = modal.querySelector('.no-button');
+    yesButton.addEventListener('click', () => {
+      fetch(`/services/subcategories/del/${tileId}`, { method: 'POST' })
+        .then(response => {
+          if (response.ok) {
+            location.reload();
+          } else {
+            console.error(`Failed to delete tile with ID ${tileId}: ${response.status} ${response.statusText}`);
+          }
+        })
+        .catch(error => {
+          console.error(`Failed to delete tile with ID ${tileId}: ${error}`);
+        });
+    });
+    noButton.addEventListener('click', () => {
+      modal.remove();
+    });
+  }
+  
+  function closeModal() {
+    const modal = document.querySelector('.modal');
+    modal.remove();
+  }
+</script>
+{% endblock %}
+</div>
+

@@ -16,6 +16,9 @@ class NewService(FlaskForm):
     service_price = FloatField('Cena czynnośći serwisowej', validators=[DataRequired('Cena jest obowiazkowa')]) 
     submit = SubmitField('Utwórz nowe zlecenie serwisowe')
 
+class NewCategory(FlaskForm):
+    category_name = StringField('Czynność serwisowa', validators=[DataRequired('Nazwa jest obowiazkowa')])
+    submit = SubmitField('Utwórz nową kategorię serwisową')
 
 class FilterServices(FlaskForm):
     txt_search = StringField()

@@ -27,8 +27,8 @@ class NewLead(FlaskForm):
     bike_manufacturer = StringField('Marka roweru', id='bike_manufacturer', validators=[DataRequired(message='Marka roweru jest obowiązkowa!')])
     bike_model = StringField('Model roweru', id='bike_model', validators=[DataRequired(message='Model roweru jest obowiązkowy!')])
     title = StringField('Nazwa', id='title')
-    first_name = StringField('Imię', validators=[DataRequired(message='Imię jest obowiązkowe!')])
-    last_name = StringField('Nazwisko', validators=[DataRequired(message='Nazwisko jest obowiązkowe!')])
+    first_name = StringField('Imię')
+    last_name = StringField('Nazwisko')
     notes = StringField('Notatki', widget=TextArea())
     lead_status = QuerySelectField('Status', query_factory=LeadStatus.lead_status_query_final, get_pk=lambda a: a.id,
                                    get_label='status_name', default=LeadStatus.get_by_id(2), allow_blank=False, blank_text='Wybierz status zlecenia')
@@ -39,7 +39,7 @@ class NewLead(FlaskForm):
                                  validators=[Length(max=10, message='Cos sie data nie zgadza.')])
     service_name = StringField('Czynność serwisowa')
     service_price = FloatField('Cena czynnośći serwisowej') 
-    total_price = FloatField('Cena całkowita serwisu') 
+    total_price = FloatField('Przybliżona cena całkowita serwisu') 
     submit = SubmitField('Utwórz nowe zlecenie serwisowe')
 
 class EditLead(NewLead):

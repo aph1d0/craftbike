@@ -66,13 +66,7 @@ def get_contacts_view():
     query = Contact.query.filter(or_(
             Contact.first_name.ilike(f'%{search}%'),
             Contact.last_name.ilike(f'%{search}%'),
-            Contact.email.ilike(f'%{search}%'),
             Contact.phone.ilike(f'%{search}%'),
-            Contact.mobile.ilike(f'%{search}%'),
-            Contact.address_line.ilike(f'%{search}%'),
-            Contact.addr_state.ilike(f'%{search}%'),
-            Contact.addr_city.ilike(f'%{search}%'),
-            Contact.post_code.ilike(f'%{search}%')
         ) if search else True)\
         .filter(owner) \
         .filter(advanced_filters) \
