@@ -194,10 +194,10 @@ def new_lead():
                     bike = new_bike(bike_manufacturer=str(form.bike_manufacturer.data).lower(), bike_model=str(form.bike_model.data).lower(), client_id=client.id)
             lead = LeadMain(title=form.title.data,
                         status=form.lead_status.data, notes=form.notes.data)
-            # for service in form.service_name.raw_data:
-            #     service_obj = Services.query.filter(Services.name == service).first()
-            #     if service_obj:
-            #         lead.services.append(service_obj)
+            for service in form.service_name.raw_data:
+                service_obj = ServicesAction.query.filter(ServicesAction.name == service).first()
+                if service_obj and (service_obj not in lead.services):
+                    lead.services.append(service_obj)
             if form.lead_status.data.status_name == 'Umówiony na serwis':
                 lead.date_scheduled = form.date_scheduled.data
             else:
@@ -244,10 +244,10 @@ def update_lead(lead_id):
             lead.date_scheduled = form.date_scheduled.data
             lead.notes = form.notes.data
             services = []
-            # for service in form.service_name.raw_data:
-            #     service_obj = Services.query.filter(Services.name == service).first()
-            #     if service_obj:
-            #         services.append(service_obj)
+            for service in form.service_name.raw_data:
+                service_obj = ServicesAction.query.filter(ServicesAction.name == service).first()
+                if service_obj:
+                    services.append(service_obj)
             lead.services = services
             up_stage = update_stage(lead_id=lead.id, lead_stage_id=lead.status.id)
             if up_stage.json["status"] == 200:
@@ -270,8 +270,8 @@ def update_lead(lead_id):
         form.lead_status.data = lead.status
         form.date_scheduled.data = lead.date_scheduled.strftime('%Y-%m-%d')
         form.notes.data = lead.notes
-        form.total_price.data = LeadMain.get_total_price(lead.id)
-        form.submit.label = Label('update_lead', 'Aktualizuj zlecenie')
+        #form.total_price.data = LeadMain.get_total_price(lead.id)
+        form.submit.label = Label('update_lead', 'Aktualizuj')
     return render_template("leads/new_lead.html", title="Aktualizuj zlecenie", form=form, lead_id=lead.id)
 
 

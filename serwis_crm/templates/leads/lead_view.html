@@ -7,13 +7,17 @@
       <span data-feather="edit-2"></span>
       Edytuj
     </a>
+    <a href="" class="btn btn-md btn-outline-secondary" role="button" id="print-btn">
+      <span data-feather="printer"></span>
+      Drukuj
+    </a>
     <a href="{{ url_for('leads.get_leads_view') }}" class="btn btn-md btn-outline-secondary" role="button">
       <span data-feather="arrow-left"></span>
       Powrót do listy
     </a>
   </div>
 </div>
-<div class="row">
+<div class="row printable">
   <div class="col-5">
     <ul class="list-group list-group-flush">
       <li class="list-group-item g_field">
@@ -62,17 +66,7 @@
     </ul>
   </div>
 </div>
-<div class="row">
-  <div class="col-10">
-    <ul class="list-group list-group-flush">
-      <li class="list-group-item g_field col-12">
-        <div class="label">Notatki</div>
-        <div class="text">{{ lead.notes if lead.notes else '_' }}</div>
-      </li>
-    </ul>
-  </div>
-</div>
-<div class="row">
+<div class="row printable">
   <div class="col-10">
     <ul class="list-group list-group-flush">
       <li class="list-group-item g_field col-12">
@@ -90,7 +84,7 @@
     </ul>
   </div>
 </div>
-<div class="row">
+<div class="row printable">
   <div class="col-10">
     <ul class="list-group list-group-flush">
       <li class="list-group-item g_field col-12">
@@ -100,4 +94,34 @@
     </ul>
   </div>
 </div>
+<script>
+// Get the button element
+const printBtn = document.getElementById('print-btn');
+
+// Add a click event listener to the button
+printBtn.addEventListener('click', () => {
+  // Get all the div elements with the specified classes
+  const divsToPrint = document.querySelectorAll('.row.printable');
+
+  // Create a new container div element to hold the selected div elements
+  const containerDiv = document.createElement('div');
+
+  // Loop through each div element and add it to the container div
+  divsToPrint.forEach(div => {
+    containerDiv.appendChild(div.cloneNode(true));
+  });
+
+  // Create a new window to print the contents
+  const printWindow = window.open('Zlecenie serwisowe', 'Print', 'height=600,width=800');
+
+  // Write the contents of the container div to the new window
+  printWindow.document.write(containerDiv.innerHTML);
+
+  // Call the browser's print function to print the contents
+  printWindow.print();
+
+  // Close the new window
+  printWindow.close();
+});
+</script>
 {% endblock %}

@@ -48,7 +48,7 @@ class LeadMain(db.Model):
         lead = LeadMain.query.filter_by(id=lead_id).first()
         if lead.services:
             for service in lead.services:
-                total += float(service.price)
+                total += int(service.price)
         return total
 
 

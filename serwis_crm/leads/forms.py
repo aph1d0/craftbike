@@ -2,7 +2,7 @@ import datetime
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from wtforms.fields.html5 import DateField
-from wtforms import StringField, SubmitField, FloatField, BooleanField
+from wtforms import StringField, SubmitField, IntegerField
 from wtforms.widgets import TextArea
 from wtforms.validators import DataRequired, Email, Optional, ValidationError, Length
 from wtforms_sqlalchemy.fields import QuerySelectField, QuerySelectMultipleField
@@ -38,8 +38,8 @@ class NewLead(FlaskForm):
     date_scheduled = StringField('Data wizyty', id='date_scheduled', default=datetime.datetime.now().strftime('%Y-%m-%d'),
                                  validators=[Length(max=10, message='Cos sie data nie zgadza.')])
     service_name = StringField('Czynność serwisowa')
-    service_price = FloatField('Cena czynnośći serwisowej') 
-    total_price = FloatField('Przybliżona cena całkowita serwisu') 
+    service_price = IntegerField('Cena czynnośći serwisowej') 
+    total_price = IntegerField('Przybliżona cena całkowita serwisu') 
     submit = SubmitField('Utwórz nowe zlecenie serwisowe')
 
 class EditLead(NewLead):

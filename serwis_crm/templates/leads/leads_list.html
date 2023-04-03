@@ -44,7 +44,7 @@
         >
     </div>
 
-    {% if current_user.is_admin %}
+    <!-- {% if current_user.is_admin %}
     <a
       class="btn btn-sm btn-outline-secondary mr-2"
       role="button"
@@ -53,14 +53,14 @@
       <span data-feather="upload"></span>
       Importuj ...
     </a>
-    {% endif %}
+    {% endif %} -->
     <a
       class="btn btn btn-sm btn-outline-primary"
       role="button"
       href="{{ url_for('leads.new_lead') }}"
     >
       <span data-feather="plus"></span>
-      Nowe zlecenie serwisowe
+      Nowe zlecenie
     </a>
   </div>
 </div>

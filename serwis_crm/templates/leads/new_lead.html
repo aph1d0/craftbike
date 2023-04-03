@@ -217,35 +217,53 @@
       <button class="btn btn-md btn-outline-secondary" id="add-input-button" , type="button">
         Dodaj czynność serwisową
       </button>
+      <br><br>
       <script>
         function closeModal() {
           const modal = document.querySelector('.modal');
-          modal.remove();
+          if (modal){
+            modal.remove();
+          }
         }
-        function updateTotalServicePrice(service_id) {
-          var price = document.getElementById(service_id + '-price').innerHTML;
+        function closeModalOnOutsideClick() {
+          const modal = document.querySelector('.modal');
+ 
+        }
+        function updateTotalServicePrice(service_id, add=true) {
+          var price = document.getElementById(service_id + '-price').value;
           price = Number(price.replace(/\D/g, ""));
           var total_price = Number(document.getElementById('total-service-price').innerHTML);
-          total_price += price
+          if (add){
+            total_price += price
+          } else {
+            total_price -= price
+          }
           document.getElementById('total-service-price').innerHTML = total_price
 
         }
-        function getServices(lead_id){
-          fetch('/leads/' + lead_id  + '/get_services')
-          .then(response => response.json())
-          .then(data => {
-          }
-          )
+        function deleteService(service_id) {
+          updateTotalServicePrice(service_id, add=false)
+          document.getElementById(service_id + '-row').innerHTML = ''
         }
         $(document).ready(function () {
-          
+          closeModalOnOutsideClick() 
+          function getServices(lead_id){
+            fetch('/leads/' + lead_id  + '/get_services')
+            .then(response => response.json())
+            .then(data => {
+              data.forEach(item => {
+                addServiceAction(item.id, item.name, item.price)
+              })
+            })
+          }
+          getServices('{{ lead_id }}')
           function addServiceAction(service_id, service_name, service_price) {
             const new_service_row = document.createElement('div');
             const new_service_name_div = document.createElement('div');
             const new_service_price_div = document.createElement('div');
             const new_service_del_button_div = document.createElement('div');
-            const new_service_name = document.createElement('div');
-            const new_service_price = document.createElement('div');
+            const new_service_name = document.createElement('textarea');
+            const new_service_price = document.createElement('input');
             const new_service_del_button = document.createElement('button');
             const new_service_del_button_span = document.createElement('span');
 
@@ -255,18 +273,24 @@
 
             new_service_name.setAttribute('id', service_id + '-name')
             new_service_price.setAttribute('id', service_id + '-price')
-            new_service_name.innerText = service_name
-            new_service_price.innerText = service_price + " zł"
-            new_service_name.className = "form"
-            new_service_price.className = "form"
+            new_service_name.setAttribute('name', 'service_name')
+            new_service_price.setAttribute('name', 'service_price')
+            new_service_name.value = service_name
+            new_service_price.value = service_price
+            new_service_name.className = "form-control from-control-lg"
+            new_service_price.className = "form-control from-control-lg"
 
             new_service_del_button_span.setAttribute("data-feather", "trash-2");
             new_service_del_button.setAttribute("id", service_id + '-del')
             new_service_del_button.className = "btn btn-md btn-outline-secondary"
+            new_service_del_button.addEventListener('click', () => {
+              deleteService(service_id)
+            });
             new_service_del_button.appendChild(new_service_del_button_span)
 
             const service_inputs = document.getElementById('inputs-container');
             new_service_row.className = "form-row"
+            new_service_row.setAttribute('id', service_id + '-row')
             new_service_name_div.appendChild(new_service_name)
             new_service_price_div.appendChild(new_service_price)
             new_service_del_button_div.appendChild(new_service_del_button)
@@ -276,12 +300,17 @@
             service_inputs.appendChild(new_service_row)
             feather.replace();
             updateTotalServicePrice(service_id)
-            if (modal){
-              closeModal()
+
+            closeModal()
             }
-          }
+        
           $("#add-input-button").on("click", function () {
             const modal = document.createElement('div');
+            window.onclick = function(event) {
+              if (event.target == modal) {
+                modal.style.display = "none";
+              }
+            }
             modal.classList.add('modal');
             modal.setAttribute('style', 'display:flex;')
             const modal_content = document.createElement('div');
