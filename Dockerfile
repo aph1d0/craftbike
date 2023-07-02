@@ -23,7 +23,7 @@ ENV AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION}
 
 # RUN apk update && apk add --no-cache python3-dev py3-pip gcc musl-dev mariadb-connector-c-dev
 
-RUN apt-get update && apt-get install -y default-libmysqlclient-dev gcc
+RUN apt-get update && apt-get install -y default-libmysqlclient-dev gcc pkg-config 
 
 COPY requirements.txt /
 RUN pip3 install -r /requirements.txt
