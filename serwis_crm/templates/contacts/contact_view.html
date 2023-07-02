@@ -69,7 +69,7 @@
             <div class="tab-content p-4">
               <div class="tab-pane fade show active" id="bikes-tab" role="tabpanel" aria-labelledby="bikes-tab">
                 <div class="mt-2 mb-4">Rowery klienta</div>
-                  {% if contact.bikes|length > 0 %}
+                  {% if contact.contact_bikes|length > 0 %}
                         <table class="table">
                             <thead>
                                 <tr>
@@ -78,7 +78,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for bike in contact.bikes %}
+                                {% for bike in contact.contact_bikes %}
                                     <tr>
                                         <td>{{ bike.manufacturer }}</td>
                                         <td>{{ bike.model }}</td>

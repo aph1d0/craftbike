@@ -2,8 +2,8 @@ from serwis_crm import db
 from sqlalchemy.orm import relationship   
 
 lead_service = db.Table('lead_service',
-                    db.Column('lead_id', db.Integer, db.ForeignKey('lead_main.id')),
-                    db.Column('service_id', db.Integer, db.ForeignKey('services_action.id'))
+                    db.Column('lead_id', db.Integer, db.ForeignKey('lead_main.id', ondelete='SET NULL')),
+                    db.Column('service_id', db.Integer, db.ForeignKey('services_action.id', ondelete='SET NULL'))
                     )    
 
 class ServicesCategory(db.Model):

@@ -10,9 +10,13 @@
     class="clickable-tile"
     role="button"
     id="{{ service_cat.id }}"
+    name="{{ service_cat.name }}"
     onclick='getSubcategoriesButtons("{{ service_cat.id }}",main_cat=true);resetButtonContainer()'
   >
   <div class="tile-content">
+  <div class="delete-button">
+    <span data-feather="trash-2" onclick='deleteCategory(event)'></span>
+  </div>
   {{ service_cat.name }}
   </div>
   </a>
@@ -56,12 +60,14 @@ onclick="addMainCategory()"
               new_tile.price = data.price
               var item_id = data.id
               new_tile.addEventListener('click', editServiceAction);
-              const delButton = document.createElement('div');
-              delButton.innerHTML = "X"
+              const delButton_div = document.createElement('div');
+              const delButton = document.createElement('a');
+              delButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>'
               delButton.addEventListener('click', deleteServiceAction);
               delButton.addEventListener('touchend', handleActionTouchEnd);
-              delButton.className="delete-button"
-              tile_content.appendChild(delButton)
+              delButton_div.className="delete-button"
+              delButton_div.appendChild(delButton)
+              tile_content.appendChild(delButton_div)
               new_tile.appendChild(tile_content)
               newRow.appendChild(new_tile);
           } else {
@@ -112,12 +118,14 @@ onclick="addMainCategory()"
           newButton.addEventListener('click', () => {
             getSubcategoriesButtons(item.id, main_cat=false, item.name)
           });
-          const delButton = document.createElement('div');
-          delButton.innerHTML = "X"
-          delButton.addEventListener('click', deleteSubcategory);
+          const delButton_div = document.createElement('div');
+          const delButton = document.createElement('a');
+          delButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>'
+          delButton.addEventListener('click', deleteCategory);
           delButton.addEventListener('touchend', handleTouchEnd);
-          delButton.className="delete-button"
-          tile_content.appendChild(delButton);
+          delButton_div.className="delete-button"
+          delButton_div.appendChild(delButton)
+          tile_content.appendChild(delButton_div);
           newButton.appendChild(tile_content)
           newRow.appendChild(newButton);
         });
@@ -177,17 +185,18 @@ onclick="addMainCategory()"
     const yesButton = modal.querySelector('.yes-button');
     const noButton = modal.querySelector('.no-button');
     yesButton.addEventListener('click', () => {
-      const new_category_name = modal.querySelector('.category_name').value;
-      fetch(`/services/categories/new/${new_category_name}`, { method: 'POST' })
+      const new_action_name = modal.querySelector('.service_name').value;
+      const new_action_price = modal.querySelector('.service_price').value;
+      fetch(`/services/actions/add/${category_id}/${new_action_name}/${new_action_price}`, { method: 'POST' })
         .then(response => {
           if (response.ok) {
             location.reload();
           } else {
-            console.error(`Failed to delete tile with ID ${tileId}: ${response.status} ${response.statusText}`);
+            console.error(`Failed to add service action: ${response.status} ${response.statusText}`);
           }
         })
         .catch(error => {
-          console.error(`Failed to delete tile with ID ${tileId}: ${error}`);
+          console.error(`Failed to add service action: ${error}`);
         });
     });
     noButton.addEventListener('click', () => {
@@ -270,7 +279,7 @@ onclick="addMainCategory()"
   function handleTouchEnd(event) {
     clearTimeout(touchTimeout);
     touchTimeout = setTimeout(() => {
-      deleteSubcategory(event);
+      deleteCategory(event);
     }, 300); // 300ms delay before registering click
   }
   function handleActionTouchEnd(event) {
@@ -280,6 +289,40 @@ onclick="addMainCategory()"
     }, 300); // 300ms delay before registering click
   }
   function deleteServiceAction(event) {
+    const tile = event.target.closest('.clickable-tile');
+    const tileId = tile.id;
+    const tileName = tile.name;
+    const modal = document.createElement('div');
+    modal.setAttribute('style','display:flex;')
+    modal.classList.add('modal');
+    modal.innerHTML = `
+      <div class="modal-content">
+        <h2>Czy jestes pewny ze chcesz usunać ` + tileName + `?</h2>
+        <br>
+        <button class="modal-button yes-button">Tak</button>
+        <br>
+        <button class="modal-button no-button">Nie</button>
+      </div>
+    `;
+    document.body.appendChild(modal);
+    const yesButton = modal.querySelector('.yes-button');
+    const noButton = modal.querySelector('.no-button');
+    yesButton.addEventListener('click', () => {
+      fetch(`/services/actions/del/${tileId}`, { method: 'POST' })
+        .then(response => {
+          if (response.ok) {
+            location.reload();
+          } else {
+            console.error(`Failed to delete tile with ID ${tileId}: ${response.status} ${response.statusText}`);
+          }
+        })
+        .catch(error => {
+          console.error(`Failed to delete tile with ID ${tileId}: ${error}`);
+        });
+    });
+    noButton.addEventListener('click', () => {
+      modal.remove();
+    });
 
   }
   function editServiceAction(event){
@@ -327,7 +370,7 @@ onclick="addMainCategory()"
       modal.remove();
     });
   };
-  function deleteSubcategory(event) {
+  function deleteCategory(event) {
     const tile = event.target.closest('.clickable-tile');
     const tileId = tile.id;
     const tileName = tile.name;

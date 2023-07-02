@@ -1,5 +1,6 @@
 import pandas as pd
 from sqlalchemy import cast, not_, or_
+import sqlalchemy
 from wtforms import Label
 
 from flask import Blueprint, jsonify, session, Response
@@ -79,32 +80,36 @@ def update_action(action_id,new_tile_name,new_tile_price):
     db.session.commit()
     return jsonify({"status_code":200, "message": "Czynność serwisowa zaktualizowana."})
 
-@services.route("/services/new", methods=['GET', 'POST'])
+@services.route("/services/actions/del/<int:action_id>", methods=['POST'])
 @login_required
-@check_access('services', 'create')
-def new_service():
-    form = NewService()
-    if request.method == 'POST':
-        if form.is_submitted() and form.validate():
-            service = form.service_name.data
-            price = form.service_price.data
-            fetched_service = ServicesAction.query.filter(ServicesAction.name.ilike(f'%{service}%')).all()
-            if not fetched_service:
-                new_service = ServicesAction()
-                new_service.name = service
-                new_service.price = price
-                db.session.add(new_service)
-                db.session.commit()
-                flash('Nowa czynność serwisowa została utworzona!', 'success')
-            else:
-                flash('Czynność o takiej nazwie już istnieje! Zapraszam do użycia przycisku szukaj.', 'danger')
-            return redirect(url_for('services.get_services_view'))
-        else:
-            for error in form.errors:
-                print(error)
-            flash('Błednie wypełniony formularz. Sprawdz go ponownie baranie!', 'danger')
-    return render_template("services/new_service.html", title="Nowa czynność serwisowa", form=form)
+@check_access('services', 'remove')
+def delete_action(action_id):
+    service_action = ServicesAction.get_by_id(action_id)
+    if not service_action:
+        return jsonify({"status_code":404, "message": "Nie ma takiej akcji!"})
+    else:
+        ServicesAction.query.filter(ServicesAction.id==action_id).delete()
+        try:
+            db.session.commit()
+        except sqlalchemy.exc.IntegrityError:
+            return jsonify({"status_code":501, "message": "Nie można usunąć czynnośći serwisowej ponieważ jest powiązana z istniejącym serwisem"})  
+    return jsonify({"status_code":200, "message": "Poprawnie usunięto czynność serwisową"})    
 
+@services.route("/services/actions/add/<int:category_id>/<string:action_name>/<int:action_price>", methods=['POST'])
+@login_required
+@check_access('services', 'add')
+def add_action(category_id, action_name, action_price):
+    service_action = ServicesAction.query.filter(ServicesAction.name==action_name).first()
+    if service_action:
+        return jsonify({"status_code":501, "message": "Taka akcja serwisowa juz istnieje!"})
+    else:
+        new_service_action = ServicesAction()
+        new_service_action.name = action_name
+        new_service_action.parent_id = category_id
+        new_service_action.price = action_price
+        db.session.add(new_service_action)
+        db.session.commit()
+        return jsonify({"status_code":200, "message": "Poprawnie dodano czynność serwisową"})    
 
 @services.route("/services/subcategories/del/<int:subcategory_id>", methods=['GET', 'POST'])
 @login_required
@@ -115,7 +120,6 @@ def delete_service_subcategory(subcategory_id):
         return jsonify({"status_code":404, "message": "Nie ma takiej podkategorii!"})
     else:
         ServicesCategory.query.filter(ServicesCategory.id==subcategory_id).delete()
-        #delete_subcategories_cascade(service_cat)
         db.session.commit()
     return jsonify({"status_code":200, "message": "Poprawnie usunięto podkategorie i jej wszystkie zależnośći"})
 
