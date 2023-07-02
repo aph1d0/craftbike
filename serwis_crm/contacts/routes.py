@@ -75,9 +75,9 @@ def get_contacts_view():
     return render_template("contacts/contacts_list.html", title="Przegląd klientów",
                            contacts=Paginate(query=query), filters=filters)
 
-@contacts.route("/contact/new", methods=['GET', 'POST'])
+@contacts.route("/contacts/new", methods=['GET', 'POST'])
 @login_required
-@check_access('contact', 'create')
+@check_access('contacts', 'create')
 def new_contact(first_name, last_name, phone, current_user):
     contact = Contact(first_name=first_name,
             last_name=last_name,

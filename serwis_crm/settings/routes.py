@@ -270,7 +270,17 @@ def settings_roles_update(role_id):
         form.name.data = role.name
         for resource in role.resources:
             resource_form = ResourceForm()
-            resource_form.name = resource.name
+            # lazy translation :<
+            if resource.name == 'leads':
+                resource_form.name = 'serwisy'
+            elif resource.name == 'staff':
+                resource_form.name = 'pracownicy'
+            elif resource.name == 'bikes':
+                resource_form.name = 'rowery'    
+            elif resource.name == 'contacts':
+                resource_form.name = 'klienci'  
+            elif resource.name == 'services':
+                resource_form.name = 'czynnośći serwiosowe' 
             resource_form.can_view = resource.can_view
             resource_form.can_create = resource.can_create
             resource_form.can_edit = resource.can_edit
