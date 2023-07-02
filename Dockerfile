@@ -6,7 +6,7 @@ COPY . /serwis_crm_app
 # Remove the .git folder from the build directory
 RUN rm -rf /serwis_crm_app/.git
 
-FROM python:3.12.0b3-slim
+FROM python:3.10.12-slim
 
 ARG AWS_ACCESS_KEY_ID
 ARG AWS_SECRET_ACCESS_KEY
