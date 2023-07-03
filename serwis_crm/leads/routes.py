@@ -183,7 +183,7 @@ def new_lead():
         if form.is_submitted() and form.validate():
             client = Contact.query.filter_by(phone=form.phone.data).first()
             if not client:
-                client = new_contact(first_name=form.first_name.data, last_name=form.last_name.data, phone=form.phone.data, current_user=current_user.id)
+                client = new_contact(phone=form.phone.data, current_user=current_user.id)
             clients_bikes = Bike.query.filter_by(contact_id=client.id).all()
             for client_bike in clients_bikes:
                 if str(form.bike_manufacturer.data).lower() == client_bike.manufacturer and str(form.bike_model.data).lower() == client_bike.model:
@@ -234,8 +234,8 @@ def update_lead(lead_id):
     if request.method == 'POST':
         if form.is_submitted() and form.validate():
             lead.title = form.title.data
-            contact.first_name = form.first_name.data
-            contact.last_name = form.last_name.data
+            #contact.first_name = form.first_name.data
+            #contact.last_name = form.last_name.data
             contact.phone = form.phone.data
             bike.manufacturer = form.bike_manufacturer.data
             bike.model = form.bike_model.data
@@ -261,8 +261,8 @@ def update_lead(lead_id):
             flash('Aktualizacja zlecenia nie powiodła się! Sprawdź formularz.', 'danger')
     elif request.method == 'GET':
         form.title.data = lead.title
-        form.first_name.data = contact.first_name
-        form.last_name.data = contact.last_name
+        #form.first_name.data = contact.first_name
+        #form.last_name.data = contact.last_name
         form.phone.data = contact.phone
         form.bike_manufacturer.data = bike.manufacturer
         form.bike_model.data = bike.model

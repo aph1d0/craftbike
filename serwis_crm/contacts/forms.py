@@ -9,8 +9,9 @@ from serwis_crm.users.models import User
 
 
 class NewContact(FlaskForm):
-    first_name = StringField('Imię')
-    last_name = StringField('Nazwisko')
+    # GDPR
+    #first_name = StringField('Imię')
+    #last_name = StringField('Nazwisko')
     phone = StringField('Telefon')
     notes = StringField('Notatki', widget=TextArea())
     assignees = QuerySelectField('Przypisz do', query_factory=User.user_list_query, get_pk=lambda a: a.id,
