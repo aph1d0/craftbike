@@ -74,7 +74,7 @@ onclick="addMainCategory()"
               const add_span = document.createElement('span');
               add_span.setAttribute("data-feather", "plus");
               // no data -> add new service action or new subcategory
-              if (!main_cat) {
+              //if (!main_cat) {
               const newAddActionButton = document.createElement('tile');
               newAddActionButton.className = 'clickable-tile add' 
               const action_tile_content = document.createElement('div')
@@ -87,7 +87,7 @@ onclick="addMainCategory()"
               newAddActionButton.appendChild(buttonText);
               newRow.appendChild(newAddActionButton)
               feather.replace();
-              }
+              //}
               const newAddSubCategoryButton = document.createElement('tile');
               newAddSubCategoryButton.className = 'clickable-tile add' 
               const subcategory_tile_content = document.createElement('div')
