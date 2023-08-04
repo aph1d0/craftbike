@@ -30,17 +30,17 @@ class Contact(db.Model):
 
     @staticmethod
     def get_label(contact):
-        return contact.first_name + ' ' + contact.last_name
+        return contact.phone
 
     @staticmethod
     def get_contact(contact_id):
         return Contact.query.filter_by(id=contact_id).first()
 
-    def get_contact_name(self):
-        if self.last_name:
-            return self.first_name + ' ' + self.last_name
-        else:
-            return None
+    # def get_contact_name(self):
+    #     if self.last_name:
+    #         return self.first_name + ' ' + self.last_name
+    #     else:
+    #         return None
 
     def __repr__(self):
-        return f"Contact('{self.last_name}', '{self.phone}')"
+        return f"Contact('{self.phone}')"

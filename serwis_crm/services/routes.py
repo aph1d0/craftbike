@@ -63,7 +63,7 @@ def get_actions(category_id):
         service_action_json = {
                 "id": service_action.id,
                 "name": service_action.name,
-                "price": service_action.price
+                "price": service_action.default_price
                 }
     else:
         service_action_json = {}
@@ -75,7 +75,7 @@ def get_actions(category_id):
 def update_action(action_id,new_tile_name,new_tile_price):
     service_action = ServicesAction.get_by_id(action_id=action_id)
     service_action.name = new_tile_name
-    service_action.price = new_tile_price
+    service_action.default_price = new_tile_price
     db.session.add(service_action)
     db.session.commit()
     return jsonify({"status_code":200, "message": "Czynność serwisowa zaktualizowana."})
@@ -106,7 +106,7 @@ def add_action(category_id, action_name, action_price):
         new_service_action = ServicesAction()
         new_service_action.name = action_name
         new_service_action.parent_id = category_id
-        new_service_action.price = action_price
+        new_service_action.default_price = action_price
         db.session.add(new_service_action)
         db.session.commit()
         return jsonify({"status_code":200, "message": "Poprawnie dodano czynność serwisową"})    

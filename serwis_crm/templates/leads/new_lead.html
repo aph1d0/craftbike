@@ -12,7 +12,7 @@
       {% endif %}
       <a href="{{ url_for('leads.get_leads_view') }}" class="btn btn-md btn-outline-secondary" role="button">
         <span data-feather="arrow-left"></span>
-        Powrót do listy zleceń
+        Powrót
       </a>
     </div>
   </div>
@@ -70,19 +70,6 @@
           });
         </script>
       </div>
-
-      <!-- <div class="form-row mb-3">
-        <div class="col">
-          {{ form.first_name.label(class="form-control-label") }}
-          {{ form.first_name(class="form-control
-          from-control-lg", placeholder="Imię ...") }}
-        </div>
-        <div class="col">
-          {{ form.last_name.label(class="form-control-label") }}
-          {{ form.last_name(class="form-control
-          from-control-lg", placeholder="Nazwisko ...") }}
-        </div>
-      </div> -->
 
       <div class="form-row mb-3">
         <div class="col">
@@ -185,7 +172,7 @@
         </div>
       </div>
 
-      {% if current_user.is_admin %}
+      {% if lead_id %}
       <div class="form-row">
         <div class="form-group col-6">
           {{ form.assignees.label(class="form-control-label") }} {{
@@ -219,6 +206,21 @@
       </button>
       <br><br>
       <script>
+        function calculateSum() {
+          const inputs = document.querySelectorAll('input');
+          const filteredInputs = Array.from(inputs).filter(input => {
+            const id = input.getAttribute('id');
+            return /^\d.*-price$/.test(id);
+          });
+          const sumDisplay = document.getElementById('total-service-price');
+          let sum = 0;
+          filteredInputs.forEach(input => {
+            const value = parseFloat(input.value) || 0;
+            sum += value;
+          });
+    
+          sumDisplay.textContent = sum;
+        }
         function closeModal() {
           const modal = document.querySelector('.modal');
           if (modal){
@@ -229,21 +231,11 @@
           const modal = document.querySelector('.modal');
  
         }
-        function updateTotalServicePrice(service_id, add=true) {
-          var price = document.getElementById(service_id + '-price').value;
-          price = Number(price.replace(/\D/g, ""));
-          var total_price = Number(document.getElementById('total-service-price').innerHTML);
-          if (add){
-            total_price += price
-          } else {
-            total_price -= price
-          }
-          document.getElementById('total-service-price').innerHTML = total_price
-
-        }
+        
         function deleteService(service_id) {
-          updateTotalServicePrice(service_id, add=false)
-          document.getElementById(service_id + '-row').innerHTML = ''
+          service = document.getElementById(service_id + '-row').innerHTML = ''
+          
+          calculateSum()
         }
         $(document).ready(function () {
           closeModalOnOutsideClick() 
@@ -257,6 +249,7 @@
             })
           }
           getServices('{{ lead_id }}')
+        });
           function addServiceAction(service_id, service_name, service_price) {
             const new_service_row = document.createElement('div');
             const new_service_name_div = document.createElement('div');
@@ -277,6 +270,7 @@
             new_service_price.setAttribute('name', 'service_price')
             new_service_name.value = service_name
             new_service_price.value = service_price
+            new_service_price.addEventListener('input', calculateSum);
             new_service_name.className = "form-control from-control-lg"
             new_service_price.className = "form-control from-control-lg"
 
@@ -299,7 +293,7 @@
             new_service_row.appendChild(new_service_del_button_div)
             service_inputs.appendChild(new_service_row)
             feather.replace();
-            updateTotalServicePrice(service_id)
+            calculateSum()
 
             closeModal()
             }
@@ -396,7 +390,7 @@
               document.body.appendChild(modal);
             };
           });
-        });
+
       </script>
     </div>
   </div>

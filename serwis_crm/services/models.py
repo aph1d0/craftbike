@@ -3,7 +3,7 @@ from sqlalchemy.orm import relationship
 
 lead_service = db.Table('lead_service',
                     db.Column('lead_id', db.Integer, db.ForeignKey('lead_main.id', ondelete='SET NULL')),
-                    db.Column('service_id', db.Integer, db.ForeignKey('services_action.id', ondelete='SET NULL'))
+                    db.Column('service_id', db.Integer, db.ForeignKey('services_to_leads.id', ondelete='SET NULL'))
                     )    
 
 class ServicesCategory(db.Model):
@@ -23,7 +23,7 @@ class ServicesCategory(db.Model):
 class ServicesAction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), nullable=False)
-    price = db.Column(db.Integer, nullable=False)
+    default_price = db.Column(db.Integer, nullable=False)
     parent_id = db.Column(db.Integer, db.ForeignKey('services_category.id', ondelete='CASCADE'))
     
     @staticmethod
@@ -34,3 +34,14 @@ class ServicesAction(db.Model):
         return f'<Services Action {self.name}>'
     
 
+class ServicesToLeads(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255), nullable=False)
+    price = db.Column(db.Integer, nullable=False)
+    
+    @staticmethod
+    def get_by_id(action_id):
+        return ServicesToLeads.query.filter_by(id=action_id).first()
+    
+    def __repr__(self):
+        return f'<Lead Service {self.name}>'

@@ -14,7 +14,7 @@ from serwis_crm.bikes.models import Bike
 from serwis_crm.bikes.routes import new_bike
 from serwis_crm.users.models import User
 from serwis_crm.leads.models import LeadMain, LeadStatus
-from serwis_crm.services.models import ServicesCategory, ServicesAction
+from serwis_crm.services.models import ServicesToLeads, ServicesAction
 from serwis_crm.contacts.models import Contact
 from serwis_crm.contacts.routes import new_contact
 from serwis_crm.common.paginate import Paginate
@@ -27,6 +27,15 @@ from .sms_notification import SnsWrapper
 from serwis_crm.rbac import check_access, is_admin
 
 leads = Blueprint('leads', __name__)
+
+def clean_up_not_attached_services():
+    all_services_to_leads = ServicesToLeads.query.all()
+    all_leads = LeadMain.query.all()
+    for service in all_services_to_leads:
+        for lead in all_leads:
+            if service not in lead.services:
+                ServicesToLeads.query.filter_by(id=service.id).delete()
+    db.session.commit()
 
 def reset_lead_filters():
     if 'lead_owner' in session:
@@ -55,7 +64,7 @@ def get_leads_view():
         .join(User, LeadMain.owner_id==User.id)\
         .join(Bike, LeadMain.bike_id==Bike.id)\
         .join(LeadStatus, LeadMain.lead_status_id==LeadStatus.id)\
-        .add_columns(LeadMain.id, LeadMain.title, Contact.first_name, Contact.last_name, Contact.phone, Bike.manufacturer, Bike.model, LeadMain.owner_id, User, LeadStatus.status_name, LeadMain.date_created)\
+        .add_columns(LeadMain.id, LeadMain.title, Contact.phone, Bike.manufacturer, Bike.model, LeadMain.owner_id, User, LeadStatus.status_name, LeadMain.date_created)\
         .filter(or_(
             LeadMain.title.ilike(f'%{search}%'),
             Contact.phone.ilike(f'%{search}%'),
@@ -244,15 +253,18 @@ def update_lead(lead_id):
             lead.date_scheduled = form.date_scheduled.data
             lead.notes = form.notes.data
             services = []
-            for service in form.service_name.raw_data:
-                service_obj = ServicesAction.query.filter(ServicesAction.name == service).first()
-                if service_obj:
-                    services.append(service_obj)
+            for service in zip(form.service_name.raw_data, form.service_price.raw_data):
+                service_obj = ServicesToLeads()
+                service_obj.name, service_obj.price = service[0], service[1]
+                db.session.add(service_obj)
+                db.session.commit()
+                services.append(service_obj)
             lead.services = services
             up_stage = update_stage(lead_id=lead.id, lead_stage_id=lead.status.id)
             if up_stage.json["status"] == 200:
                 db.session.commit()
                 flash('Zlecenie uaktualnione poprawnie!', 'success')
+                clean_up_not_attached_services()
                 return redirect(url_for('leads.get_lead_view', lead_id=lead.id))
             else:
                 flash('Aktualizacja zlecenia nie powiodła się!', 'danger')

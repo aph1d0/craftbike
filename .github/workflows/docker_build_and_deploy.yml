@@ -11,65 +11,30 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
+
+    - name: Configure AWS credentials 
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        role-to-assume: ${{ secrets.AWS_DEPLOYMENT_ROLE }}
+        aws-region: eu-central-1
+
     - name: Get current branch name
       id: get_branch_name
       run: echo ::set-output name=branch_name::${GITHUB_REF#refs/heads/}
-    - name: Build
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Build & Push
       uses: docker/build-push-action@v4
       with:
         context: .
-        push: false
+        push: true
         platforms: linux/amd64
-        tags: craft-bike-ecr:${{ steps.get_branch_name.outputs.branch_name }}.${{ github.sha }}
+        tags: ${{ steps.login-ecr.outputs.registry }}/craft-bike-ecr:${{ steps.get_branch_name.outputs.branch_name }}.${{ github.sha }}
         build-args: |
             AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
             AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
             AWS_DEFAULT_REGION=eu-central-1
-            MYSQL_HOST=${{ secrets.MYSQL_HOST }}
-            MYSQL_USER=${{ secrets.MYSQL_USER }}
-            MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}
-            MYSQL_DB_NAME=ebdb
 
-    - name: Push to ECR
-      id: ecr
-      uses: jwalton/gh-ecr-push@v1
-      with:
-        access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        region: eu-central-1
-        local-image: craft-bike-ecr:${{ steps.get_branch_name.outputs.branch_name }}.${{ github.sha }}
-        image: craft-bike-ecr:${{ steps.get_branch_name.outputs.branch_name }}.${{ github.sha }}, craft-bike-ecr:latest
-
-  deploy:
-    needs: push_to_ecr
-    runs-on: ubuntu-latest # the operating system your job will run on
-    steps:
-      - name: Checkout Latest Repo
-        # checks out your repository under the GitHub workspace so that your workflow can access it
-        uses: actions/checkout@master
-      
-      - name: Get timestamp
-        uses: gerred/actions/current-time@master
-        id: current-time
-        
-      - name: Run string replace
-        uses: frabert/replace-string-action@master
-        id: format-time
-        with:
-          # replaces '[:\.]+' in the timestamp with '-'
-          pattern: '[:\.]+'
-          string: "${{ steps.current-time.outputs.time }}"
-          replace-with: '-'
-          flags: 'g'
-          
-      - name: Deploy to EB
-        uses: einaregilsson/beanstalk-deploy@v21
-        with:
-          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          application_name: craftbike
-          environment_name: craftbike-prod
-          version_label: "${{ steps.format-time.outputs.replaced }}"
-          region: eu-central-1
-          deployment_package: Dockerrun.aws.json
-          

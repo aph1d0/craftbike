@@ -40,7 +40,7 @@ class NewLead(FlaskForm):
     service_name = StringField('Czynność serwisowa')
     service_price = IntegerField('Cena czynnośći serwisowej') 
     total_price = IntegerField('Przybliżona cena całkowita serwisu') 
-    submit = SubmitField('Utwórz nowe zlecenie serwisowe')
+    submit = SubmitField('Utwórz')
 
 class EditLead(NewLead):
         lead_status = QuerySelectField('Status', query_factory=LeadStatus.lead_status_query, get_pk=lambda a: a.id,
