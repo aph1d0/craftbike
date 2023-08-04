@@ -1,0 +1,31 @@
+{
+  "rules": [
+      {
+          "rulePriority": 10,
+          "description": "Keep Latest Images",
+          "selection": {
+              "tagStatus": "tagged",
+              "tagPrefixList": ["latest"],
+              "countType": "imageCountMoreThan",
+              "countNumber": 9999
+          },
+          "action": {
+              "type": "expire"
+          }
+      },
+      {
+          "rulePriority": 20,
+          "description": "Delete Old Images",
+          "selection": {
+              "tagStatus": "tagged",
+              "tagPrefixList": ["main"],
+              "countType": "sinceImagePushed",
+              "countUnit": "days",
+              "countNumber": 30
+          },
+          "action": {
+              "type": "expire"
+          }
+      }
+  ]
+}
