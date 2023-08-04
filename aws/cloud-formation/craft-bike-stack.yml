@@ -82,8 +82,18 @@ Resources:
       VpcId: !Ref VPC
       SecurityGroupIngress:
         - IpProtocol: tcp
-          FromPort: '8003'
+          FromPort: '80'
           ToPort: '80'
+          CidrIp: '0.0.0.0/0' 
+        - IpProtocol: tcp
+          FromPort: '443'
+          ToPort: '443'
+          CidrIp: '0.0.0.0/0' 
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          FromPort: '443'
+          ToPort: '443'
+          CidrIp: '0.0.0.0/0'
       Tags:
         - Key: Name
           Value: AppSecurityGroup
@@ -133,36 +143,22 @@ Resources:
         - Name: FlaskAppContainer
           Image: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/craft-bike-ecr:latest
           PortMappings:
-            - ContainerPort: 8003
+            - ContainerPort: 80
           LogConfiguration:
             LogDriver: awslogs
             Options:
               awslogs-group: /ecs/craft-bike
               awslogs-region: !Ref 'AWS::Region'
               awslogs-stream-prefix: ecs
-            Environment:
-            - Name: MYSQL_HOST
-              Value: !GetAtt Database.Endpoint.Address
-            - Name: MYSQL_USER
-              Value: !Ref DBUser
-            - Name: MYSQL_PASSWORD
-              Value: !Ref DBPwd
-            - Name: MYSQL_DB_NAME
-              Value: flaskdb
-
-
-  # VPC Endpoint for ECR
-  ECREndpoint:
-    Type: 'AWS::EC2::VPCEndpoint'
-    Properties:
-      ServiceName: !Sub com.amazonaws.${AWS::Region}.ecr.dkr
-      VpcId: !Ref VPC
-      SubnetIds:
-        - !Ref Subnet1
-        - !Ref Subnet2
-        - !Ref Subnet3
-      SecurityGroupIds:
-        - !Ref AppSecurityGroup
+          Environment:
+          - Name: MYSQL_HOST
+            Value: !GetAtt Database.Endpoint.Address
+          - Name: MYSQL_USER
+            Value: !Ref DBUser
+          - Name: MYSQL_PASSWORD
+            Value: !Ref DBPwd
+          - Name: MYSQL_DB_NAME
+            Value: flaskdb
 
   # ECS Task Execution Role
   ECSTaskExecutionRole:
@@ -181,31 +177,16 @@ Resources:
           PolicyDocument:
             Statement:
               - Effect: Allow
-                Action: 'ecr:GetAuthorizationToken'
-                Resource: '*'
-              - Effect: Allow
-                Action: 'ecr:BatchCheckLayerAvailability'
-                Resource: '*'
-              - Effect: Allow
-                Action: 'ecr:GetDownloadUrlForLayer'
-                Resource: '*'
-              - Effect: Allow
-                Action: 'ecr:GetRepositoryPolicy'
-                Resource: '*'
-              - Effect: Allow
-                Action: 'ecr:ListImages'
-                Resource: '*'
-              - Effect: Allow
-                Action: 'ecr:DescribeRepositories'
-                Resource: '*'
-              - Effect: Allow
-                Action: 'ecr:BatchGetImage'
-                Resource: '*'
-              - Effect: Allow
-                Action: 'logs:CreateLogStream'
-                Resource: '*'
-              - Effect: Allow
-                Action: 'logs:PutLogEvents'
+                Action:
+                  - ecr:GetAuthorizationToken
+                  - ecr:BatchCheckLayerAvailability
+                  - ecr:GetDownloadUrlForLayer
+                  - ecr:GetRepositoryPolicy
+                  - ecr:ListImages
+                  - ecr:DescribeRepositories
+                  - ecr:BatchGetImage
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
                 Resource: '*'
 
   # ECS Service
@@ -217,6 +198,7 @@ Resources:
       LaunchType: FARGATE
       NetworkConfiguration:
         AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
           Subnets:
             - !Ref Subnet1
             - !Ref Subnet2
