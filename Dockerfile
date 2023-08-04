@@ -31,12 +31,6 @@ RUN pip3 install -r /requirements.txt
 COPY --from=build /serwis_crm_app /serwis_crm_app
 WORKDIR /serwis_crm_app
 
-RUN cp serwis_crm/config_vars.example serwis_crm/config_vars.py && \
-    sed -i "s/<database_host>/${MYSQL_HOST}/g" serwis_crm/config_vars.py && \
-    sed -i "s/<database_user>/${MYSQL_USER}/g" serwis_crm/config_vars.py && \
-    sed -i "s/<database_password>/${MYSQL_PASSWORD}/g" serwis_crm/config_vars.py && \
-    sed -i "s/<database_name>/${MYSQL_DB_NAME}/g" serwis_crm/config_vars.py 
-
 RUN chmod +x ./gunicorn_starter.sh
 
 ENTRYPOINT ["./gunicorn_starter.sh"]
