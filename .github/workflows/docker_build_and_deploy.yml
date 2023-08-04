@@ -6,6 +6,7 @@ on:
 
 permissions:
   contents: read
+  id-token: write
 jobs:
   push_to_ecr:
     runs-on: ubuntu-latest
