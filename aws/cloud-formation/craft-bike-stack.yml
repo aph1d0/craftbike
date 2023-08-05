@@ -263,7 +263,7 @@ Resources:
       Family: FlaskApp
       NetworkMode: awsvpc
       RequiresCompatibilities:
-        - EC2
+        - FARGATE
       ExecutionRoleArn: !GetAtt ECSTaskExecutionRole.Arn
       Cpu: '256'
       Memory: '512'
@@ -323,7 +323,7 @@ Resources:
     Properties:
       Cluster: !Ref ECSCluster
       DesiredCount: 2
-      LaunchType: EC2
+      LaunchType: FARGATE
       NetworkConfiguration:
         AwsvpcConfiguration:
           Subnets:
