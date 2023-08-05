@@ -59,7 +59,66 @@ Resources:
       Tags:
         - Key: Name
           Value: PrivateSubnet3
-
+  #ECR
+  ECRReposiotry: 
+    Type: AWS::ECR::Repository
+    Properties: 
+      RepositoryName: "craft-bike-ecr"
+      ImageScanningConfiguration: 
+        ScanOnPush: true
+      LifecyclePolicy:
+        LifecyclePolicyText: '{
+            "rules": [
+                {
+                    "rulePriority": 10,
+                    "description": "Keep Latest Images",
+                    "selection": {
+                        "tagStatus": "tagged",
+                        "tagPrefixList": ["latest"],
+                        "countType": "imageCountMoreThan",
+                        "countNumber": 9999
+                    },
+                    "action": {
+                        "type": "expire"
+                    }
+                },
+                {
+                    "rulePriority": 20,
+                    "description": "Delete Old Images",
+                    "selection": {
+                        "tagStatus": "tagged",
+                        "tagPrefixList": ["main"],
+                        "countType": "sinceImagePushed",
+                        "countUnit": "days",
+                        "countNumber": 30
+                    },
+                    "action": {
+                        "type": "expire"
+                    }
+                }
+            ]
+          }'
+      RepositoryPolicyText: 
+        Version: "2012-10-17"
+        Statement: 
+          - 
+            Sid: AllowPushPull
+            Effect: Allow
+            Principal: 
+              AWS: 
+                - !GetAtt ECSTaskExecutionRole.Arn
+                - 'arn:aws:iam::512631731073:role/gha-deployment-role'
+            Action: 
+              - "ecr:BatchCheckLayerAvailability"
+              - "ecr:BatchDeleteImage"
+              - "ecr:BatchGetImage"
+              - "ecr:CompleteLayerUpload"
+              - "ecr:DescribeRepositories"
+              - "ecr:GetDownloadUrlForLayer"
+              - "ecr:InitiateLayerUpload"
+              - "ecr:ListImages"
+              - "ecr:PutImage"
+              - "ecr:UploadLayerPart"
   # Security Groups
   DBSecurityGroup:
     Type: 'AWS::EC2::SecurityGroup'
@@ -128,6 +187,19 @@ Resources:
     Properties:
       ClusterName: CraftBikeECSCluster
 
+  # ECRVPCEndpoint:
+  #   Type: 'AWS::EC2::VPCEndpoint'
+  #   Properties:
+  #     VpcEndpointType: Interface
+  #     ServiceName: !Sub 'com.amazonaws.${AWS::Region}.ecr.dkr'
+  #     VpcId: !Ref VPC
+  #     PrivateDnsEnabled: true
+  #     SubnetIds:
+  #       - !Ref Subnet1
+  #       - !Ref Subnet2
+  #     SecurityGroupIds:
+  #       - !Ref AppSecurityGroup
+      
   # ECS Task Definition
   ECSTaskDefinition:
     Type: 'AWS::ECS::TaskDefinition'
@@ -141,7 +213,7 @@ Resources:
       Memory: '512'
       ContainerDefinitions:
         - Name: FlaskAppContainer
-          Image: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/craft-bike-ecr:latest
+          Image: 512631731073.dkr.ecr.eu-central-1.amazonaws.com/craft-bike-ecr:latest
           PortMappings:
             - ContainerPort: 80
           LogConfiguration:
@@ -198,7 +270,6 @@ Resources:
       LaunchType: FARGATE
       NetworkConfiguration:
         AwsvpcConfiguration:
-          AssignPublicIp: ENABLED
           Subnets:
             - !Ref Subnet1
             - !Ref Subnet2
