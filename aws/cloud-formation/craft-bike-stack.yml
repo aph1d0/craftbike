@@ -270,6 +270,7 @@ Resources:
       LaunchType: FARGATE
       NetworkConfiguration:
         AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
           Subnets:
             - !Ref Subnet1
             - !Ref Subnet2
