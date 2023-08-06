@@ -244,11 +244,24 @@ Resources:
     Properties:
       ClusterName: CraftBikeECSCluster
 
-  ECRVPCEndpoint:
+  ECRDKRVPCEndpoint:
     Type: 'AWS::EC2::VPCEndpoint'
     Properties:
       VpcEndpointType: Interface
       ServiceName: !Sub 'com.amazonaws.${AWS::Region}.ecr.dkr'
+      VpcId: !Ref VPC
+      PrivateDnsEnabled: true
+      SubnetIds:
+        - !Ref Subnet2
+        - !Ref Subnet3
+      SecurityGroupIds:
+        - !Ref AppSecurityGroup
+
+  ECRAPIVPCEndpoint:
+    Type: 'AWS::EC2::VPCEndpoint'
+    Properties:
+      VpcEndpointType: Interface
+      ServiceName: !Sub 'com.amazonaws.${AWS::Region}.ecr.api'
       VpcId: !Ref VPC
       PrivateDnsEnabled: true
       SubnetIds:
@@ -264,7 +277,7 @@ Resources:
       Family: FlaskApp
       NetworkMode: awsvpc
       RequiresCompatibilities:
-        - EC2
+        - FARGATE
       ExecutionRoleArn: !GetAtt ECSTaskExecutionRole.Arn
       Cpu: '256'
       Memory: '512'
@@ -323,7 +336,7 @@ Resources:
     Type: 'AWS::ECS::Service'
     Properties:
       Cluster: !Ref ECSCluster
-      LaunchType: EC2
+      LaunchType: FARGATE
       DesiredCount: 1
       NetworkConfiguration:
         AwsvpcConfiguration:
