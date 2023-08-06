@@ -92,6 +92,7 @@ Resources:
       VpcId: !Ref VPC
       CidrBlock: '10.0.0.0/24'
       AvailabilityZone: !Select [ 0, !GetAZs '' ]
+      MapPublicIpOnLaunch: true
       Tags:
         - Key: Name
           Value: PublicSubnet1
@@ -243,18 +244,18 @@ Resources:
     Properties:
       ClusterName: CraftBikeECSCluster
 
-  # ECRVPCEndpoint:
-  #   Type: 'AWS::EC2::VPCEndpoint'
-  #   Properties:
-  #     VpcEndpointType: Interface
-  #     ServiceName: !Sub 'com.amazonaws.${AWS::Region}.ecr.dkr'
-  #     VpcId: !Ref VPC
-  #     PrivateDnsEnabled: true
-  #     SubnetIds:
-  #       - !Ref Subnet1
-  #       - !Ref Subnet2
-  #     SecurityGroupIds:
-  #       - !Ref AppSecurityGroup
+  ECRVPCEndpoint:
+    Type: 'AWS::EC2::VPCEndpoint'
+    Properties:
+      VpcEndpointType: Interface
+      ServiceName: !Sub 'com.amazonaws.${AWS::Region}.ecr.dkr'
+      VpcId: !Ref VPC
+      PrivateDnsEnabled: true
+      SubnetIds:
+        - !Ref Subnet2
+        - !Ref Subnet3
+      SecurityGroupIds:
+        - !Ref AppSecurityGroup
       
   # ECS Task Definition
   ECSTaskDefinition:
@@ -263,7 +264,7 @@ Resources:
       Family: FlaskApp
       NetworkMode: awsvpc
       RequiresCompatibilities:
-        - FARGATE
+        - EC2
       ExecutionRoleArn: !GetAtt ECSTaskExecutionRole.Arn
       Cpu: '256'
       Memory: '512'
@@ -322,13 +323,49 @@ Resources:
     Type: 'AWS::ECS::Service'
     Properties:
       Cluster: !Ref ECSCluster
-      DesiredCount: 2
-      LaunchType: FARGATE
+      LaunchType: EC2
+      DesiredCount: 1
       NetworkConfiguration:
         AwsvpcConfiguration:
           Subnets:
+            - !Ref Subnet1
             - !Ref Subnet2
             - !Ref Subnet3
           SecurityGroups:
             - !Ref AppSecurityGroup
       TaskDefinition: !Ref ECSTaskDefinition
+
+  # # ALB
+  # LoadBalancer:
+  #   Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+  #   Properties:
+  #     Name: MyALB
+  #     Subnets:
+  #       - !Ref Subnet1
+  #     SecurityGroups:
+  #       - !Ref AppSecurityGroup
+
+  # # ALB Listener
+  # HttpListener:
+  #   Type: AWS::ElasticLoadBalancingV2::Listener
+  #   Properties:
+  #     DefaultActions:
+  #       - Type: fixed-response
+  #         FixedResponseConfig:
+  #           StatusCode: '200'
+  #           ContentType: text/plain
+  #           MessageBody: 'OK'
+  #     LoadBalancerArn: !Ref LoadBalancer
+  #     Port: 80
+  #     Protocol: HTTP
+
+  # # ALB Target Group
+  # TargetGroup:
+  #   Type: AWS::ElasticLoadBalancingV2::TargetGroup
+  #   Properties:
+  #     Name: MyTargetGroup
+  #     Port: 80
+  #     Protocol: HTTP
+  #     Targets:
+  #       - Id: !Ref ECSService
+  #         Port: 80
