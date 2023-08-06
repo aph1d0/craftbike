@@ -244,6 +244,19 @@ Resources:
     Properties:
       ClusterName: CraftBikeECSCluster
 
+  CloudWatchVPCEndpoint:
+    Type: 'AWS::EC2::VPCEndpoint'
+    Properties:
+      VpcEndpointType: Interface
+      ServiceName: !Sub 'com.amazonaws.${AWS::Region}.logs'
+      VpcId: !Ref VPC
+      PrivateDnsEnabled: true
+      SubnetIds:
+        - !Ref Subnet2
+        - !Ref Subnet3
+      SecurityGroupIds:
+        - !Ref AppSecurityGroup
+
   ECRDKRVPCEndpoint:
     Type: 'AWS::EC2::VPCEndpoint'
     Properties:
@@ -321,6 +334,7 @@ Resources:
           LogConfiguration:
             LogDriver: awslogs
             Options:
+              awslogs-create-group: true
               awslogs-group: /ecs/craft-bike
               awslogs-region: !Ref 'AWS::Region'
               awslogs-stream-prefix: ecs
