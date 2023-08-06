@@ -316,7 +316,7 @@ Resources:
         - FARGATE
       ExecutionRoleArn: !GetAtt ECSTaskExecutionRole.Arn
       Cpu: '256'
-      Memory: '2048'
+      Memory: '512'
       ContainerDefinitions:
         - Name: CraftBikeAppContainer
           Image: 512631731073.dkr.ecr.eu-central-1.amazonaws.com/craft-bike-ecr:latest
@@ -332,6 +332,8 @@ Resources:
           Environment:
           - Name: MYSQL_HOST
             Value: !GetAtt Database.Endpoint.Address
+          - Name: MYSQL_PORT
+            Value: 3306
           - Name: MYSQL_USER
             Value: !Ref DBUser
           - Name: MYSQL_PASSWORD
