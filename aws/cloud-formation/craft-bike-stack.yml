@@ -316,7 +316,7 @@ Resources:
         - FARGATE
       ExecutionRoleArn: !GetAtt ECSTaskExecutionRole.Arn
       Cpu: '256'
-      Memory: '512'
+      Memory: '2048'
       ContainerDefinitions:
         - Name: CraftBikeAppContainer
           Image: 512631731073.dkr.ecr.eu-central-1.amazonaws.com/craft-bike-ecr:latest
