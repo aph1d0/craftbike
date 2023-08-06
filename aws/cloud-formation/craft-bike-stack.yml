@@ -214,20 +214,20 @@ Resources:
         - Key: Name
           Value: AppSecurityGroup
 
-  # RDS MySQL Database
-  # Database:
-  #   Type: 'AWS::RDS::DBInstance'
-  #   Properties:
-  #     AllocatedStorage: '20'
-  #     DBInstanceClass: db.t2.micro
-  #     Engine: mysql
-  #     EngineVersion: '5.7'
-  #     MasterUsername: !Ref DBUser
-  #     MasterUserPassword: !Ref DBPwd
-  #     DBName: flaskdb
-  #     VPCSecurityGroups:
-  #       - !Ref DBSecurityGroup
-  #     DBSubnetGroupName: !Ref DBSubnetGroup
+  #RDS MySQL Database
+  Database:
+    Type: 'AWS::RDS::DBInstance'
+    Properties:
+      AllocatedStorage: '20'
+      DBInstanceClass: db.t2.micro
+      Engine: mysql
+      EngineVersion: '5.7'
+      MasterUsername: !Ref DBUser
+      MasterUserPassword: !Ref DBPwd
+      DBName: flaskdb
+      VPCSecurityGroups:
+        - !Ref DBSecurityGroup
+      DBSubnetGroupName: !Ref DBSubnetGroup
 
   # RDS Subnet Group
   DBSubnetGroup:
@@ -325,8 +325,8 @@ Resources:
               awslogs-region: !Ref 'AWS::Region'
               awslogs-stream-prefix: ecs
           Environment:
-          # - Name: MYSQL_HOST
-          #   Value: !GetAtt Database.Endpoint.Address
+          - Name: MYSQL_HOST
+            Value: !GetAtt Database.Endpoint.Address
           - Name: MYSQL_USER
             Value: !Ref DBUser
           - Name: MYSQL_PASSWORD
