@@ -338,6 +338,10 @@ Resources:
             Value: !Ref DBPwd
           - Name: MYSQL_DB_NAME
             Value: flaskdb
+          - Name: FLASK_ENV
+            Value: production
+          - Name: SECRET_KEY
+            Value: asdgds33325aqwr3mnbgdnfdj
 
   # ECS Task Execution Role
   ECSTaskExecutionRole:
