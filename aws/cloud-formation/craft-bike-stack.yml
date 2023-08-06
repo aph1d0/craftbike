@@ -269,6 +269,38 @@ Resources:
         - !Ref Subnet3
       SecurityGroupIds:
         - !Ref AppSecurityGroup
+
+  S3GatewayEndpoint:
+    Type: 'AWS::EC2::VPCEndpoint'
+    Properties:
+      VpcEndpointType: 'Gateway'
+      VpcId: !Ref VPC
+      ServiceName: !Sub 'com.amazonaws.${AWS::Region}.s3'
+      # PolicyDocument:
+      #   Version: 2012-10-17
+      #   Statement:
+      #     - Effect: Allow
+      #       Principal: '*'
+      #       Action:
+      #         - 's3:GetObject'
+      #       Resource:
+      #         - 'arn:aws:s3:::prod-region-starport-layer-bucket/*'
+      RouteTableIds:
+        - !Ref S3GWRouteTable
+  S3GWRouteTable:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref VPC
+  S3GWSubnetRouteTableAssociation1:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties: 
+      SubnetId: !Ref Subnet2
+      RouteTableId: !Ref S3GWRouteTable
+  S3GWSubnetRouteTableAssociation2:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties: 
+      SubnetId: !Ref Subnet3
+      RouteTableId: !Ref S3GWRouteTable
       
   # ECS Task Definition
   ECSTaskDefinition:
@@ -329,6 +361,7 @@ Resources:
                   - ecr:BatchGetImage
                   - logs:CreateLogStream
                   - logs:PutLogEvents
+                  - s3:GetObject
                 Resource: '*'
 
   # ECS Service
