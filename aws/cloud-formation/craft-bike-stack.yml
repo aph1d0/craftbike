@@ -289,15 +289,6 @@ Resources:
       VpcEndpointType: 'Gateway'
       VpcId: !Ref VPC
       ServiceName: !Sub 'com.amazonaws.${AWS::Region}.s3'
-      # PolicyDocument:
-      #   Version: 2012-10-17
-      #   Statement:
-      #     - Effect: Allow
-      #       Principal: '*'
-      #       Action:
-      #         - 's3:GetObject'
-      #       Resource:
-      #         - 'arn:aws:s3:::prod-region-starport-layer-bucket/*'
       RouteTableIds:
         - !Ref S3GWRouteTable
   S3GWRouteTable:
@@ -389,7 +380,6 @@ Resources:
       NetworkConfiguration:
         AwsvpcConfiguration:
           Subnets:
-            - !Ref Subnet1
             - !Ref Subnet2
             - !Ref Subnet3
           SecurityGroups:
