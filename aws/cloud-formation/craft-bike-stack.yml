@@ -38,16 +38,27 @@ Resources:
       VpcId: !Ref VPC
       InternetGatewayId: !Ref InternetGateway
 
-  NATGatewayEIP:
+  NATGatewayEIP1:
     Type: AWS::EC2::EIP
     Properties:
       Domain: vpc
 
-  NATGateway:
+  NATGatewayEIP2:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+
+  NATGateway1:
     Type: AWS::EC2::NatGateway
     Properties:
-      AllocationId: !GetAtt NATGatewayEIP.AllocationId
+      AllocationId: !GetAtt NATGatewayEIP1.AllocationId
       SubnetId: !Ref Subnet1
+  
+  NATGateway2:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt NATGatewayEIP2.AllocationId
+      SubnetId: !Ref Subnet4
 
   PrivateRouteTable1:
     Type: AWS::EC2::RouteTable
@@ -59,16 +70,29 @@ Resources:
     Properties:
       VpcId: !Ref VPC
 
-  PublicRouteTable:
+  PublicRouteTable1:
     Type: AWS::EC2::RouteTable
     Properties:
       VpcId: !Ref VPC
 
-  PublicRoute:
+  PublicRouteTable2:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+
+  PublicRoute1:
     Type: AWS::EC2::Route
     DependsOn: AttachGateway
     Properties:
-      RouteTableId: !Ref PublicRouteTable
+      RouteTableId: !Ref PublicRouteTable1
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
+  PublicRoute2:
+    Type: AWS::EC2::Route
+    DependsOn: AttachGateway
+    Properties:
+      RouteTableId: !Ref PublicRouteTable2
       DestinationCidrBlock: 0.0.0.0/0
       GatewayId: !Ref InternetGateway
 
@@ -77,14 +101,26 @@ Resources:
     Properties:
       RouteTableId: !Ref PrivateRouteTable1
       DestinationCidrBlock: 0.0.0.0/0
-      NatGatewayId: !Ref NATGateway
+      NatGatewayId: !Ref NATGateway1
 
   PrivateRoute2:
     Type: AWS::EC2::Route
     Properties:
       RouteTableId: !Ref PrivateRouteTable2
       DestinationCidrBlock: 0.0.0.0/0
-      NatGatewayId: !Ref NATGateway
+      NatGatewayId: !Ref NATGateway2
+
+  PublicSubnetAssociation1:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref Subnet1
+      RouteTableId: !Ref PublicRouteTable1
+
+  PublicSubnetAssociation2:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref Subnet4
+      RouteTableId: !Ref PublicRouteTable2
 
   Subnet1:
     Type: 'AWS::EC2::Subnet'
@@ -96,6 +132,17 @@ Resources:
       Tags:
         - Key: Name
           Value: PublicSubnet1
+
+  Subnet4:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: '10.0.4.0/24'
+      AvailabilityZone: !Select [ 1, !GetAZs '' ]
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: PublicSubnet2
 
   Subnet2:
     Type: 'AWS::EC2::Subnet'
@@ -390,39 +437,41 @@ Resources:
             - !Ref Subnet3
           SecurityGroups:
             - !Ref AppSecurityGroup
+            - !Ref DBSecurityGroup
       TaskDefinition: !Ref ECSTaskDefinition
 
-  # # ALB
-  # LoadBalancer:
-  #   Type: AWS::ElasticLoadBalancingV2::LoadBalancer
-  #   Properties:
-  #     Name: MyALB
-  #     Subnets:
-  #       - !Ref Subnet1
-  #     SecurityGroups:
-  #       - !Ref AppSecurityGroup
+  # ALB
+  LoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: MyALB
+      Subnets:
+        - !Ref Subnet1
+        - !Ref Subnet4
+      SecurityGroups:
+        - !Ref AppSecurityGroup
 
-  # # ALB Listener
-  # HttpListener:
-  #   Type: AWS::ElasticLoadBalancingV2::Listener
-  #   Properties:
-  #     DefaultActions:
-  #       - Type: fixed-response
-  #         FixedResponseConfig:
-  #           StatusCode: '200'
-  #           ContentType: text/plain
-  #           MessageBody: 'OK'
-  #     LoadBalancerArn: !Ref LoadBalancer
-  #     Port: 80
-  #     Protocol: HTTP
+  # ALB Listener
+  HttpListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions:
+        - Type: fixed-response
+          FixedResponseConfig:
+            StatusCode: '200'
+            ContentType: text/plain
+            MessageBody: 'OK'
+      LoadBalancerArn: !Ref LoadBalancer
+      Port: 80
+      Protocol: HTTP
 
-  # # ALB Target Group
-  # TargetGroup:
-  #   Type: AWS::ElasticLoadBalancingV2::TargetGroup
-  #   Properties:
-  #     Name: MyTargetGroup
-  #     Port: 80
-  #     Protocol: HTTP
-  #     Targets:
-  #       - Id: !Ref ECSService
-  #         Port: 80
+  # ALB Target Group
+  TargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: MyTargetGroup
+      Port: 80
+      Protocol: HTTP
+      Targets:
+        - Id: !Ref ECSService
+          Port: 80
