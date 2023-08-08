@@ -33,4 +33,6 @@ WORKDIR /serwis_crm_app
 
 RUN chmod +x ./gunicorn_starter.sh
 
+EXPOSE 8003
+
 ENTRYPOINT ["./gunicorn_starter.sh"]
