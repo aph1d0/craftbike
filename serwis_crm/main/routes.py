@@ -24,6 +24,10 @@ def reset_main_filters():
     if 'lead_contact' in session:
         session.pop('lead_contact', None)
 
+@main.route("/_health", methods=['GET'])
+def health_check():
+    return '', 200
+
 @main.route("/")
 @main.route("/home", methods=['GET', 'POST'])
 #@check_access('leads', 'view')
