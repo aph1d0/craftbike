@@ -14,6 +14,9 @@ from serwis_crm.install.data.currency_timezone import INSERT_SQL
 
 install = Blueprint('install', __name__)
 
+@install.route("/_health", methods=['GET'])
+def health_check():
+    return '', 200
 
 @install.route("/", methods=['GET', 'POST'])
 @install.route("/install", methods=['GET', 'POST'])
