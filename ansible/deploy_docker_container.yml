@@ -15,9 +15,9 @@
   docker_container:
     name: craft-bike-app
     image: registry.hub.docker.com/aph1d/craft-bike:{{ git_commit }}
-    state: present
+    state: started
     restart_policy: always
-    recreate: true
+    restart: true
     ports:
       - 8003:8003
     env:
