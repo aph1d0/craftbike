@@ -1,28 +1,22 @@
 ---
-- name: Install and Configure Nginx
-  hosts: srv21.mikr.us
-  become: true  # This allows Ansible to become root user
-  tasks:
-    - name: Check if Nginx is installed
-      become: false
-      command: "which nginx"
-      register: nginx_installed
-      ignore_errors: true
-    - name: Install Nginx if not installed
-      apt:
-        name: nginx
-        state: present
-      when: nginx_installed.rc != 0
-      become: true
-    - name: Update Nginx configuration
-      template:
-        src: templates/nginx.conf.j2  # Path to your custom configuration template
-        dest: /etc/nginx/nginx.conf
-      notify: restart nginx
-      become: true
-
-  handlers:
-    - name: restart nginx
-      service:
-        name: nginx
-        state: restarted
+  - name: Check if Nginx is installed
+    become: false
+    command: "which nginx"
+    register: nginx_installed
+    ignore_errors: true
+  - name: Install Nginx if not installed
+    apt:
+      name: nginx
+      state: present
+    when: nginx_installed.rc != 0
+    become: true
+  - name: Update Nginx configuration
+    template:
+      src: templates/nginx.conf.j2  # Path to your custom configuration template
+      dest: /etc/nginx/nginx.conf
+    notify: restart nginx
+    become: true
+  - name: restart nginx
+    service:
+      name: nginx
+      state: restarted

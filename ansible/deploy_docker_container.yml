@@ -1,42 +1,38 @@
 ---
-- name: Deploy Docker Image
-  hosts: srv21.mikr.us
-  become: true
-  tasks:
-  - name: Log into private registry and force re-authorization
-    docker_login:
-      registry: aph1d/craft-bike
-      username: "{{ docker_user }}"
-      password: "{{ docker_password }}"
-      reauthorize: true
+- name: Log into private registry and force re-authorization
+  docker_login:
+    registry: aph1d/craft-bike
+    username: "{{ docker_user }}"
+    password: "{{ docker_password }}"
+    reauthorize: true
 
-  - name: Pull latest Docker image
-    docker_image:
-      name: aph1d/craft-bike:latest
-      source: pull
+- name: Pull latest Docker image
+  docker_image:
+    name: aph1d/craft-bike:latest
+    source: pull
 
-  - name: Stop and remove existing container (if running)
-    docker_container:
-      name: craft-bike-app
-      state: stopped
-      remove: true
-    ignore_errors: true
+- name: Stop and remove existing container (if running)
+  docker_container:
+    name: craft-bike-app
+    state: stopped
+    remove: true
+  ignore_errors: true
 
-  - name: Run Docker container
-    docker_container:
-      name: craft-bike-app
-      image: aph1d/craft-bike:latest
-      state: started
-      restart_policy: always
-      restart: true
-      ports:
-        - 8003:8003
-      env:
-        AWS_ACCESS_KEY_ID: "{{ AWS_ACCESS_KEY_ID }}"
-        AWS_SECRET_ACCESS_KEY: "{{ AWS_SECRET_ACCESS_KEY }}"
-        AWS_DEFAULT_REGION: "{{ AWS_DEFAULT_REGION  }}"
-        MYSQL_HOST: "mysql.mikr.us"
-        MYSQL_USER: "{{ MYSQL_USER }}"
-        MYSQL_PASSWORD: "{{ MYSQL_PASSWORD }}"
-        MYSQL_PORT: 3306
-        MYSQL_DB_NAME: "{{ MYSQL_DB_NAME }}"
+- name: Run Docker container
+  docker_container:
+    name: craft-bike-app
+    image: aph1d/craft-bike:latest
+    state: started
+    restart_policy: always
+    restart: true
+    ports:
+      - 8003:8003
+    env:
+      AWS_ACCESS_KEY_ID: "{{ AWS_ACCESS_KEY_ID }}"
+      AWS_SECRET_ACCESS_KEY: "{{ AWS_SECRET_ACCESS_KEY }}"
+      AWS_DEFAULT_REGION: "{{ AWS_DEFAULT_REGION  }}"
+      MYSQL_HOST: "mysql.mikr.us"
+      MYSQL_USER: "{{ MYSQL_USER }}"
+      MYSQL_PASSWORD: "{{ MYSQL_PASSWORD }}"
+      MYSQL_PORT: 3306
+      MYSQL_DB_NAME: "{{ MYSQL_DB_NAME }}"
