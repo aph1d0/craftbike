@@ -35,6 +35,9 @@ jobs:
     needs: [ 'build_and_push_to_docker_hub' ]
     steps: 
       - uses: actions/checkout@v3
+      - name: Get current branch name
+        id: get_branch_name
+        run: echo ::set-output name=branch_name::${GITHUB_REF#refs/heads/}
       - name: Run playbook
         uses: dawidd6/action-ansible-playbook@v2
         with:
