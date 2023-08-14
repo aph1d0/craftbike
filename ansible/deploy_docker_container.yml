@@ -6,15 +6,15 @@
     password: "{{ docker_password }}"
     reauthorize: true
 
-- name: Pull latest Docker image
+- name: Pull Docker image
   docker_image:
-    name: registry.hub.docker.com/aph1d/craft-bike:latest
+    name: registry.hub.docker.com/aph1d/craft-bike:{{ git_commit }}
     source: pull
 
 - name: Run Docker container
   docker_container:
     name: craft-bike-app
-    image: registry.hub.docker.com/aph1d/craft-bike:latest
+    image: registry.hub.docker.com/aph1d/craft-bike:{{ git_commit }}
     state: present
     restart_policy: always
     recreate: true
