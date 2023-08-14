@@ -9,8 +9,8 @@ events {
 
 http {
     server {
-        listen 80;
-        server_name example.com;
+        listen [2a01:4f9:4a:27c1::253]:80;
+        server_name craftbike.toadres.pl;
 
         location / {
             proxy_pass http://localhost:8003;
