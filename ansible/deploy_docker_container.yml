@@ -1,7 +1,7 @@
 ---
 - name: Log into private registry and force re-authorization
   docker_login:
-    registry: aph1d/craft-bike
+    registry: registry.hub.docker.com/aph1d/craft-bike
     username: "{{ docker_user }}"
     password: "{{ docker_password }}"
     reauthorize: true
