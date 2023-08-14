@@ -35,6 +35,11 @@ jobs:
     needs: [ 'build_and_push_to_docker_hub' ]
     steps: 
       - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10' 
+      - name: Install docker SDK for python
+        run: pip install docker  
       - name: Run playbook
         uses: dawidd6/action-ansible-playbook@v2
         with:
