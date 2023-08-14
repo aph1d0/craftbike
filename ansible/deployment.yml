@@ -1,0 +1,9 @@
+---
+- name: Main Deployment Playbook
+  hosts: srv21.mikr.us
+  tasks:
+    - name: Deploy docker app contianer
+      include_tasks: deploy_docker_container.yml
+
+    - name: Install/update nginx
+      include_tasks: nginx.yml

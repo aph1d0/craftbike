@@ -1,0 +1,5 @@
+virtualmachines:
+  hosts:
+    srv21.mikr.us:
+      ansible_host: srv21.mikr.us:10253
+      ansible_ssh_user: ansible
