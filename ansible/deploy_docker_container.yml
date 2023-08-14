@@ -8,13 +8,15 @@
 
 - name: Pull Docker image
   docker_image:
-    name: registry.hub.docker.com/aph1d/craft-bike:{{ git_commit }}
+    name: registry.hub.docker.com/aph1d/craft-bike:latest
+    state: present
+    force_source: true
     source: pull
 
 - name: Run Docker container
   docker_container:
     name: craft-bike-app
-    image: registry.hub.docker.com/aph1d/craft-bike:{{ git_commit }}
+    image: registry.hub.docker.com/aph1d/craft-bike:latest
     state: started
     restart_policy: always
     restart: true
