@@ -11,20 +11,13 @@
     name: registry.hub.docker.com/aph1d/craft-bike:latest
     source: pull
 
-- name: Stop and remove existing container (if running)
-  docker_container:
-    name: craft-bike-app
-    state: stopped
-    remove: true
-  ignore_errors: true
-
 - name: Run Docker container
   docker_container:
     name: craft-bike-app
     image: registry.hub.docker.com/aph1d/craft-bike:latest
-    state: started
+    state: present
     restart_policy: always
-    restart: true
+    recreate: true
     ports:
       - 8003:8003
     env:
@@ -36,3 +29,4 @@
       MYSQL_PASSWORD: "{{ MYSQL_PASSWORD }}"
       MYSQL_PORT: "3306"
       MYSQL_DB_NAME: "{{ MYSQL_DB_NAME }}"
+      SECRET_KEY: "{{ SECRET_KEY }}"
