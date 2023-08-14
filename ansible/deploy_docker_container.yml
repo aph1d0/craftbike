@@ -8,7 +8,7 @@
 
 - name: Pull latest Docker image
   docker_image:
-    name: aph1d/craft-bike:latest
+    name: registry.hub.docker.com/aph1d/craft-bike:latest
     source: pull
 
 - name: Stop and remove existing container (if running)
