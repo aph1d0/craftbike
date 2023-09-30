@@ -9,7 +9,7 @@ import os
 from .config import DevelopmentConfig, TestConfig, ProductionConfig
 
 # database handle
-db = SQLAlchemy(session_options={"autoflush": False, "pool_pre_ping": True})
+db = SQLAlchemy(session_options={"autoflush": False})
 
 # encryptor handle
 bcrypt = Bcrypt()
