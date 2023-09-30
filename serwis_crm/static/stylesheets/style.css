@@ -378,6 +378,7 @@ body {
   align-items: center;
   background-color: rgba(0, 0, 0, 0.5);
   z-index: 999;
+  overflow-y: auto; 
 }
 
 .modal.show {
@@ -391,6 +392,7 @@ body {
   align-items: center;
   background-color: rgba(0, 0, 0, 0.5);
   z-index: 9999;
+  overflow-y: auto; 
 }
 
 .modal-content {
@@ -402,6 +404,7 @@ body {
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  overflow-y: auto; 
 }
 
 .modal h2 {
