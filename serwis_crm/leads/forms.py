@@ -35,7 +35,7 @@ class NewLead(FlaskForm):
 
     assignees = QuerySelectField('Przypisz do', query_factory=User.user_list_query, get_pk=lambda a: a.id,
                                  get_label=User.get_label, default=User.get_current_user)
-    date_scheduled = StringField('Data wizyty', id='date_scheduled', default=datetime.datetime.now().strftime('%Y-%m-%d'),
+    date_scheduled = StringField('Data wizyty', id='date_scheduled', default=datetime.datetime.utcnow().strftime('%Y-%m-%d'),
                                  validators=[Length(max=10, message='Cos sie data nie zgadza.')])
     service_name = StringField('Czynność serwisowa')
     service_price = IntegerField('Cena czynnośći serwisowej') 

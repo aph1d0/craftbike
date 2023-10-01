@@ -17,7 +17,7 @@
     </div>
   </div>
   <div class="row">
-    <div class="col-9">
+    <div class="col-12">
       <div class="form-row mb-3">
         <div class="col">
           {{ form.bike_manufacturer.label(class="form-control-label") }} {% if
@@ -310,6 +310,12 @@
             const modal_content = document.createElement('div');
             modal_content.className = 'modal-content'
             modal_content.innerHTML = '<h2>Dodaj czynność serwisową</h2>'
+            const exit_button_div = document.createElement('div');
+            const exit_button = document.createElement('button');
+            exit_button.innerText = 'Zamknij'
+            exit_button.addEventListener('click', closeModal);
+            exit_button_div.appendChild(exit_button)
+            modal_content.appendChild(exit_button_div)
             const newRow = document.createElement('div');
             newRow.classList.add('tiles-container');
             fetch('/services/get_main_categories')
