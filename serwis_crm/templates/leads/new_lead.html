@@ -2,10 +2,12 @@
 <script>
   home = document.querySelector('.navbar-brand')
   home.removeAttribute('href');
+  home.setAttribute('style', "color: white;")
 </script>
 <form class="form-new-lead" method="POST">
   {{ form.hidden_tag() }}
   <!-- security 'csrf' token -->
+  <br>
   <h2 class="h4">{% if title %}{{title}}{% else %}No Title{% endif %}</h2>
   <div class="btn-toolbar mb-2 mb-md-0 pt-3 pb-2 mb-3 border-bottom" style="display: flex; justify-content: space-between;">
     {{ form.submit(class="btn btn-md btn-outline-info mr-2") }}
@@ -17,6 +19,7 @@
       Powrót
     </a>
   </div>
+  <br>
   <div class="row">
     <div class="col-12">
       <div class="form-row mb-3">
