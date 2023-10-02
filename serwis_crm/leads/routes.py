@@ -203,10 +203,9 @@ def new_lead():
                     bike = new_bike(bike_manufacturer=str(form.bike_manufacturer.data).lower(), bike_model=str(form.bike_model.data).lower(), client_id=client.id)
             lead = LeadMain(title=form.title.data,
                         status=form.lead_status.data, notes=form.notes.data)
-            for service in form.service_name.raw_data:
-                service_obj = ServicesAction.query.filter(ServicesAction.name == service).first()
-                if service_obj and (service_obj not in lead.services):
-                    lead.services.append(service_obj)
+            for name, price in zip(form.service_name.raw_data, form.service_price.raw_data):
+                new_service = ServicesToLeads(name=name, price=price)
+                lead.services.append(new_service)
             if form.lead_status.data.status_name == 'Umówiony na serwis':
                 lead.date_scheduled = form.date_scheduled.data
             else:
@@ -280,7 +279,7 @@ def update_lead(lead_id):
         form.bike_model.data = bike.model
         form.assignees.data = lead.owner
         form.lead_status.data = lead.status
-        form.date_scheduled.data = lead.date_scheduled.strftime('%Y-%m-%d')
+        form.date_scheduled.data = lead.date_scheduled
         form.notes.data = lead.notes
         #form.total_price.data = LeadMain.get_total_price(lead.id)
         form.submit.label = Label('update_lead', 'Aktualizuj')
@@ -292,7 +291,7 @@ def update_lead(lead_id):
 @check_access('leads', 'view')
 def get_lead_view(lead_id):
     lead = LeadMain.query.filter_by(id=lead_id).first()
-    lead.date_scheduled= lead.date_scheduled.strftime('%Y-%m-%d')
+    lead.date_scheduled= lead.date_scheduled
     bike = Bike.get_bike(lead.bike_id)
     contact = Contact.get_contact(lead.contact_id)
     lead.total_price = LeadMain.get_total_price(lead.id)
