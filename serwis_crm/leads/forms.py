@@ -2,7 +2,7 @@ import datetime
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from wtforms.fields.html5 import DateField
-from wtforms import StringField, SubmitField, IntegerField
+from wtforms import StringField, SubmitField, IntegerField, DateField
 from wtforms.widgets import TextArea
 from wtforms.validators import DataRequired, Email, Optional, ValidationError, Length
 from wtforms_sqlalchemy.fields import QuerySelectField, QuerySelectMultipleField
@@ -35,8 +35,7 @@ class NewLead(FlaskForm):
 
     assignees = QuerySelectField('Przypisz do', query_factory=User.user_list_query, get_pk=lambda a: a.id,
                                  get_label=User.get_label, default=User.get_current_user)
-    date_scheduled = StringField('Data wizyty', id='date_scheduled', default=datetime.datetime.utcnow().strftime('%Y-%m-%d'),
-                                 validators=[Length(max=10, message='Cos sie data nie zgadza.')])
+    date_scheduled = DateField('Data wizyty', id='date_scheduled', default=datetime.date.today)
     service_name = StringField('Czynność serwisowa')
     service_price = IntegerField('Cena czynnośći serwisowej') 
     total_price = IntegerField('Przybliżona cena całkowita serwisu') 

@@ -41,7 +41,8 @@ body {
   position: relative;
   top: 0;
   height: calc(100vh - 48px);
-  padding-top: 83px;
+  padding-top: 43px;
+  max-height: 300px;
   overflow-x: hidden;
   overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
 }
@@ -405,11 +406,12 @@ body {
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
   overflow-y: auto; 
+  max-height: 80%; /* Adjust as needed */
 }
 
-.modal h2 {
+/* .modal h2 {
   margin: 0 0 20px;
-}
+} */
 
 .modal-button {
   display: flex;
