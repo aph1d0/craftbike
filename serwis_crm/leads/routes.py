@@ -291,7 +291,7 @@ def update_lead(lead_id):
 @check_access('leads', 'view')
 def get_lead_view(lead_id):
     lead = LeadMain.query.filter_by(id=lead_id).first()
-    lead.date_scheduled= lead.date_scheduled
+    lead.date_scheduled= lead.date_scheduled.strftime("%Y-%m-%d")
     bike = Bike.get_bike(lead.bike_id)
     contact = Contact.get_contact(lead.contact_id)
     lead.total_price = LeadMain.get_total_price(lead.id)
