@@ -29,12 +29,17 @@ from serwis_crm.rbac import check_access, is_admin
 leads = Blueprint('leads', __name__)
 
 def clean_up_not_attached_services():
+    services_to_delete = []
     all_services_to_leads = ServicesToLeads.query.all()
     all_leads = LeadMain.query.all()
     for service in all_services_to_leads:
         for lead in all_leads:
             if service not in lead.services:
-                ServicesToLeads.query.filter_by(id=service.id).delete()
+                services_to_delete.append(service)
+            else:
+                services_to_delete.remove(service)
+    for service_to_delete in services_to_delete:
+        ServicesToLeads.query.filter_by(id=service_to_delete.id).delete()
     db.session.commit()
 
 def reset_lead_filters():
@@ -90,9 +95,12 @@ def get_leads_view():
 @login_required
 @check_access('leads', 'update')
 @leads.route('/leads/update_stage/<int:lead_id>/<int:lead_stage_id>', methods=['GET','POST'])
-def update_stage(lead_id, lead_stage_id):
-    lead = LeadMain.query.filter(LeadMain.id == lead_id).first()
-    owner = User.get_current_user()
+def update_stage(lead_id, lead_stage_id, owner=None, lead=None):
+    if not lead:
+        lead = LeadMain.query.filter(LeadMain.id == lead_id).first()
+    if not owner:
+        owner = User.get_current_user()
+        lead.owner = owner
     lead_stage = LeadStatus.get_by_id(lead_stage_id)
     # to disable dragging back and forth from final stage
     if lead_stage.is_final == False and lead.status.is_final == True:
@@ -111,7 +119,6 @@ def update_stage(lead_id, lead_stage_id):
             response  = jsonify(error)
             response.status_code = error['status']
             return response
-    lead.owner = owner
     lead.lead_status_id = lead_stage_id
     db.session.add(lead)
     db.session.commit()
@@ -251,16 +258,13 @@ def update_lead(lead_id):
             lead.status = form.lead_status.data
             lead.date_scheduled = form.date_scheduled.data
             lead.notes = form.notes.data
-            services = []
-            for service in zip(form.service_name.raw_data, form.service_price.raw_data):
-                service_obj = ServicesToLeads()
-                service_obj.name, service_obj.price = service[0], service[1]
-                db.session.add(service_obj)
-                db.session.commit()
-                services.append(service_obj)
-            lead.services = services
-            up_stage = update_stage(lead_id=lead.id, lead_stage_id=lead.status.id)
+            lead.services = []
+            for name, price in zip(form.service_name.raw_data, form.service_price.raw_data):
+                service_obj = ServicesToLeads(name=name, price=price)
+                lead.services.append(service_obj)
+            up_stage = update_stage(lead_id=lead.id, lead_stage_id=lead.status.id, owner=form.assignees.data, lead=lead)
             if up_stage.json["status"] == 200:
+                db.session.add(lead)
                 db.session.commit()
                 flash('Zlecenie uaktualnione poprawnie!', 'success')
                 clean_up_not_attached_services()

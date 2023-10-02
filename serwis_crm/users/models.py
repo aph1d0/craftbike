@@ -27,7 +27,7 @@ class User(db.Model, UserMixin):
 
     @staticmethod
     def user_list_query():
-        return User.query
+        return User.query.filter(User.first_name != 'admin').all()
 
     @staticmethod
     def get_current_user():
