@@ -22,18 +22,6 @@
                 <li class="list-group-item g_field col-12">
                     <div class="row">
                       <div class="col-6">
-                          <div class="label">Imię</div>
-                          <div class="text">{{ contact.first_name if contact.last_name else '_' }}</div>
-                      </div>
-                      <div class="col-6">
-                          <div class="label">Nazwisko</div>
-                          <div class="text">{{ contact.last_name if contact.last_name else '_' }}</div>
-                      </div>
-                  </div>
-                </li>
-                <li class="list-group-item g_field col-12">
-                    <div class="row">
-                      <div class="col-6">
                           <div class="label">Telefon</div>
                           <div class="text">
                               <span data-feather="phone" class="mr-1"></span> {{ contact.phone if contact.phone else '_' }}

@@ -15,7 +15,6 @@
         <th width="150"></th>
         <th width="150" scope="col">Marka</th>
         <th width="100" scope="col">Model</th>
-        <th width="100" scope="col">Klient</th>
         <th width="100" scope="col">Kontakt do klienta</th>
       </tr>
     </thead>
@@ -46,7 +45,6 @@
         </th>
         <td>{{ bike.manufacturer }}</td>
         <td>{{ bike.model }}</td>
-        <td>{{ bike.contact.first_name }} {{ bike.contact.last_name }}</td>
         <td>{{ bike.contact.phone }}</td>
       </tr>
       {% endfor %}

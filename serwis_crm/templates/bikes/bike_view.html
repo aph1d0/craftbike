@@ -32,12 +32,6 @@
                 <li class="list-group-item g_field col-12">
                     <div class="row">
                       <div class="col-6">
-                          <div class="label">Klient</div>
-                          <div class="text">
-                            <span data-feather="user" class="mr-1"></span>  {{ bike.contact.first_name }} {{ bike.contact.last_name }}
-                          </div>
-                      </div>
-                      <div class="col-6">
                           <div class="label">Kontakt do klienta</div>
                           <div class="text">
                               <span data-feather="phone" class="mr-1"></span> {{ bike.contact.phone  if bike.contact.phone else '_' }}
