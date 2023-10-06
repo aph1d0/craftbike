@@ -36,7 +36,7 @@ def clean_up_not_attached_services():
         for lead in all_leads:
             if service not in lead.services:
                 services_to_delete.append(service)
-            else:
+            elif service in services_to_delete:
                 services_to_delete.remove(service)
     for service_to_delete in services_to_delete:
         ServicesToLeads.query.filter_by(id=service_to_delete.id).delete()
