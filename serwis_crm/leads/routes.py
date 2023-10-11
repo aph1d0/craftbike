@@ -267,7 +267,7 @@ def update_lead(lead_id):
                 db.session.add(lead)
                 db.session.commit()
                 flash('Zlecenie uaktualnione poprawnie!', 'success')
-                clean_up_not_attached_services()
+                #clean_up_not_attached_services()
                 return redirect(url_for('leads.get_lead_view', lead_id=lead.id))
             else:
                 flash('Aktualizacja zlecenia nie powiodła się!', 'danger')
