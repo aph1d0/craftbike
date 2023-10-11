@@ -28,19 +28,19 @@ from serwis_crm.rbac import check_access, is_admin
 
 leads = Blueprint('leads', __name__)
 
-def clean_up_not_attached_services():
-    services_to_delete = []
-    all_services_to_leads = ServicesToLeads.query.all()
-    all_leads = LeadMain.query.all()
-    for service in all_services_to_leads:
-        for lead in all_leads:
-            if service not in lead.services:
-                services_to_delete.append(service)
-            elif service in services_to_delete:
-                services_to_delete.remove(service)
-    for service_to_delete in services_to_delete:
-        ServicesToLeads.query.filter_by(id=service_to_delete.id).delete()
-    db.session.commit()
+# def clean_up_not_attached_services():
+#     services_to_delete = []
+#     all_services_to_leads = ServicesToLeads.query.all()
+#     all_leads = LeadMain.query.all()
+#     for service in all_services_to_leads:
+#         for lead in all_leads:
+#             if service not in lead.services:
+#                 services_to_delete.append(service)
+#             elif service in services_to_delete:
+#                 services_to_delete.remove(service)
+#     for service_to_delete in services_to_delete:
+#         ServicesToLeads.query.filter_by(id=service_to_delete.id).delete()
+#     db.session.commit()
 
 def reset_lead_filters():
     if 'lead_owner' in session:
