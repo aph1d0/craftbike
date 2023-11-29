@@ -12,8 +12,8 @@
     state: present
     force_source: true
     source: pull
-    async: 1800
-    poll: 5
+  async: 1800
+  poll: 5
 
 - name: Run Docker container
   docker_container:
