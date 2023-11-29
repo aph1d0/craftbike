@@ -108,7 +108,7 @@ def update_stage(lead_id, lead_stage_id, owner=None, lead=None):
         try:
             sns = boto3.resource('sns')
             sms_notif = SnsWrapper(sns)
-            message = "Dzień dobry! Tu serwis rowerowy CraftBike. Twój rower jest już gotowy do odbioru. Zapraszamy do naszego serwisu w tygodniu 10-18 oraz w soboty 10-14."
+            message = "Dzień dobry! Tu serwis rowerowy CraftBike. Twój rower jest już gotowy do odbioru. Zapraszamy do naszego serwisu w Toruniu przy ulicy Adama Mickiewicza 100c/5 w tygodniu 10-18 oraz w soboty 10-14."
             sms_notif.publish_text_message(phone_number=lead.lead_contact.phone, message=message)
         except:
             error = {'message': 'Coś nie poszło z wysyłaniem tego typu smsa :<', 'status': 500}
