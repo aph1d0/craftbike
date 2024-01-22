@@ -65,12 +65,11 @@ def get_leads_view():
         .join(User, LeadMain.owner_id==User.id)\
         .join(Bike, LeadMain.bike_id==Bike.id)\
         .join(LeadStatus, LeadMain.lead_status_id==LeadStatus.id)\
-        .add_columns(LeadMain.id, LeadMain.title, Contact.phone, Bike.manufacturer, Bike.model, LeadMain.owner_id, User, LeadStatus.status_name, LeadMain.date_created)\
+        .add_columns(LeadMain.id, LeadMain.title, Contact.phone, Contact.first_name, Bike.manufacturer, Bike.model, LeadMain.owner_id, User, LeadStatus.status_name, LeadMain.date_created)\
         .filter(or_(
             LeadMain.title.ilike(f'%{search}%'),
             Contact.phone.ilike(f'%{search}%'),
             Contact.first_name.ilike(f'%{search}%'),
-            Contact.last_name.ilike(f'%{search}%'),
             Bike.manufacturer.ilike(f'%{search}%'),
             Bike.model.ilike(f'%{search}%')
         ) if search else True) \
@@ -245,7 +244,7 @@ def update_lead(lead_id):
     if request.method == 'POST':
         if form.is_submitted() and form.validate():
             lead.title = form.title.data
-            #contact.first_name = form.first_name.data
+            contact.first_name = form.first_name.data
             #contact.last_name = form.last_name.data
             contact.phone = form.phone.data
             bike.manufacturer = form.bike_manufacturer.data
@@ -272,7 +271,7 @@ def update_lead(lead_id):
             flash('Aktualizacja zlecenia nie powiodła się! Sprawdź formularz.', 'danger')
     elif request.method == 'GET':
         form.title.data = lead.title
-        #form.first_name.data = contact.first_name
+        form.first_name.data = contact.first_name
         #form.last_name.data = contact.last_name
         form.phone.data = contact.phone
         form.bike_manufacturer.data = bike.manufacturer

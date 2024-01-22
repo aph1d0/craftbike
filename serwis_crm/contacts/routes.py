@@ -64,7 +64,7 @@ def get_contacts_view():
     advanced_filters = set_date_filters(filters, 'Contact', 'contacts_date_created')
 
     query = Contact.query.filter(or_(
-            #Contact.first_name.ilike(f'%{search}%'),
+            Contact.first_name.ilike(f'%{search}%'),
             #Contact.last_name.ilike(f'%{search}%'),
             Contact.phone.ilike(f'%{search}%'),
         ) if search else True)\
@@ -97,7 +97,7 @@ def update_contact(contact_id):
     form = NewContact()
     if request.method == 'POST':
         if form.is_submitted() and form.validate():
-            #contact.first_name = form.first_name.data
+            contact.first_name = form.first_name.data
             #contact.last_name = form.last_name.data
             contact.phone = form.phone.data
             contact.notes = form.notes.data
@@ -108,7 +108,7 @@ def update_contact(contact_id):
             print(form.errors)
             flash('Contact update failed! Form has errors', 'danger')
     elif request.method == 'GET':
-        #form.first_name.data = contact.first_name
+        form.first_name.data = contact.first_name
         #form.last_name.data = contact.last_name
         form.phone.data = contact.phone
         form.assignees.data = contact.contact_owner

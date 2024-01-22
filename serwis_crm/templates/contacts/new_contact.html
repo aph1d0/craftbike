@@ -19,8 +19,15 @@
 
             <div class="form-row mb-3">
                 <div class="col">
+                    {{ form.first_name.label(class="form-control-label") }}
+                    {{ form.first_name(class="form-control from-control-lg") }}
+                </div>
+            </div>
+
+            <div class="form-row mb-3">
+                <div class="col">
                     {{ form.phone.label(class="form-control-label") }}
-                    {{ form.phone(class="form-control from-control-lg", placeholder="(555) 555-1234") }}
+                    {{ form.phone(class="form-control from-control-lg", placeholder="+48666777888") }}
                 </div>
             </div>
 

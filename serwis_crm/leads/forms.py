@@ -27,7 +27,7 @@ class NewLead(FlaskForm):
     bike_manufacturer = StringField('Marka roweru', id='bike_manufacturer', validators=[DataRequired(message='Marka roweru jest obowiązkowa!')])
     bike_model = StringField('Model roweru', id='bike_model', validators=[DataRequired(message='Model roweru jest obowiązkowy!')])
     title = StringField('Nazwa', id='title')
-    #first_name = StringField('Imię')
+    first_name = StringField('Imię')
     #last_name = StringField('Nazwisko')
     notes = StringField('Notatki', widget=TextArea())
     lead_status = QuerySelectField('Status', query_factory=LeadStatus.lead_status_query_final, get_pk=lambda a: a.id,

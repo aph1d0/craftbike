@@ -77,6 +77,21 @@
 
       <div class="form-row mb-3">
         <div class="col">
+          {{ form.first_name.label(class="form-control-label") }} {% if
+          form.first_name.errors %} {{ form.first_name(class="form-control form-control-lg
+          required is-invalid") }}
+          <div class="invalid-feedback">
+            {% for error in form.first_name.errors %}
+            <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+          {% else %} {% if not form.first_name.data %} {{
+          form.first_name(class="form-control required from-control-lg",
+          placeholder="Imię ...") }} {% else %} {{
+          form.first_name(class="form-control required from-control-lg",
+          placeholder="Imię ...") }} {% endif %} {% endif %}
+        </div>
+        <div class="col">
           {{ form.phone.label(class="form-control-label") }} {% if
           form.phone.errors %} {{ form.phone(class="form-control form-control-lg
           required is-invalid") }}

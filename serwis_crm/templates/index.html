@@ -38,12 +38,7 @@
                 <span data-feather="phone"></span> {{ lead.lead_contact.phone }}
               </div>
               <div>
-                <span data-feather="calendar"></span> {{
-                lead.date_created }}
-              </div>
-              <div>
-                <span data-feather="tool"></span> {{ lead.owner.first_name }} {{
-                lead.owner.last_name }}
+                <span data-feather="user"></span> {{ lead.lead_contact.first_name }}
               </div>
             </div>
             <div class="card-actions">
@@ -56,8 +51,8 @@
                   <span data-feather="edit"></span> Edytuj zlecenie
                 </a>
               </div>
-              <div class="card-actions">
-              <div class="ca_item">
+              <!--<div class="card-actions">
+               <div class="ca_item">
                 <a
                   href="/leads/{{ lead.id }}"
                   class="btn btn-sm btn-outline-secondary"
@@ -65,8 +60,8 @@
                 >
                   <span data-feather="arrow-up-right"></span> Szczególy zlecenia
                 </a>
-              </div>
-            </div>
+              </div> 
+            </div>-->
               {% if lead.status.status_name == "Gotowy" %}
               <div class="card-actions">
                 <div class="ca_item">

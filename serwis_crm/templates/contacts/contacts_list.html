@@ -14,8 +14,8 @@
                       <input type="checkbox" id="select_all" value="all" />
                   </th>
                     <th width="150"></th>
-                  <!-- <th width="150" scope="col">Imię</th>
-                  <th width="150" scope="col">Nazwisko</th> -->
+                  <th width="150" scope="col">Imię</th>
+                  <!--  <th width="150" scope="col">Nazwisko</th> -->
                     <th width="150" scope="col">Telefon</th>
                     <th width="200" scope="col">Serwisant</th>
                     <th width="200" scope="col">Data utworzenia</th>
@@ -40,8 +40,8 @@
                             <span data-feather="arrow-up-right"></span>
                         </a>
                     </th>
-                  <!-- <td>{{ contact.first_name }}</td>
-                  <td>{{ contact.last_name }}</td> -->
+                  <td>{{ contact.first_name }}</td>
+                  <!--  <td>{{ contact.last_name }}</td> -->
                     <td>{{ contact.phone }}</td>
                     <td>{% with owner=contact.contact_owner %}{% include 'common/owner_cell.html' %}{% endwith %}</td>
                     <td>{{ contact.date_created.strftime('%Y-%m-%d') if contact.date_created }}</td>

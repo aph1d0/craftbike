@@ -12,10 +12,11 @@
         <th width="40" scope="col">
           <input type="checkbox" id="select_all" value="all" />
         </th>
-        <th width="150"></th>
+        <th width="50"></th>
         <th width="150" scope="col">Marka</th>
         <th width="100" scope="col">Model</th>
         <th width="100" scope="col">Kontakt do klienta</th>
+        <th width="100" scope="col">Imię klienta</th>
       </tr>
     </thead>
     <tbody>
@@ -46,6 +47,7 @@
         <td>{{ bike.manufacturer }}</td>
         <td>{{ bike.model }}</td>
         <td>{{ bike.contact.phone }}</td>
+        <td>{{ bike.contact.first_name }}</td>
       </tr>
       {% endfor %}
     </tbody>
