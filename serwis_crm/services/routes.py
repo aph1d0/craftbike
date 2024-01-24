@@ -97,7 +97,7 @@ def delete_action(action_id):
 
 @services.route("/services/actions/add/<int:category_id>/<string:action_name>/<int:action_price>", methods=['POST'])
 @login_required
-@check_access('services', 'add')
+@check_access('services', 'create')
 def add_action(category_id, action_name, action_price):
     service_action = ServicesAction.query.filter(ServicesAction.name==action_name).first()
     if service_action:
