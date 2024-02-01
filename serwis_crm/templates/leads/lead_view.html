@@ -31,6 +31,12 @@
         </div>
       </li>
       <li class="list-group-item g_field">
+        <div class="label">Telefon</div>
+        <div class="text">
+          {{ contact.phone if contact.phone else '_' }}
+        </div>
+      </li>
+      <li class="list-group-item g_field">
         <div class="label">Rower</div>
         <div class="text">
           {{ bike.manufacturer if bike.manufacturer else '_' }} {{ bike.model if

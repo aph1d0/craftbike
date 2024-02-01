@@ -4,6 +4,14 @@
   class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"
 >
   <h2 class="h4">{% if title %}{{title}}{% else %}No Title{% endif %}</h2>
+  <a
+  class="btn btn btn-sm btn-outline-primary"
+  role="button"
+  href="{{ url_for('leads.new_lead') }}"
+>
+  <span data-feather="plus"></span>
+  Nowe zlecenie
+</a>
 </div>
 {% include "kanban_filters.html" %}
 {% if lead_statuses|length > 0 %}
