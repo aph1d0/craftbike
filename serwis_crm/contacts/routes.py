@@ -78,9 +78,10 @@ def get_contacts_view():
 @contacts.route("/contacts/new", methods=['GET', 'POST'])
 @login_required
 @check_access('contacts', 'create')
-def new_contact(phone, current_user):
+def new_contact(first_name, phone, current_user):
     contact = Contact(
-            phone=phone)
+            phone=phone,
+            first_name=first_name)
     contact.owner_id = current_user
     db.session.add(contact)
     db.session.commit()

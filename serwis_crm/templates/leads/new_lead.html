@@ -74,12 +74,86 @@
           });
         </script>
       </div>
-
+      <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var inputField = document.getElementById('first_name');
+            var suggestionsList = document.getElementById('suggestions_list');
+            var phone = document.getElementById('phone');
+    
+            inputField.addEventListener('input', function () {
+                var inputValue = inputField.value.trim();
+    
+                if (inputValue.length === 0) {
+                    suggestionsList.style.display = 'none';
+                    return;
+                }
+    
+                var apiEndpoint = '/leads/new/_search_for_contact?name=' + inputValue;
+    
+                // Using AJAX to fetch data from the API
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', apiEndpoint, true);
+    
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === 4 && xhr.status === 200) {
+                        var response = JSON.parse(xhr.responseText);
+                        displaySuggestions(response);
+                    }
+                };
+    
+                xhr.send();
+            });
+    
+            function displaySuggestions(suggestions) {
+                suggestionsList.innerHTML = '';
+    
+                if (suggestions.length === 0) {
+                    suggestionsList.style.display = 'none';
+                    return;
+                }
+    
+                suggestions.forEach(function (suggestion) {
+                    var listItem = document.createElement('li');
+                    listItem.textContent = suggestion;
+                    listItem.addEventListener('click', function () {
+                        inputField.value = suggestion;
+                        suggestionsList.style.display = 'none';
+                        var apiEndpoint = '/leads/new/_get_contact_phone?name=' + inputField.value;
+    
+                        // Using AJAX to fetch data from the API
+                        var xhr = new XMLHttpRequest();
+                        xhr.open('GET', apiEndpoint, true);
+            
+                        xhr.onreadystatechange = function () {
+                            if (xhr.readyState === 4 && xhr.status === 200) {
+                                var response = JSON.parse(xhr.responseText);
+                                phone.value = response;
+                            }
+                        };
+            
+                        xhr.send();
+                    });
+    
+                    suggestionsList.appendChild(listItem);
+                });
+    
+                suggestionsList.style.display = 'block';
+            }
+    
+            document.addEventListener('click', function (event) {
+                var isClickInside = inputField.contains(event.target) || suggestionsList.contains(event.target);
+    
+                if (!isClickInside) {
+                    suggestionsList.style.display = 'none';
+                }
+            });
+        });
+    </script>
       <div class="form-row mb-3">
         <div class="col">
-          {{ form.first_name.label(class="form-control-label") }} {% if
-          form.first_name.errors %} {{ form.first_name(class="form-control form-control-lg
-          required is-invalid") }}
+          {{ form.first_name.label(class="form-control-label") }} 
+          {% if form.first_name.errors %} 
+          {{ form.first_name(class="form-control form-control-lg required is-invalid") }}
           <div class="invalid-feedback">
             {% for error in form.first_name.errors %}
             <span>{{ error }}</span>
@@ -90,6 +164,7 @@
           placeholder="Imię ...") }} {% else %} {{
           form.first_name(class="form-control required from-control-lg",
           placeholder="Imię ...") }} {% endif %} {% endif %}
+          <ul id="suggestions_list"></ul>
         </div>
         <div class="col">
           {{ form.phone.label(class="form-control-label") }} {% if

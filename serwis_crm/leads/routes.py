@@ -137,6 +137,35 @@ def get_services(lead_id):
         )
     return jsonify(json_services)
 
+
+@login_required
+@check_access('leads', 'view')
+@leads.route('/leads/new/_search_for_contact', methods=['GET'])
+def search_for_contact():
+    # Get the input from the query string
+    input = str(request.args.get("name"))
+    if len(input) > 2:
+        # Query the database for the matching records
+        results = Contact.query.filter(Contact.first_name.like(f'%{input}%')).all()
+        # Return the phone numbers as a JSON array
+        return jsonify([result.first_name for result in results])
+    else:
+        return ''
+
+@login_required
+@check_access('leads', 'view')
+@leads.route('/leads/new/_get_contact_phone', methods=['GET'])
+def get_contact_phone():
+    # Get the input from the query string
+    input = request.args.get("name")
+    # Query the database for the matching records
+    result = Contact.query.filter_by(first_name=input).first()
+    # Return the phone numbers as a JSON array
+    if result:
+        return jsonify(result.phone)
+    else:
+        return jsonify('No contact found with that name')
+
 @login_required
 @check_access('leads', 'view')
 @leads.route('/leads/new/_autoset_title', methods=['POST'])
@@ -194,7 +223,7 @@ def new_lead():
         if form.is_submitted() and form.validate():
             client = Contact.query.filter_by(phone=form.phone.data).first()
             if not client:
-                client = new_contact(phone=form.phone.data, current_user=current_user.id)
+                client = new_contact(first_name=form.first_name.data, phone=form.phone.data, current_user=current_user.id)
             clients_bikes = Bike.query.filter_by(contact_id=client.id).all()
             for client_bike in clients_bikes:
                 if str(form.bike_manufacturer.data).lower() == client_bike.manufacturer and str(form.bike_model.data).lower() == client_bike.model:

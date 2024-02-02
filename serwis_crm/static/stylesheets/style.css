@@ -433,3 +433,26 @@ body {
 .modal-button:hover {
   background-color: #d32f2f9c;
 }
+
+#suggestions_list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid #030000;
+  border-radius: 5px;
+  position: absolute;
+  display: none;
+  z-index: 9999;
+  background-color: #f8f8f8;
+}
+
+#suggestions_list li {
+  padding: 8px;
+  cursor: pointer;
+}
+
+#suggestions_list li:hover {
+  background-color: #007bff;
+}
