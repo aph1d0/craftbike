@@ -74,10 +74,9 @@
               <div class="card-actions">
                 <div class="ca_item">
                   <a
-                    href="/leads/update_stage/{{ lead.id }}/6"
                     class="btn btn-sm btn-outline-secondary"
                     role="button"
-                    onClick="window.location.reload();"
+                    onClick="update_deal_stage('{{ lead.id }}', 6);"
                   >
                     <span data-feather="log-out"></span> Odebrany
                   </a>
@@ -144,7 +143,7 @@
     });
     setTimeout(function(){
       window.location.reload();
-   }, 3000);
+   }, 1000);
   }
 
   function getDragAfterElement(column, y) {
