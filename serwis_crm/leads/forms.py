@@ -2,7 +2,7 @@ import datetime
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from wtforms.fields.html5 import DateField
-from wtforms import StringField, SubmitField, IntegerField, DateField
+from wtforms import StringField, SubmitField, IntegerField, DateField, BooleanField
 from wtforms.widgets import TextArea
 from wtforms.validators import DataRequired, Email, Optional, ValidationError, Length
 from wtforms_sqlalchemy.fields import QuerySelectField, QuerySelectMultipleField
@@ -40,6 +40,7 @@ class NewLead(FlaskForm):
     service_price = IntegerField('Cena czynnośći serwisowej') 
     total_price = IntegerField('Przybliżona cena całkowita serwisu') 
     submit = SubmitField('Utwórz')
+    sms_sent = BooleanField('SMS wysłany', id='sms_sent')
 
 class EditLead(NewLead):
         lead_status = QuerySelectField('Status', query_factory=LeadStatus.lead_status_query, get_pk=lambda a: a.id,

@@ -58,14 +58,13 @@ def get_leads_view():
     owner = CommonFilters.set_owner(filters, 'lead_main', 'lead_owner')
     advanced_filters = set_date_filters(filters, 'lead_date_created')
     status_filter = set_status(filters, 'lead_status')
-    lead=LeadMain.get_by_id(1)
 
     query = LeadMain.query \
         .join(Contact, LeadMain.contact_id==Contact.id)\
         .join(User, LeadMain.owner_id==User.id)\
         .join(Bike, LeadMain.bike_id==Bike.id)\
         .join(LeadStatus, LeadMain.lead_status_id==LeadStatus.id)\
-        .add_columns(LeadMain.id, LeadMain.title, Contact.phone, Contact.first_name, Bike.manufacturer, Bike.model, LeadMain.owner_id, User, LeadStatus.status_name, LeadMain.date_created)\
+        .add_columns(LeadMain.id, LeadMain.title, Contact.phone, LeadMain.sms_sent, Contact.first_name, Bike.manufacturer, Bike.model, LeadMain.owner_id, User, LeadStatus.status_name, LeadMain.date_created)\
         .filter(or_(
             LeadMain.title.ilike(f'%{search}%'),
             Contact.phone.ilike(f'%{search}%'),
@@ -89,8 +88,38 @@ def get_leads_view():
 
 @login_required
 @check_access('leads', 'update')
+@leads.route('/leads/send_sms/<int:lead_id>', methods=['POST'])
+def send_sms(lead_id):
+    lead = LeadMain.query.filter(LeadMain.id == lead_id).first()
+    lead_stage = LeadStatus.get_by_id(lead.lead_status_id)
+    if lead_stage.id == 5:
+        try:
+            sns = boto3.resource('sns')
+            sms_notif = SnsWrapper(sns)
+            message = "Dzień dobry! Tu serwis rowerowy CraftBike. Twój rower jest już gotowy do odbioru. Zapraszamy do naszego serwisu w Toruniu przy ulicy Wita Stwosza 2 w tygodniu 10-18 oraz w soboty 10-14."
+            sms_notif.publish_text_message(phone_number=lead.lead_contact.phone, message=message)
+            lead.sms_sent=True
+        except:
+            error = {'message': 'Coś nie poszło z wysyłaniem tego typu smsa :<', 'status': 500}
+            response  = jsonify(error)
+            response.status_code = error['status']
+            return response
+    else: 
+        na = {'message': 'Zlecenie nie jest w statusie "Gotowy"', 'status': 406}
+        response  = jsonify(na)
+        response.status_code = na['status']
+        return response
+    ok = {'message': 'Wysłano SMS do klienta.', 'status': 200}
+    response  = jsonify(ok)
+    response.status_code = ok['status']
+    db.session.add(lead)
+    db.session.commit()
+    return response
+
+@login_required
+@check_access('leads', 'update')
 @leads.route('/leads/update_stage/<int:lead_id>/<int:lead_stage_id>', methods=['GET','POST'])
-def update_stage(lead_id, lead_stage_id, owner=None, lead=None):
+def update_stage(lead_id, lead_stage_id, owner=None, lead=None) -> Response:
     if not lead:
         lead = LeadMain.query.filter(LeadMain.id == lead_id).first()
     if not owner:
@@ -103,17 +132,6 @@ def update_stage(lead_id, lead_stage_id, owner=None, lead=None):
         response  = jsonify(error)
         response.status_code = error['status']
         return response
-    if lead_stage_id == 5:
-        try:
-            sns = boto3.resource('sns')
-            sms_notif = SnsWrapper(sns)
-            message = "Dzień dobry! Tu serwis rowerowy CraftBike. Twój rower jest już gotowy do odbioru. Zapraszamy do naszego serwisu w Toruniu przy ulicy Wita Stwosza 2 w tygodniu 10-18 oraz w soboty 10-14."
-            sms_notif.publish_text_message(phone_number=lead.lead_contact.phone, message=message)
-        except:
-            error = {'message': 'Coś nie poszło z wysyłaniem tego typu smsa :<', 'status': 500}
-            response  = jsonify(error)
-            response.status_code = error['status']
-            return response
     lead.lead_status_id = lead_stage_id
     db.session.add(lead)
     db.session.commit()
@@ -234,9 +252,10 @@ def new_lead():
                     bike = new_bike(bike_manufacturer=str(form.bike_manufacturer.data).lower(), bike_model=str(form.bike_model.data).lower(), client_id=client.id)
             lead = LeadMain(title=form.title.data,
                         status=form.lead_status.data, notes=form.notes.data)
-            for name, price in zip(form.service_name.raw_data, form.service_price.raw_data):
-                new_service = ServicesToLeads(name=name, price=price)
-                lead.services.append(new_service)
+            if (form.service_name.raw_data is not None) and (form.service_price.raw_data is not None):
+                for name, price in zip(form.service_name.raw_data, form.service_price.raw_data):
+                    new_service = ServicesToLeads(name=name, price=price)
+                    lead.services.append(new_service)
             if form.lead_status.data.status_name == 'Umówiony na serwis':
                 lead.date_scheduled = form.date_scheduled.data
             else:
@@ -282,12 +301,14 @@ def update_lead(lead_id):
             lead.status = form.lead_status.data
             lead.date_scheduled = form.date_scheduled.data
             lead.notes = form.notes.data
+            lead.sms_sent = form.sms_sent.data
             lead.services = []
-            for name, price in zip(form.service_name.raw_data, form.service_price.raw_data):
-                service_obj = ServicesToLeads(name=name, price=price)
-                lead.services.append(service_obj)
+            if (form.service_name.raw_data is not None) and (form.service_price.raw_data is not None):
+                for name, price in zip(form.service_name.raw_data, form.service_price.raw_data):
+                    service_obj = ServicesToLeads(name=name, price=price)
+                    lead.services.append(service_obj)
             up_stage = update_stage(lead_id=lead.id, lead_stage_id=lead.status.id, owner=form.assignees.data, lead=lead)
-            if up_stage.json["status"] == 200:
+            if (up_stage.json is not None) and (up_stage.json["status"] == 200):
                 db.session.add(lead)
                 db.session.commit()
                 flash('Zlecenie uaktualnione poprawnie!', 'success')
@@ -309,6 +330,7 @@ def update_lead(lead_id):
         form.lead_status.data = lead.status
         form.date_scheduled.data = lead.date_scheduled
         form.notes.data = lead.notes
+        form.sms_sent.data = lead.sms_sent
         #form.total_price.data = LeadMain.get_total_price(lead.id)
         form.submit.label = Label('update_lead', 'Aktualizuj')
     return render_template("leads/new_lead.html", title="Aktualizuj zlecenie", form=form, lead_id=lead.id)

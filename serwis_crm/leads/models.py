@@ -38,6 +38,7 @@ class LeadMain(db.Model):
     date_created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     date_scheduled= db.Column(db.DateTime, nullable=True)
     services = db.relationship('ServicesToLeads', secondary=lead_service, backref='leads')
+    sms_sent = db.Column(db.Boolean, nullable=False, default=False)
 
     @staticmethod
     def get_by_id(lead_id):

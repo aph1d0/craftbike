@@ -21,6 +21,10 @@
   <div class="col-5">
     <ul class="list-group list-group-flush">
       <li class="list-group-item g_field">
+        <div class="label">SMS</div>
+        <div type="text">{{ 'Tak' if lead.sms_sent else 'Nie' }}</div>
+      </li>
+      <li class="list-group-item g_field">
         <div class="label">Nazwa</div>
         <div class="text">{{ lead.title if lead.title else '_' }}</div>
       </li>

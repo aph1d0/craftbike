@@ -48,6 +48,11 @@
               <div>
                 <span data-feather="user"></span> {{ lead.lead_contact.first_name }}
               </div>
+              {% if lead.status.status_name == "Gotowy" %}
+              <div>
+                <span data-feather="message-square"></span> {{ 'Tak' if lead.sms_sent else 'Nie' }}
+              </div>
+              {% endif %}
             </div>
             <div class="card-actions">
               <div class="ca_item">
@@ -72,6 +77,16 @@
             </div>-->
               {% if lead.status.status_name == "Gotowy" %}
               <div class="card-actions">
+                <div class="ca_item">
+                  <a
+                    class="btn btn-sm btn-outline-secondary"
+                    role="button"
+                    onClick="send_sms('{{ lead.id }}', '{{ lead.sms_sent}}');"
+                  >
+                    <span data-feather="message-square"></span> Wyślij SMS
+                  </a>
+                </div>
+                <div><br></div>
                 <div class="ca_item">
                   <a
                     class="btn btn-sm btn-outline-secondary"
@@ -105,6 +120,59 @@
     ev.stopPropagation();
   }
 
+  function send_sms(leadId, leadSmsSent) {
+    $(".ajax_indicator")
+      .css("display", "block")
+      .text("przetwarzam")
+      .removeClass("done")
+      .addClass("processing");
+    if (leadSmsSent == 'True'){
+      var result = confirm("Ponownie wysłać sms?");
+      if (!result) {
+        $(".ajax_indicator")
+        .removeClass("processing")
+        .addClass("done")
+        .fadeOut(2000);
+        setTimeout(function(){
+          window.location.reload();
+       }, 1000);
+        return
+      }
+    }
+    $.ajax({
+      type: "POST",
+      url: "/leads/send_sms/" + leadId,
+      contentType: "application/json",
+      dataType: "json",
+      success: function (data) {
+        alert('SMS wysłany poprawnie!');
+        $(".ajax_indicator")
+          .html("<span data-feather='check'></span> " + data.message)
+          .removeClass("processing")
+          .addClass("done")
+          .fadeOut(2000);
+      },
+      error: function (data) {
+        if (data.responseJSON){
+          alert('Nie udało sie wysłać SMS: ' + data.responseJSON.message);
+          $(".ajax_indicator")
+          .html("<span data-feather='check'></span> " + data.responseJSON.message)
+          .removeClass("processing")
+          .addClass("error")
+          .fadeOut(2000);
+        } else {
+          $(".ajax_indicator")
+          .html("<span data-feather='check'></span> " + data.statusText)
+          .removeClass("processing")
+          .addClass("error")
+          .fadeOut(2000);
+        }
+      },
+    });
+    setTimeout(function(){
+      window.location.reload();
+   }, 1000);
+  }
   function update_deal_stage(leadId, leadStageId) {
     $(".ajax_indicator")
       .css("display", "block")
