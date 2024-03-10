@@ -41,6 +41,7 @@ class NewLead(FlaskForm):
     total_price = IntegerField('Przybliżona cena całkowita serwisu') 
     submit = SubmitField('Utwórz')
     sms_sent = BooleanField('SMS wysłany', id='sms_sent')
+    sms_sending = BooleanField('Wysyłać SMS?', id='sms', default=True)
 
 class EditLead(NewLead):
         lead_status = QuerySelectField('Status', query_factory=LeadStatus.lead_status_query, get_pk=lambda a: a.id,

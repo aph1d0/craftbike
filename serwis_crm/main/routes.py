@@ -49,7 +49,7 @@ def home():
         .filter(advanced_filters) \
     .all()
     for lead in leads:
-        if lead.status.status_name != "Odebrany" and lead.date_scheduled.date() <= date.today():
+        if lead.status.status_name == "Przyjęty na serwis" or lead.status.status_name == "Umówiony na serwis" or lead.status.status_name == "Gotowy" :
             good_leads.append(lead)
         if lead.status.status_name == "Umówiony na serwis" and lead.date_scheduled.date() != date.today():
             if lead in good_leads:

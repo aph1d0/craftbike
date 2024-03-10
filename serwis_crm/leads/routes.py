@@ -92,7 +92,7 @@ def get_leads_view():
 def send_sms(lead_id):
     lead = LeadMain.query.filter(LeadMain.id == lead_id).first()
     lead_stage = LeadStatus.get_by_id(lead.lead_status_id)
-    if lead_stage.id == 5:
+    if lead_stage.id == 5 and lead.sms_sending is True:
         try:
             sns = boto3.resource('sns')
             sms_notif = SnsWrapper(sns)
@@ -133,6 +133,7 @@ def update_stage(lead_id, lead_stage_id, owner=None, lead=None) -> Response:
         response.status_code = error['status']
         return response
     lead.lead_status_id = lead_stage_id
+    send_sms(lead_id=lead.id)
     db.session.add(lead)
     db.session.commit()
     ok = {'message': 'Zaktualizowano status zlecenia poprawnie.', 'status': 200}
@@ -210,27 +211,6 @@ def get_scheduled():
         #a = jsonify(json_scheduled_serwices)
     return json_scheduled_services
 
-# @leads.route("/leads/new/suggest_service", methods=['GET', 'POST'])
-# @login_required
-# @check_access('leads', 'create')
-# def suggest_service():
-#     query = request.args.get('query')
-#     if not query:
-#         return jsonify([])
-#     items = Services.query.filter(Services.name.ilike(f'%{query}%')).all()
-#     suggestions = [item.name for item in items]
-#     return jsonify(suggestions)
-
-# @leads.route("/leads/new/get_service_price", methods=['GET', 'POST'])
-# @login_required
-# @check_access('leads', 'create')
-# def get_service_price():
-#     query = request.args.get('query')
-#     if not query:
-#         return jsonify([])
-#     price = Services.query.filter(Services.name == query).first()
-#     return jsonify(price.price)
-
 @leads.route("/leads/new", methods=['GET', 'POST'])
 @login_required
 @check_access('leads', 'create')
@@ -267,6 +247,11 @@ def new_lead():
                 lead.owner = current_user
             lead.contact_id = client.id
             lead.bike_id = bike.id
+            sms_sending = request.form.get('sms_sending')
+            if sms_sending == 'on':
+                lead.sms_sending = True
+            else:
+                lead.sms_sending = False
             db.session.add(lead)
             db.session.commit()
             flash('Nowe zlecenie serwisowe utworzone!', 'success')
@@ -301,7 +286,11 @@ def update_lead(lead_id):
             lead.status = form.lead_status.data
             lead.date_scheduled = form.date_scheduled.data
             lead.notes = form.notes.data
-            lead.sms_sent = form.sms_sent.data
+            sms_sending = request.form.get('sms_sending')
+            if sms_sending == 'on':
+                lead.sms_sending = True
+            else:
+                lead.sms_sending = False
             lead.services = []
             if (form.service_name.raw_data is not None) and (form.service_price.raw_data is not None):
                 for name, price in zip(form.service_name.raw_data, form.service_price.raw_data):
@@ -322,7 +311,6 @@ def update_lead(lead_id):
     elif request.method == 'GET':
         form.title.data = lead.title
         form.first_name.data = contact.first_name
-        #form.last_name.data = contact.last_name
         form.phone.data = contact.phone
         form.bike_manufacturer.data = bike.manufacturer
         form.bike_model.data = bike.model
@@ -331,7 +319,7 @@ def update_lead(lead_id):
         form.date_scheduled.data = lead.date_scheduled
         form.notes.data = lead.notes
         form.sms_sent.data = lead.sms_sent
-        #form.total_price.data = LeadMain.get_total_price(lead.id)
+        form.sms_sending.data = lead.sms_sending
         form.submit.label = Label('update_lead', 'Aktualizuj')
     return render_template("leads/new_lead.html", title="Aktualizuj zlecenie", form=form, lead_id=lead.id)
 
@@ -356,7 +344,6 @@ def delete_lead(lead_id):
     if not lead:
         flash('Zlecenie nie istnieje :(', 'danger')
     else:
-        #LeadMain.query.filter_by(id=lead_id).delete()
         lead = LeadMain.query.filter_by(id=lead_id).first()
         for service in lead.services:
             lead.services.remove(service)

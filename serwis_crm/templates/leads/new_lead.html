@@ -28,45 +28,20 @@
           {{ 'Tak' if form.sms_sent.data else 'Nie' }}
         </div>
         <div class="col">
-          <button id="sendSMSButton">Wyślij SMS</button>
+          {{ form.sms_sending.label(class="form-control-label") }} : 
+          <input type="checkbox" name="sms_sending" checked >
+          {% if not form.sms_sending.data %} 
+          <script>
+            // Select the input field
+            var smsSendingCheckbox = document.querySelector('input[name="sms_sending"]');
+        
+            // Uncheck the input field
+            if (smsSendingCheckbox) {
+                smsSendingCheckbox.checked = false;
+            }
+          </script>
+          {% endif %}
         </div>
-        <script>
-          document.getElementById('sendSMSButton').addEventListener('click', function() {
-            // Prevent the default form submission behavior
-            event.preventDefault();
-            // Make a POST request to the /leads/send_sms endpoint
-            fetch('/leads/send_sms/{{ lead_id }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                    // Add any other headers if needed, such as authentication token
-                },
-                // Add any payload/data you want to send with the request
-                body: JSON.stringify({
-                    // Add data if needed
-                })
-            })
-            .then(response => {
-                if (!response.ok) {
-                  return response.json().then(json => {
-                    throw new Error(json.message); // or handle the error as per your requirement
-                  });
-                }
-                return response.json();
-            })
-            .then(data => {
-                // Handle the response data here
-                console.log(data);
-                alert('SMS wysłany poprawnie!');
-                location.reload()
-            })
-            .catch(error => {
-                // Handle errors here
-                console.error('There was a problem with your fetch operation:', error);
-                alert('Nie udało sie wysłać SMS: ' + error.message);
-            });
-        });
-        </script>
       </div>
       <div class="form-row mb-3">
         <div class="col">
