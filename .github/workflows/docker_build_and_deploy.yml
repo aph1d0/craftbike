@@ -30,6 +30,8 @@ jobs:
         push: true
         platforms: linux/amd64
         tags: aph1d/craft-bike:${{ steps.get_branch_name.outputs.branch_name }}.${{ github.sha }}, aph1d/craft-bike:latest
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
   deploy_docker_container_using_ansible:
     runs-on: ubuntu-latest
     needs: [ 'build_and_push_to_docker_hub' ]
