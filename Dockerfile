@@ -1,12 +1,9 @@
-FROM python:3.10-slim as build
+FROM python:3.12.2-alpine as build
 
 # Copy the entire directory to the temporary build stage
 COPY . /serwis_crm_app
 
-# Remove the .git folder from the build directory
-RUN rm -rf /serwis_crm_app/.git
-
-FROM python:3.10.12-slim
+FROM python:3.12.2-alpine
 
 ARG MYSQL_HOST
 ARG MYSQL_PORT
@@ -16,9 +13,9 @@ ARG MYSQL_DB_NAME
 
 ENV PYTHONUNBUFFERED 1
 
-# RUN apk update && apk add --no-cache python3-dev py3-pip gcc musl-dev mariadb-connector-c-dev
-
-RUN apt-get update && apt-get install -y default-libmysqlclient-dev gcc pkg-config 
+RUN apk update \
+    && apk add --virtual build-deps gcc python3-dev musl-dev g++ libffi-dev openssl-dev\
+    && apk add --no-cache mariadb-dev mariadb-client
 
 COPY requirements.txt /
 RUN pip3 install -r /requirements.txt
