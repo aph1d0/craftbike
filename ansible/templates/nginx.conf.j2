@@ -11,7 +11,23 @@ http {
     server {
         listen [2a01:4f9:4a:27c1::253]:80;
         server_name craftbike.toadres.pl;
+        # Disable TLS 1.0 and TLS 1.1
+        ssl_protocols TLSv1.2 TLSv1.3;
 
+        # Enable only strong cipher suites
+        ssl_ciphers 'TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256:TLS_AES_128_GCM_SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256';
+
+        # Other SSL configurations
+        ssl_prefer_server_ciphers on;
+        ssl_session_timeout 1d;
+        ssl_session_cache shared:SSL:50m;
+        ssl_session_tickets off;
+
+        # Additional security headers
+        add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
+        add_header X-Frame-Options SAMEORIGIN;
+        add_header X-Content-Type-Options nosniff;
+        add_header X-XSS-Protection "1; mode=block";
         location / {
             proxy_pass http://localhost:8003;
         }
