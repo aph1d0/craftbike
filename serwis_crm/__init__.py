@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 from sqlalchemy import inspect
+import sentry_sdk
 
 import os
 
@@ -28,6 +29,16 @@ def run_install(app_ctx):
 
 
 def create_app(config_class=ProductionConfig):
+    sentry_sdk.init(
+        dsn=os.getenv('SENTRY_SDK_DSN'),
+        # Set traces_sample_rate to 1.0 to capture 100%
+        # of transactions for performance monitoring.
+        traces_sample_rate=1.0,
+        # Set profiles_sample_rate to 1.0 to profile 100%
+        # of sampled transactions.
+        # We recommend adjusting this value in production.
+        profiles_sample_rate=1.0,
+    )
     app = Flask(__name__, instance_relative_config=True)
 
     if os.getenv('FLASK_ENV') == 'development':
