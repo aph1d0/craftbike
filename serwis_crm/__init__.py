@@ -85,6 +85,13 @@ def create_app(config_class=ProductionConfig):
         app.register_blueprint(contacts)
         app.register_blueprint(bikes)
         app.register_blueprint(services)
+        # Elastic APM
+        from elasticapm.contrib.flask import ElasticAPM
+        apm = ElasticAPM()
+        apm.init_app(app, service_name=os.getenv('APM_SERVICE_NAME'), 
+                     secret_token=os.getenv('APM_SERVICE_TOKEN'), 
+                     server_url=os.getenv('APM_SERVER_URL'),
+                     environment=os.getenv('APM_ENV'))
         return app
 
 

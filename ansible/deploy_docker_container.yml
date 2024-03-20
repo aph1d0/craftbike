@@ -36,3 +36,7 @@
       MYSQL_PORT: "{{ MYSQL_PORT }}"
       MYSQL_DB_NAME: "{{ MYSQL_DB_NAME }}"
       SECRET_KEY: "{{ SECRET_KEY }}"
+      APM_SERVER_URL: "{{ APM_SERVER_URL }}"
+      APM_SERVICE_TOKEN: "{{ APM_SERVICE_TOKEN }}"
+      APM_SERVICE_NAME: "{{ APM_SERVICE_NAME }}"
+      APM_ENV: "production"
