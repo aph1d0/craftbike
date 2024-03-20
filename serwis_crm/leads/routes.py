@@ -1,8 +1,7 @@
-from datetime import date
 import datetime
 import boto3
 import pandas as pd
-from sqlalchemy import Date, cast, or_
+from sqlalchemy import or_
 from wtforms import Label
 
 from flask import Blueprint, jsonify, session, Response
@@ -199,17 +198,35 @@ def autoset():
 @login_required
 @leads.route('/leads/get_scheduled', methods=['GET'])
 def get_scheduled():
-    json_scheduled_services = []
-    scheduled_services = LeadMain.query.filter(cast(LeadMain.date_scheduled,Date) >= date.today()).all()
+    json_services = []
+    scheduled_services = LeadMain.query.filter(LeadMain.lead_status_id == 2).all()
     for scheduled_service in scheduled_services:
-        json_scheduled_services.append({
+        json_services.append({
             'id' : scheduled_service.id,
             'title' : scheduled_service.title,
-            'start' : scheduled_service.date_scheduled.strftime('%Y-%m-%d')
+            'start' : scheduled_service.date_scheduled.strftime('%Y-%m-%d'),
+            'color': 'blue'
         }
             )
-        #a = jsonify(json_scheduled_serwices)
-    return json_scheduled_services
+    current_services = LeadMain.query.filter(LeadMain.lead_status_id == 1).all()
+    for current_service in current_services:
+        json_services.append({
+            'id' : current_service.id,
+            'title' : current_service.title,
+            'start' : current_service.date_created.strftime('%Y-%m-%d'),
+            'color': 'orange'
+        }
+            )
+    ready_services = LeadMain.query.filter(LeadMain.lead_status_id == 5).all()
+    for ready_service in ready_services:
+        json_services.append({
+            'id' : ready_service.id,
+            'title' : ready_service.title,
+            'start' : ready_service.date_created.strftime('%Y-%m-%d'),
+            'color': 'green'
+        }
+            )
+    return json_services
 
 @leads.route("/leads/new", methods=['GET', 'POST'])
 @login_required

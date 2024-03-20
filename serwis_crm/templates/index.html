@@ -8,10 +8,10 @@
   class="btn btn btn-sm btn-outline-primary"
   role="button"
   href="{{ url_for('leads.new_lead') }}"
->
+  >
   <span data-feather="plus"></span>
   Nowe zlecenie
-</a>
+  </a>
 </div>
 {% include "kanban_filters.html" %}
 {% if lead_statuses|length > 0 %}
@@ -25,11 +25,8 @@
         class="card-body"
         data-dropstage="{{ lead_status.id }}"
       >
-        {% if lead_status.status_name == "Umówiony na serwis" %}
-        <h5 class="card-title">Umówiony na serwis dzisiaj</h5>
-        {% else %}
         <h5 class="card-title">{{ lead_status.status_name }}</h5>
-        {% endif %} {% for lead in leads %} {% if lead.status.status_name ==
+        {% for lead in leads %} {% if lead.status.status_name ==
         lead_status.status_name %}
         <div
           id="item_{{ lead.id }}"
@@ -48,6 +45,11 @@
               <div>
                 <span data-feather="user"></span> {{ lead.lead_contact.first_name }}
               </div>
+              {% if lead.status.status_name == "Umówiony na serwis" %}
+              <div>
+                <span data-feather="calendar"></span> {{ lead.date_scheduled }}
+              </div>
+              {% endif %}
               {% if lead.status.status_name == "Gotowy" %}
               <div>
                 <span data-feather="message-square"></span> {{ 'Tak' if lead.sms_sent else 'Nie' }}

@@ -1,64 +1,38 @@
-<div class="modal fade ba_modal" id="calendarmodal" tabindex="-1" role="dialog"
-     aria-labelledby="calendarmodal"
-     aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <meta charset="UTF-8">
-                <title>Kalendarz</title>
-                    <script type='importmap'>
-                      {
-                        "imports": {
-                          "@fullcalendar/core": "https://cdn.skypack.dev/@fullcalendar/core@6.1.5",
-                          "@fullcalendar/daygrid": "https://cdn.skypack.dev/@fullcalendar/daygrid@6.1.5",
-                          "@fullcalendar/interaction": "https://cdn.skypack.dev/@fullcalendar/interaction@6.1.5"
-                        }
-                      }
-                    </script>  
-                <h5 class="modal-title" id="calendarmodal">Wybierz dzień</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-                <script type='module'>
-                    import { Calendar } from '@fullcalendar/core';
-                    import dayGridPlugin from '@fullcalendar/daygrid';
-                    import interactionPlugin from '@fullcalendar/interaction';
-                    var events = []
-                    $.ajax({
-                            url: "/leads/get_scheduled",
-                            type: "GET",
-                            success: function(response) {
-                                events = response;
-                            }
-                        });
-                    document.addEventListener('DOMContentLoaded', function() {
-                    var calendarEl = document.getElementById('calendar');
-
-                    var calendar = new Calendar(calendarEl, {
-                        plugins: [ interactionPlugin, dayGridPlugin ],
-                        initialView: 'dayGridMonth',
-                        selectable: true,
-                        select: function(info)  {
-                        // Get the selected date and format it as yyyy-mm-dd
-                        var selectedDate = moment(info.start).format('YYYY-MM-DD');
-
-                        // Store the selected date in a hidden input field
-                        document.getElementById('selected-date').value = selectedDate;
-                        },
-                        events: events
-                    });
-
-                    calendar.render();
-                    });
-                </script>
-            </div>
-            <div class="modal-body">
-                <label>Kalendarz</label>
-                <div id='calendar'></div>
-                <label for="selected-date">Wybrana data:</label>
-                <input type="text" id="selected-date" name="selected-date"><br><br>
-
-            </div>
-        </div>
-    </div>
+{% extends "layout.html" %} {% set active_page = "calendar" %} {% block content %}
+<div class="form-row" id="calendar_row" style="display: none">
+    <div class="col">
+    <br><br>
+      <h5>Kalendarz</h5>
+      <div>Legenda: </div>
+      <div style="color:blue">&#9632; - umówiony na serwis</div>
+      <div style="color:orange">&#9632; - przyjęty na serwis</div>
+      <div style="color:green">&#9632; - gotowy</div>
+      <div id="calendar"></div>
+      <br />
 </div>
+<script>
+    var calendarEl = document.getElementById("calendar");
+    var calendar_row = document.getElementById("calendar_row");
+    var date_scheduled = document.getElementById("date_scheduled");
+    //date_scheduled.value = "";
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: "dayGridWeek",
+        locale: "pl",
+        selectable: true,
+        height: 400,
+        select: function (info) {
+        // Get the selected date and format it as yyyy-mm-dd
+        var selectedDate = moment(info.start).format("YYYY-MM-DD");
+
+        // Store the selected date in a hidden input field
+        document.getElementById("date_scheduled").value = selectedDate;
+        },
+        events: {
+        url: "/leads/get_scheduled",
+        method: "GET",
+        },
+    });
+    calendar_row.style.display = "block";
+    calendar.render();
+</script>
+{% endblock %}

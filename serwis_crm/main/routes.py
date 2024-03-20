@@ -1,4 +1,3 @@
-from datetime import date, timedelta
 from flask import render_template, flash, session, url_for, redirect, Blueprint, current_app
 from serwis_crm import db
 from flask_login import login_required
@@ -30,7 +29,7 @@ def health_check():
 
 @main.route("/")
 @main.route("/home", methods=['GET', 'POST'])
-#@check_access('leads', 'view')
+@check_access('leads', 'view')
 @login_required
 def home():
     filters = FilterLeads()
@@ -49,13 +48,17 @@ def home():
         .filter(advanced_filters) \
     .all()
     for lead in leads:
-        if lead.status.status_name == "Przyjęty na serwis" or lead.status.status_name == "Umówiony na serwis" or lead.status.status_name == "Gotowy" :
+        if lead.status.status_name == "Przyjęty na serwis" or lead.status.status_name == "Umówiony na serwis" or lead.status.status_name == "Gotowy":
+            lead.date_scheduled = lead.date_scheduled.strftime("%Y-%m-%d")
             good_leads.append(lead)
-        if lead.status.status_name == "Umówiony na serwis" and lead.date_scheduled.date() != date.today():
-            if lead in good_leads:
-                good_leads.remove(lead)
             
     return render_template("index.html", title="Dashboard", leads=good_leads, lead_statuses=statuses, filters=filters)
+
+@main.route("/calendar", methods=['GET'])
+@check_access('leads', 'view')
+@login_required
+def calendar():
+    return render_template("calendar.html", title="Kalendarz")
 
 @main.route("/home/reset_filters")
 @check_access('leads', 'view')
@@ -75,9 +78,3 @@ def create_db():
 @current_app.errorhandler(404)
 def page_not_found(error):
     return render_template('404.html', title="Oops! Page Not Found", error=error), 404
-
-
-@current_app.errorhandler(404)
-def page_not_found(error):
-    return render_template("404.html", title="Page Not Found")
-

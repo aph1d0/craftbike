@@ -76,6 +76,12 @@
           </a>
         </li>
         <li class="nav-item">
+          <a class="{{ 'nav-link active' if active_page == 'calendar' else 'nav-link' }}" href="{{ url_for('main.calendar') }}">
+            <i data-feather="calendar"></i>
+            Kalendarz 
+          </a>
+        </li>
+        <li class="nav-item">
           <a class="{{ 'nav-link active' if active_page == 'leads' else 'nav-link' }}" href="{{ url_for('leads.get_leads_view') }}">
             <span data-feather="tool"></span>
             Zlecenia serwisowe
@@ -128,6 +134,12 @@
             <a class="{{ 'nav-link active' if active_page == 'dashboard' else 'nav-link' }}" href="{{ url_for('main.home') }}">
               <i data-feather="home"></i>
               Dashboard <span class="sr-only">(current)</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="{{ 'nav-link active' if active_page == 'calendar' else 'nav-link' }}" href="{{ url_for('main.calendar') }}">
+              <i data-feather="calendar"></i>
+              Kalendarz
             </a>
           </li>
           <li class="nav-item">
