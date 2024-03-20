@@ -234,6 +234,7 @@ def get_scheduled():
 def new_lead():
     found_bike = False
     form = NewLead()
+    lead_services = []
     if request.method == 'POST':
         if form.is_submitted() and form.validate():
             client = Contact.query.filter_by(phone=form.phone.data).first()
@@ -274,10 +275,13 @@ def new_lead():
             flash('Nowe zlecenie serwisowe utworzone!', 'success')
             return redirect(url_for('leads.get_leads_view'))
         else:
-            for error in form.errors:
-                print(error)
             flash('Błednie wypełniony formularz. Sprawdz go ponownie baranie!', 'danger')
-    return render_template("leads/new_lead.html", title="Nowe zlecenie", form=form)
+            if (form.service_name.raw_data is not None) and (form.service_price.raw_data is not None):
+                i = 0
+                for name, price in zip(form.service_name.raw_data, form.service_price.raw_data):
+                    lead_services.append({"id": i, "service_name": name, "service_price": price})
+                    i+=1
+    return render_template("leads/new_lead.html", title="Nowe zlecenie", form=form, services=lead_services)
 
 
 @leads.route("/leads/edit/<int:lead_id>", methods=['GET', 'POST'])

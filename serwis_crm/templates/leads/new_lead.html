@@ -368,14 +368,26 @@
         $(document).ready(function () {
           closeModalOnOutsideClick() 
           function getServices(lead_id){
-            fetch('/leads/' + lead_id  + '/get_services')
-            .then(response => response.json())
-            .then(data => {
-              data.forEach(item => {
-                addServiceAction(item.id, item.name, item.price)
-              })
-            })
+            if (lead_id){
+              fetch('/leads/' + lead_id  + '/get_services')
+              .then(response => response.json())
+              .then(data => {
+                data.forEach(item => {
+                  addServiceAction(item.id, item.name, item.price)
+                });
+              }
+              )
+            } else {
+              var jsonString = '{{ services }}'
+              // Replace HTML character entity references with double quotes
+              var replacedString = jsonString.replace(/&#39;/g, "\"");
+              // Parse the JSON string into a JavaScript object
+              var listOfDicts = JSON.parse(replacedString);
+              listOfDicts.forEach(item => {
+                addServiceAction(item.id, item.service_name, item.service_price)
+              })   
           }
+        }
           getServices('{{ lead_id }}')
         });
           function addServiceAction(service_id, service_name, service_price) {
