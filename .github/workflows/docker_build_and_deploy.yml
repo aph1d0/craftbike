@@ -47,7 +47,7 @@ jobs:
           # Optional, additional flags to pass to ansible-playbook
           options: |
             --inventory inventory.yml
-            --extra-vars "docker_user=${{ secrets.DOCKERHUB_USERNAME }} docker_password=${{ secrets.DOCKERHUB_TOKEN }} AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} AWS_DEFAULT_REGION=${{ secrets.AWS_DEFAULT_REGION }} MYSQL_HOST=${{ secrets.MYSQL_HOST }} MYSQL_PORT=${{ secrets.MYSQL_PORT }} MYSQL_DB_NAME=${{ secrets.MYSQL_DB_NAME }} MYSQL_USER=${{ secrets.MYSQL_USER }} MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }} SECRET_KEY=${{ secrets.SECRET_KEY }} APM_SERVICE_NAME=${{ secrets.APM_SERVICE_NAME }} APM_SERVICE_TOKEN=${{ secrets.APM_SERVICE_TOKEN }} APM_SERVER_URL=${{ secrets.APM_SERVER_URL }}"
+            --extra-vars "docker_user=${{ secrets.DOCKERHUB_USERNAME }} docker_password=${{ secrets.DOCKERHUB_TOKEN }} AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} AWS_DEFAULT_REGION=${{ secrets.AWS_DEFAULT_REGION }} MYSQL_HOST=${{ secrets.MYSQL_HOST }} MYSQL_PORT=${{ secrets.MYSQL_PORT }} MYSQL_DB_NAME=${{ secrets.MYSQL_DB_NAME }} MYSQL_USER=${{ secrets.MYSQL_USER }} MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }} SECRET_KEY=${{ secrets.SECRET_KEY }}"
             --user ${{secrets.ANSIBLE_DEPLOY_USER}}
             --verbose
             --timeout 1800
