@@ -1,6 +1,6 @@
 from flask import render_template
 from functools import wraps
-from flask_login import current_user
+from flask_login import AnonymousUserMixin, current_user
 from serwis_crm.users.models import Resource, Role
 
 
@@ -44,20 +44,23 @@ def check_access(resource, action):
     def decorator(function):
         @wraps(function)
         def decorated_function(*args, **kwargs):
-            if not current_user.is_admin and not current_user.role:
+            if not current_user.is_anonymous: 
+                if not current_user.is_admin and not current_user.role:
+                    return render_template("no_access.html", title="Access Not Allowed")
+                if current_user.is_admin:
+                    return function(*args, **kwargs)
+                elif not current_user.is_admin and current_user.role:
+                    try:
+                        if not is_allowed(current_user.role_id, resource, action):
+                            return render_template("no_access.html", title="Access Not Allowed")
+                        else:
+                            return function(*args, **kwargs)
+                    except NullRBACRowException:
+                        print("NullRBACRowException: Query failed for RBAC operation")
+                    except RBACActionNotFoundException:
+                        print("RBACActionNotFoundException: Action not found")
+            else:
                 return render_template("no_access.html", title="Access Not Allowed")
-            if current_user.is_admin:
-                return function(*args, **kwargs)
-            elif not current_user.is_admin and current_user.role:
-                try:
-                    if not is_allowed(current_user.role_id, resource, action):
-                        return render_template("no_access.html", title="Access Not Allowed")
-                    else:
-                        return function(*args, **kwargs)
-                except NullRBACRowException:
-                    print("NullRBACRowException: Query failed for RBAC operation")
-                except RBACActionNotFoundException:
-                    print("RBACActionNotFoundException: Action not found")
         return decorated_function
     return decorator
 
