@@ -1,6 +1,6 @@
 from flask import render_template, flash, session, url_for, redirect, Blueprint, current_app
 from serwis_crm import db
-from flask_login import login_required
+from flask_login import login_required, current_user
 from configparser import ConfigParser
 from sqlalchemy import or_
 from serwis_crm.common.filters import CommonFilters
@@ -12,6 +12,11 @@ from serwis_crm.rbac import check_access
 parser = ConfigParser()
 
 main = Blueprint('main', __name__)
+
+from sentry_sdk import set_user
+
+set_user({"username": f"{current_user.first_name} {current_user.last_name}",
+          "email": current_user.email })
 
 def reset_main_filters():
     if 'lead_owner' in session:
