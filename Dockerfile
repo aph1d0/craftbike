@@ -18,9 +18,6 @@ RUN apk update \
     && apk add --virtual build-deps gcc python3-dev musl-dev g++ libffi-dev openssl-dev ca-certificates\
     && apk add --no-cache mariadb-dev mariadb-client
 
-# Add an entry to /etc/hosts
-RUN echo "34.88.93.149 dupa.dupacycki.it.local" >> /etc/hosts
-
 # Add CA
 COPY sentry_ca.crt /usr/local/share/ca-certificates/
 RUN update-ca-certificates

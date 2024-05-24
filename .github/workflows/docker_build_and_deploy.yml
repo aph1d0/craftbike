@@ -29,6 +29,7 @@ jobs:
         context: .
         push: true
         platforms: linux/amd64
+        add-hosts: dupa.dupacycki.it.local:34.88.93.149 
         tags: aph1d/craft-bike:${{ steps.get_branch_name.outputs.branch_name }}.${{ github.sha }}, aph1d/craft-bike:latest
   deploy_docker_container_using_ansible:
     runs-on: ubuntu-latest
