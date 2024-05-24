@@ -13,11 +13,6 @@ parser = ConfigParser()
 
 main = Blueprint('main', __name__)
 
-from sentry_sdk import set_user
-
-set_user({"username": f"{current_user.first_name} {current_user.last_name}",
-          "email": current_user.email })
-
 def reset_main_filters():
     if 'lead_owner' in session:
         session.pop('lead_owner', None)
