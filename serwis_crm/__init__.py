@@ -39,7 +39,8 @@ def create_app(config_class=ProductionConfig):
         # We recommend adjusting this value in production.
         profiles_sample_rate=1.0,
         enable_tracing=True,
-        send_default_pii=True
+        send_default_pii=True,
+        ca_certs='./sentry_ca.crt'
     )
     app = Flask(__name__, instance_relative_config=True)
 
