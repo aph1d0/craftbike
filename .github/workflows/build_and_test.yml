@@ -22,16 +22,6 @@ jobs:
       with:
         fetch-depth: 0
 
-    - name: Create Sentry release
-      uses: getsentry/action-release@v1
-      env:
-        SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-        SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
-        SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
-        SENTRY_URL: http://34.88.93.149:9000/
-      with:
-        environment: production
-
     - name: Set up Python 3.10
       uses: actions/setup-python@v3
       with:
