@@ -17,7 +17,11 @@
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
 
     <!-- <script src="https://js.sentry-cdn.com/5fb46e4264c9819f4c635284abb0059c.min.js" crossorigin="anonymous"></script> -->
-    <script src='https://dupa.dupacycki.it.local/js-sdk-loader/b840d3f8868e40708f428c87d0a52c94.min.js' crossorigin="anonymous"></script>
+    <script
+      src="https://browser.sentry-cdn.com/8.4.0/bundle.tracing.replay.min.js"
+      integrity="sha384-Rf+XJT/f9AXnkFQISKt/jsSGHRM/8+raZavmU1L2vj7l7sGpHDTmu3pazQemDLZu"
+      crossorigin="anonymous"
+    ></script>
     <script
       src="https://code.jquery.com/jquery-3.4.1.min.js"
       integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
@@ -56,6 +60,26 @@
     <link href="{{ url_for('static', filename='stylesheets/style.css') }}" rel="stylesheet">
   </head>
   <body>
+    <script>
+      Sentry.init({
+        dsn: 'https://b840d3f8868e40708f428c87d0a52c94@dupa.dupacycki.it.local/3',
+        // this assumes your build process replaces `process.env.npm_package_version` with a value
+        release: '1.0.1' ,
+        integrations: [
+          // If you use a bundle with performance monitoring enabled, add the BrowserTracing integration
+          Sentry.browserTracingIntegration(),
+          // If you use a bundle with session replay enabled, add the Replay integration
+          Sentry.replayIntegration(),
+        ],
+      
+        // We recommend adjusting this value in production, or using tracesSampler
+        // for finer control
+        tracesSampleRate: 1.0,
+      
+        // Set `tracePropagationTargets` to control for which URLs distributed tracing should be enabled
+        tracePropagationTargets: ['localhost'],
+      });
+    </script>
     <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
       <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="/home">serwis_crm</a>
       <!-- <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search"> -->
