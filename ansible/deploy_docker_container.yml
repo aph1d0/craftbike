@@ -22,10 +22,6 @@
     state: started
     restart_policy: always
     restart: true
-    etc_hosts: >
-      {
-        "dupa.dupacycki.it.local" : "34.88.93.149"
-      }
     ports:
       - 8003:8003
     volumes:

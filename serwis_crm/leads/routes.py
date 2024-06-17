@@ -168,7 +168,7 @@ def search_for_contact():
         # Return the phone numbers as a JSON array
         return jsonify([result.first_name for result in results])
     else:
-        return ''
+        return {}
 
 @login_required
 @check_access('leads', 'view')

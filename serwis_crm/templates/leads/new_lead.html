@@ -104,7 +104,7 @@
             inputField.addEventListener('input', function () {
                 var inputValue = inputField.value.trim();
     
-                if (inputValue.length === 0) {
+                if (inputValue.length <= 2) {
                     suggestionsList.style.display = 'none';
                     return;
                 }
@@ -434,7 +434,6 @@
             service_inputs.appendChild(new_service_row)
             feather.replace();
             calculateSum()
-
             closeModal()
             }
         
