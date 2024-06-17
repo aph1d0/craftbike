@@ -4,6 +4,7 @@ from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 from sqlalchemy import inspect
 import sentry_sdk
+import git
 
 import os
 
@@ -29,6 +30,8 @@ def run_install(app_ctx):
 
 
 def create_app(config_class=ProductionConfig):
+    repo = git.Repo(search_parent_directories=True)
+    sha = repo.head.object.hexsha
     sentry_sdk.init(
         dsn=os.getenv('SENTRY_SDK_DSN'),
         # Set traces_sample_rate to 1.0 to capture 100%
@@ -40,7 +43,8 @@ def create_app(config_class=ProductionConfig):
         profiles_sample_rate=1.0,
         enable_tracing=True,
         send_default_pii=True,
-        ca_certs='./sentry_ca.crt'
+        ca_certs='./sentry_ca.crt',
+        release=sha,
     )
     app = Flask(__name__, instance_relative_config=True)
 
