@@ -37,3 +37,4 @@
       MYSQL_DB_NAME: "{{ MYSQL_DB_NAME }}"
       SECRET_KEY: "{{ SECRET_KEY }}"
       SENTRY_SDK_DSN: "{{ SENTRY_SDK_DSN }}"
+      GITHUB_SHA: "{{ GITHUB_SHA }}"
