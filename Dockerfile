@@ -1,9 +1,9 @@
-FROM python:3.12.2-alpine as build
+FROM python:3.12.4-alpine as build
 
 # Copy the entire directory to the temporary build stage
 COPY . /serwis_crm_app
 
-FROM python:3.12.2-alpine
+FROM python:3.12.4-alpine
 
 ARG MYSQL_HOST
 ARG MYSQL_PORT
@@ -16,7 +16,7 @@ ENV PYTHONUNBUFFERED 1
 
 RUN apk update \
     && apk add --virtual build-deps gcc python3-dev musl-dev g++ libffi-dev openssl-dev ca-certificates\
-    && apk add --no-cache mariadb-dev mariadb-client
+    && apk add --no-cache mariadb-dev mariadb-client git
 
 # Add CA
 COPY sentry_ca.crt /usr/local/share/ca-certificates/
