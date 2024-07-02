@@ -41,7 +41,6 @@ def create_app(config_class=ProductionConfig):
         profiles_sample_rate=0.5,
         enable_tracing=True,
         send_default_pii=True,
-        ca_certs='./sentry_ca.crt',
         release=os.getenv('GITHUB_SHA'),
     )
     app = Flask(__name__, instance_relative_config=True)

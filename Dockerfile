@@ -19,10 +19,6 @@ RUN apk update \
     && apk add --virtual build-deps gcc python3-dev musl-dev g++ libffi-dev openssl-dev ca-certificates\
     && apk add --no-cache mariadb-dev mariadb-client git
 
-# Add CA
-COPY sentry_ca.crt /usr/local/share/ca-certificates/
-RUN update-ca-certificates
-
 COPY requirements.txt /
 RUN pip3 install -r /requirements.txt
 
