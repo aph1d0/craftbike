@@ -60,17 +60,10 @@
         </div>
       </li>
       <li class="list-group-item g_field">
-        <div class="label">Serwisant</div>
-        {% if lead.owner %}
+        <div class="label">Notatki</div>
         <div class="text">
-          <div class="mt-1">
-            {% with owner=lead.owner %}{% include 'common/owner_cell.html' %}{%
-            endwith %}
-          </div>
+          {{ lead.notes if lead.notes else '_' }}
         </div>
-        {% else %}
-        <div class="text">_</div>
-        {% endif %}
       </li>
     </ul>
   </div>
