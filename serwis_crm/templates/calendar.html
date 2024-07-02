@@ -31,6 +31,15 @@
         url: "/leads/get_scheduled",
         method: "GET",
         },
+        eventClick: function(info) {
+            // Prevent the default behavior
+            info.jsEvent.preventDefault();
+    
+            // Redirect to the event's URL
+            if (info.event.id) {
+                window.location.href = "/leads/edit/" + info.event.id;
+            }
+        }
     });
     calendar_row.style.display = "block";
     calendar.render();
