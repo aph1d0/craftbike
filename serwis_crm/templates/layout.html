@@ -16,7 +16,37 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
 
-    <script src="https://js.sentry-cdn.com/5fb46e4264c9819f4c635284abb0059c.min.js" crossorigin="anonymous"></script>
+    <script
+    src="https://js.sentry-cdn.com/34972066dc4e6634de1be6f5bd1e3a83.min.js"
+    crossorigin="anonymous"
+    ></script>
+    <script>
+      window.sentryOnLoad = function () {
+        Sentry.init({
+          dsn: "https://34972066dc4e6634de1be6f5bd1e3a83@o4506943847202816.ingest.us.sentry.io/4506943863521280",
+          integrations: [
+            Sentry.browserTracingIntegration(),
+            Sentry.replayIntegration(),
+          ],
+    
+          // Set tracesSampleRate to 1.0 to capture 100%
+          // of transactions for tracing.
+          // We recommend adjusting this value in production
+          tracesSampleRate: 0.5,
+    
+          // Set `tracePropagationTargets` to control for which URLs trace propagation should be enabled
+          tracePropagationTargets: [
+            "localhost",
+            /^https:\/\/craftbike\.toadres\.pl\//,
+          ],
+    
+          // Capture Replay for 10% of all sessions,
+          // plus for 100% of sessions with an error
+          replaysSessionSampleRate: 0.1,
+          replaysOnErrorSampleRate: 1.0,
+        });
+      };
+    </script>
     <script
       src="https://code.jquery.com/jquery-3.4.1.min.js"
       integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
