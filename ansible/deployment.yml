@@ -1,6 +1,6 @@
 ---
 - name: Main Deployment Playbook
-  hosts: srv21.mikr.us
+  hosts: vps-e9084b50.vps.ovh.net
   become: true
   tasks:
     - name: Deploy docker app contianer

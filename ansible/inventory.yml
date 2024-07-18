@@ -1,6 +1,6 @@
 virtualmachines:
   hosts:
-    srv21.mikr.us:
-      ansible_host: srv21.mikr.us
-      ansible_port: 10253
+    vps-e9084b50.vps.ovh.net:
+      ansible_host: vps-e9084b50.vps.ovh.net
+      ansible_port: 22
       ansible_ssh_user: ansible
