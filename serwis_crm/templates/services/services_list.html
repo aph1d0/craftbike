@@ -38,7 +38,7 @@ onclick="addMainCategory()"
       selected_categories_name_cascade += category_name + " "
     }
     // Send a GET request to the Flask URL
-    fetch('/services/get_subcategories/' + parseInt(category_id))
+    fetch('serwis/services/get_subcategories/' + parseInt(category_id))
       .then(response => response.json())
       .then(data => {
         // Create a new row for the buttons
@@ -46,7 +46,7 @@ onclick="addMainCategory()"
         newRow.classList.add('tiles-container');
         // If there is no more subcategories
         //if (data.length === 0){
-          fetch('/services/get_action/' + parseInt(category_id))
+          fetch('serwis//services/get_action/' + parseInt(category_id))
           .then(response => response.json())
           .then(data => {
             if (Object.keys(data).length !== 0){

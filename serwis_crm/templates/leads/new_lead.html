@@ -452,7 +452,7 @@
             const location = document.createElement('div');
             const newRow = document.createElement('div');
             newRow.classList.add('tiles-container');
-            fetch('/services/get_main_categories')
+            fetch('serwis//services/get_main_categories')
               .then(response => response.json())
               .then(data => {
                 data.forEach(item => {
@@ -484,11 +484,11 @@
                 tile.remove(); // Remove each tile container
               });
               newCatRow.classList.add('tiles-container');
-              fetch('/services/get_subcategories/' + parseInt(category_id))
+              fetch('serwis/services/get_subcategories/' + parseInt(category_id))
                 .then(response => response.json())
                 .then(data => {
                   if (data.length === 0) {
-                    fetch('/services/get_action/' + parseInt(category_id))
+                    fetch('serwis/services/get_action/' + parseInt(category_id))
                       .then(response => response.json())
                       .then(data => {
                         if (Object.keys(data).length !== 0) {
