@@ -10,7 +10,7 @@ events {
 http {
     server {
         listen 443 ssl;
-        server_name serwis.craftbike.pl;
+        server_name craftbike.pl;
         ssl_certificate     /etc/letsencrypt/live/craftbike.pl/fullchain.pem;
         ssl_certificate_key /etc/letsencrypt/live/craftbike.pl/privkey.pem;
         # Disable TLS 1.0 and TLS 1.1
@@ -29,12 +29,13 @@ http {
         add_header X-Frame-Options SAMEORIGIN;
         add_header X-Content-Type-Options nosniff;
         add_header X-XSS-Protection "1; mode=block";
-        location / {
+        location /serwis {
             proxy_pass http://localhost:8003;
             proxy_read_timeout 3600;
             proxy_connect_timeout 3600;
             proxy_send_timeout 3600;
             send_timeout 3600;
         }
+        
     }
 }
