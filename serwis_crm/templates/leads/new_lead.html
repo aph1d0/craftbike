@@ -369,7 +369,7 @@
           closeModalOnOutsideClick() 
           function getServices(lead_id){
             if (lead_id){
-              fetch('leads/' + lead_id  + '/get_services')
+              fetchFromBase('leads/' + lead_id  + '/get_services')
               .then(response => response.json())
               .then(data => {
                 data.forEach(item => {
@@ -452,7 +452,7 @@
             const location = document.createElement('div');
             const newRow = document.createElement('div');
             newRow.classList.add('tiles-container');
-            fetch('serwis//services/get_main_categories')
+            fetchFromBase('services/get_main_categories')
               .then(response => response.json())
               .then(data => {
                 data.forEach(item => {
@@ -484,11 +484,11 @@
                 tile.remove(); // Remove each tile container
               });
               newCatRow.classList.add('tiles-container');
-              fetch('serwis/services/get_subcategories/' + parseInt(category_id))
+              fetchFromBase('services/get_subcategories/' + parseInt(category_id))
                 .then(response => response.json())
                 .then(data => {
                   if (data.length === 0) {
-                    fetch('serwis/services/get_action/' + parseInt(category_id))
+                    fetchFromBase('services/get_action/' + parseInt(category_id))
                       .then(response => response.json())
                       .then(data => {
                         if (Object.keys(data).length !== 0) {

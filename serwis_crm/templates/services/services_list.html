@@ -38,7 +38,7 @@ onclick="addMainCategory()"
       selected_categories_name_cascade += category_name + " "
     }
     // Send a GET request to the Flask URL
-    fetch('serwis/services/get_subcategories/' + parseInt(category_id))
+    fetchFromBase('services/get_subcategories/' + parseInt(category_id))
       .then(response => response.json())
       .then(data => {
         // Create a new row for the buttons
@@ -46,7 +46,7 @@ onclick="addMainCategory()"
         newRow.classList.add('tiles-container');
         // If there is no more subcategories
         //if (data.length === 0){
-          fetch('serwis//services/get_action/' + parseInt(category_id))
+          fetchFromBase('services/get_action/' + parseInt(category_id))
           .then(response => response.json())
           .then(data => {
             if (Object.keys(data).length !== 0){
@@ -187,7 +187,7 @@ onclick="addMainCategory()"
     yesButton.addEventListener('click', () => {
       const new_action_name = modal.querySelector('.service_name').value;
       const new_action_price = modal.querySelector('.service_price').value;
-      fetch(`/services/actions/add/${category_id}/${new_action_name}/${new_action_price}`, { method: 'POST' })
+      fetchFromBase(`services/actions/add/${category_id}/${new_action_name}/${new_action_price}`, { method: 'POST' })
         .then(response => {
           if (response.ok) {
             location.reload();
@@ -223,7 +223,7 @@ onclick="addMainCategory()"
     const noButton = modal.querySelector('.no-button');
     yesButton.addEventListener('click', () => {
       const new_category_name = modal.querySelector('.category_name').value;
-      fetch(`/services/categories/new/${new_category_name}`, { method: 'POST' })
+      fetchFromBase(`services/categories/new/${new_category_name}`, { method: 'POST' })
         .then(response => {
           if (response.ok) {
             location.reload();
@@ -259,7 +259,7 @@ onclick="addMainCategory()"
     const noButton = modal.querySelector('.no-button');
     yesButton.addEventListener('click', () => {
       const new_subcategory_name = modal.querySelector('.subcategory_name').value;
-      fetch(`/services/subcategories/new/${category_id}/${new_subcategory_name}`, { method: 'POST' })
+      fetchFromBase(`services/subcategories/new/${category_id}/${new_subcategory_name}`, { method: 'POST' })
         .then(response => {
           if (response.ok) {
             location.reload();
@@ -308,7 +308,7 @@ onclick="addMainCategory()"
     const yesButton = modal.querySelector('.yes-button');
     const noButton = modal.querySelector('.no-button');
     yesButton.addEventListener('click', () => {
-      fetch(`/services/actions/del/${tileId}`, { method: 'POST' })
+      fetchFromBase(`services/actions/del/${tileId}`, { method: 'POST' })
         .then(response => {
           if (response.ok) {
             location.reload();
@@ -354,7 +354,7 @@ onclick="addMainCategory()"
     yesButton.addEventListener('click', () => {
       const new_tile_name = modal.querySelector('.tile_name').value;
       const new_tile_price = modal.querySelector('.tile_price').value;
-      fetch(`/services/actions/edit/${tileId}/${new_tile_name}/${new_tile_price}`, { method: 'POST' })
+      fetchFromBase(`services/actions/edit/${tileId}/${new_tile_name}/${new_tile_price}`, { method: 'POST' })
         .then(response => {
           if (response.ok) {
             location.reload();
@@ -390,7 +390,7 @@ onclick="addMainCategory()"
     const yesButton = modal.querySelector('.yes-button');
     const noButton = modal.querySelector('.no-button');
     yesButton.addEventListener('click', () => {
-      fetch(`/services/subcategories/del/${tileId}`, { method: 'POST' })
+      fetchFromBase(`services/subcategories/del/${tileId}`, { method: 'POST' })
         .then(response => {
           if (response.ok) {
             location.reload();
