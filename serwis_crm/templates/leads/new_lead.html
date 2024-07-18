@@ -78,7 +78,7 @@
           $(document).ready(function () {
             $("#bike_manufacturer, #bike_model").on("input", function () {
               $.ajax({
-                url: "leads/new/_autoset_title",
+                url: urlForAjax("leads/new/_autoset_title"),
                 data: {
                   bike_manufacturer: $("#bike_manufacturer").val(),
                   bike_model: $("#bike_model").val(),
@@ -234,7 +234,7 @@
                 document.getElementById("date_scheduled").value = selectedDate;
               },
               events: {
-                url: "leads/get_scheduled",
+                url: urlForAjax("leads/get_scheduled"),
                 method: "GET",
               },
             });
