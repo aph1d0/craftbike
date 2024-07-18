@@ -78,7 +78,7 @@
           $(document).ready(function () {
             $("#bike_manufacturer, #bike_model").on("input", function () {
               $.ajax({
-                url: "serwis/leads/new/_autoset_title",
+                url: "leads/new/_autoset_title",
                 data: {
                   bike_manufacturer: $("#bike_manufacturer").val(),
                   bike_model: $("#bike_model").val(),
@@ -109,7 +109,7 @@
                     return;
                 }
     
-                var apiEndpoint = 'serwis/leads/new/_search_for_contact?name=' + inputValue;
+                var apiEndpoint = 'leads/new/_search_for_contact?name=' + inputValue;
     
                 // Using AJAX to fetch data from the API
                 var xhr = new XMLHttpRequest();
@@ -139,7 +139,7 @@
                     listItem.addEventListener('click', function () {
                         inputField.value = suggestion;
                         suggestionsList.style.display = 'none';
-                        var apiEndpoint = 'serwis/leads/new/_get_contact_phone?name=' + inputField.value;
+                        var apiEndpoint = 'leads/new/_get_contact_phone?name=' + inputField.value;
     
                         // Using AJAX to fetch data from the API
                         var xhr = new XMLHttpRequest();
@@ -234,7 +234,7 @@
                 document.getElementById("date_scheduled").value = selectedDate;
               },
               events: {
-                url: "serwis/leads/get_scheduled",
+                url: "leads/get_scheduled",
                 method: "GET",
               },
             });
@@ -369,7 +369,7 @@
           closeModalOnOutsideClick() 
           function getServices(lead_id){
             if (lead_id){
-              fetch('serwis/leads/' + lead_id  + '/get_services')
+              fetch('leads/' + lead_id  + '/get_services')
               .then(response => response.json())
               .then(data => {
                 data.forEach(item => {

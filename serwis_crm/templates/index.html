@@ -59,7 +59,7 @@
             <div class="card-actions">
               <div class="ca_item">
                 <a
-                  href="serwis/leads/edit/{{ lead.id }}"
+                  href="leads/edit/{{ lead.id }}"
                   class="btn btn-sm btn-outline-secondary"
                   role="button"
                 >
@@ -143,7 +143,7 @@
     }
     $.ajax({
       type: "POST",
-      url: "serwis/leads/send_sms/" + leadId,
+      url: "leads/send_sms/" + leadId,
       contentType: "application/json",
       dataType: "json",
       success: function (data) {
@@ -184,7 +184,7 @@
 
     $.ajax({
       type: "POST",
-      url: "serwis/leads/update_stage/" + leadId + "/" + leadStageId,
+      url: "leads/update_stage/" + leadId + "/" + leadStageId,
       contentType: "application/json",
       dataType: "json",
       success: function (data) {
