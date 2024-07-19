@@ -299,14 +299,14 @@
         </div>
       </div>
       {% endif %}
-      {% if current_user.is_admin %}
+      <!-- {% if current_user.is_admin %}
       <div class="form-row">
            <div class="form-group col-6">
                {{ form.assignees.label(class="form-control-label") }}
               {{ form.assignees(class="form-control from-control-lg") }}
            </div>
       </div>
-      {% endif %}
+      {% endif %} -->
       <div class="form-group">
         {{ form.notes.label(class="form-control-label") }} {{
         form.notes(class="form-control from-control-lg") }}
