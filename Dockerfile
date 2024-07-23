@@ -10,7 +10,6 @@ ARG MYSQL_PORT
 ARG MYSQL_USER
 ARG MYSQL_PASSWORD
 ARG MYSQL_DB_NAME
-ARG SENTRY_SDK_DSN
 ARG GITHUB_SHA
 
 ENV PYTHONUNBUFFERED 1
@@ -24,6 +23,8 @@ RUN pip3 install -r /requirements.txt
 
 COPY --from=build /serwis_crm_app /serwis_crm_app
 WORKDIR /serwis_crm_app
+
+RUN sed -i "s/commit:abcdefg12345/${GITHUB_SHA}/g" /serwis_crm_app/serwis_crm/templates/layout.html
 
 RUN chmod +x ./gunicorn_starter.sh
 
