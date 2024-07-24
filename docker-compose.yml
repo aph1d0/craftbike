@@ -2,15 +2,32 @@ version: '3'
 
 services:
   db:
-    image: mysql
-
+    image: mariadb
+    ports:
+      - "32000:3306"
+    volumes:
+        - my-datavolume:/var/lib/mysql
+    environment:
+      - MARIADB_DATABASE=serwis
+      - MARIADB_USER=craftbike
+      - MARIADB_PASSWORD=1234
+      - MARIADB_RANDOM_ROOT_PASSWORD=1
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      start_period: 10s
+      interval: 10s
+      timeout: 5s
+      retries: 3
   web:
     build: .
-    command: python run.py
-    volumes:
-      - .:/app
-    image: aph1d0/serwis_crm
+    env_file: "docker.env"
+    image: craftbike-crm
     ports:
-      - "5000:5000"
+      - "8003:8003"
     depends_on:
+      db:
+        condition: service_healthy
+    links:
       - db
+volumes:
+  my-datavolume:

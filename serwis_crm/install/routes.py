@@ -1,4 +1,5 @@
 from flask import render_template, session, url_for, redirect, Blueprint, request
+from sqlalchemy import text
 from serwis_crm import db, bcrypt
 import os
 import sys
@@ -49,7 +50,7 @@ def setup_sys_user():
             session['admin_password'] = hashed_pwd
 
             # create currency & timezone data
-            db.session.execute(INSERT_SQL)
+            db.session.execute(text(INSERT_SQL))
             db.session.commit()
 
             return redirect(url_for('install.ex_settings'))

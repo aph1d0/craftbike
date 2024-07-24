@@ -16,7 +16,7 @@ ENV PYTHONUNBUFFERED 1
 
 RUN apk update \
     && apk add --virtual build-deps gcc python3-dev musl-dev g++ libffi-dev openssl-dev ca-certificates\
-    && apk add --no-cache mariadb-dev mariadb-client git
+    && apk add --no-cache mariadb-dev mariadb-client git bzip2-dev coreutils libc-dev libffi-dev linux-headers
 
 COPY requirements.txt /
 RUN pip3 install -r /requirements.txt
@@ -24,7 +24,10 @@ RUN pip3 install -r /requirements.txt
 COPY --from=build /serwis_crm_app /serwis_crm_app
 WORKDIR /serwis_crm_app
 
-RUN sed -i "s/commit:abcdefg12345/${GITHUB_SHA}/g" /serwis_crm_app/serwis_crm/templates/layout.html
+ENV NEW_RELIC_APP_NAME="CraftBike serwis"
+ENV NEW_RELIC_LOG=stdout
+ENV NEW_RELIC_DISTRIBUTED_TRACING_ENABLED=true
+ENV NEW_RELIC_LOG_LEVEL=info
 
 RUN chmod +x ./gunicorn_starter.sh
 

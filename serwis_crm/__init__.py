@@ -3,8 +3,6 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 from sqlalchemy import inspect
-import highlight_io
-from highlight_io.integrations.flask import FlaskIntegration
 import os
 
 from .config import DevelopmentConfig, TestConfig, ProductionConfig
@@ -30,14 +28,6 @@ def run_install(app_ctx):
 
 def create_app(config_class=ProductionConfig):
     app = Flask(__name__, instance_relative_config=True)
-    H = highlight_io.H(
-        "lgx3j8pg",
-        integrations=[FlaskIntegration()],
-        instrument_logging=True,
-        service_name="craft-bike-app",
-        service_version=os.getenv('GITHUB_SHA', ''),
-        environment="production",
-    )
 
     if os.getenv('FLASK_ENV') == 'development':
         config_class = DevelopmentConfig()
