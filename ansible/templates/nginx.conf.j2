@@ -42,4 +42,13 @@ http {
         }
 
     }
+    server {
+        location = /status {
+            stub_status  on;
+            default_type text/plain;
+            access_log   off;
+            allow        127.0.0.1;
+            deny all;
+        }
+    }
 }

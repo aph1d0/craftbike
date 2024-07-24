@@ -1,7 +1,7 @@
 ---
   - name: Check if Nginx is installed
-    become: false
-    command: "which nginx"
+    become: true
+    command: "/bin/which nginx"
     register: nginx_installed
     ignore_errors: true
   - name: Install Nginx if not installed
