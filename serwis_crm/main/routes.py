@@ -38,7 +38,7 @@ def home():
     contact = CommonFilters.set_contacts(filters, 'lead_main', 'lead_contact')
     advanced_filters = set_date_filters(filters, 'lead_date_created')
     good_leads = []
-    statuses = LeadStatus.query.filter(LeadStatus.status_name != "Odebrany").all()
+    statuses = LeadStatus.query.filter(LeadStatus.status_name != "Odebrany", LeadStatus.status_name != "Sprzedany").all()
     leads = LeadMain.query \
         .filter(or_(
             LeadMain.title.ilike(f'%{search}'),
