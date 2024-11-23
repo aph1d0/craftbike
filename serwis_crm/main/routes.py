@@ -48,7 +48,10 @@ def home():
         .filter(advanced_filters) \
     .all()
     for lead in leads:
-        if lead.status.status_name == "Przyjęty na serwis" or lead.status.status_name == "Umówiony na serwis" or lead.status.status_name == "Gotowy":
+        if lead.status.status_name == "Przyjęty na serwis" \
+            or lead.status.status_name == "Umówiony na serwis" \
+            or lead.status.status_name == "Gotowy" \
+            or lead.status.status_name == "Na sprzedaż":
             lead.date_scheduled = lead.date_scheduled.strftime("%Y-%m-%d")
             good_leads.append(lead)
             
