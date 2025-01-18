@@ -95,7 +95,7 @@ def send_sms(lead_id):
         try:
             sns = boto3.resource('sns')
             sms_notif = SnsWrapper(sns)
-            message = "Dzień dobry! Twój rower jest już gotowy do odbioru. Zapraszamy do naszego serwisu w Toruniu przy ulicy Wita Stwosza 2 w tygodniu 10-18 oraz w soboty 10-14."
+            message = "Dzień dobry! Twój rower jest już gotowy do odbioru. Zapraszamy do naszego serwisu w Toruniu przy ulicy Wita Stwosza 2 w tygodniu 10-17 oraz w soboty 10-14."
             sms_notif.publish_text_message(phone_number=lead.lead_contact.phone, message=message)
             lead.sms_sent=True
         except:
