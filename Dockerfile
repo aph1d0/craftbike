@@ -1,9 +1,9 @@
-FROM python:3.12.4-alpine as build
+FROM python:3.12.8-alpine3.21 as build
 
 # Copy the entire directory to the temporary build stage
 COPY . /serwis_crm_app
 
-FROM python:3.12.4-alpine
+FROM python:3.12.8-alpine3.21
 
 ARG MYSQL_HOST
 ARG MYSQL_PORT
