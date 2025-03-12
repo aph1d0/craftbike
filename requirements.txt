@@ -31,6 +31,5 @@ requests==2.32.0
 boto3
 gunicorn==22.0.0
 gitpython
-opentelemetry-sdk 
-opentelemetry-exporter-otlp 
-opentelemetry-instrumentation-flask
+opentelemetry-distro
+opentelemetry-exporter-otlp

@@ -3,10 +3,6 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 from sqlalchemy import inspect
-from opentelemetry.instrumentation.flask import FlaskInstrumentor
-from opentelemetry.sdk.trace import TracerProvider
-from opentelemetry.sdk.trace.export import BatchSpanProcessor
-from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
 import os
 
 from .config import DevelopmentConfig, TestConfig, ProductionConfig
@@ -32,14 +28,6 @@ def run_install(app_ctx):
 
 def create_app(config_class=ProductionConfig):
     app = Flask(__name__, instance_relative_config=True)
-
-    # Instrument Flask with OpenTelemetry
-    FlaskInstrumentor().instrument_app(app)
-
-    # Configure OpenTelemetry Tracing
-    tracer_provider = TracerProvider()
-    span_processor = BatchSpanProcessor(OTLPSpanExporter(endpoint=os.getenv("OTEL_EXPORTER_OTLP_ENDPOINT")))
-    tracer_provider.add_span_processor(span_processor)
 
 
     if os.getenv('FLASK_ENV') == 'development':
