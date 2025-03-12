@@ -106,4 +106,3 @@ venv.bak/
 aws/cloud-formation/*
 .vscode/
 docker.env
-newrelic.ini

@@ -22,6 +22,8 @@
     state: started
     restart_policy: always
     restart: true
+    networks:
+      name: otel_otel
     # network_mode: host
     ports:
       - 8003:8003
@@ -38,4 +40,7 @@
       MYSQL_DB_NAME: "{{ MYSQL_DB_NAME }}"
       SECRET_KEY: "{{ SECRET_KEY }}"
       GITHUB_SHA: "{{ GITHUB_SHA }}"
-      NEW_RELIC_LICENSE_KEY: "{{ NEW_RELIC_LICENSE_KEY }}"
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4317"
+      OTEL_SERVICE_NAME: craftbike-app
+      OTEL_RESOURCE_ATTRIBUTES: deployment.environment=production
+      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
