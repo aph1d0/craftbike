@@ -36,9 +36,6 @@ def create_app(config_class=ProductionConfig):
 
     app = Flask(__name__, instance_relative_config=True)
 
-    # Auto-instrument Flask
-    FlaskInstrumentor().instrument_app(app)
-
     # Auto-instrument logging
     LoggingInstrumentor().instrument(set_logging_format=True)
 
