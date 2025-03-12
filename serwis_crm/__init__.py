@@ -1,8 +1,11 @@
+import logging
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 from sqlalchemy import inspect
+from opentelemetry.instrumentation.flask import FlaskInstrumentor
+from opentelemetry.instrumentation.logging import LoggingInstrumentor
 import os
 
 from .config import DevelopmentConfig, TestConfig, ProductionConfig
@@ -27,8 +30,17 @@ def run_install(app_ctx):
 
 
 def create_app(config_class=ProductionConfig):
+    # Set up logging
+    logging.basicConfig(level=logging.INFO)
+    logger = logging.getLogger(__name__)
+
     app = Flask(__name__, instance_relative_config=True)
 
+    # Auto-instrument Flask
+    FlaskInstrumentor().instrument_app(app)
+
+    # Auto-instrument logging
+    LoggingInstrumentor().instrument(set_logging_format=True)
 
     if os.getenv('FLASK_ENV') == 'development':
         config_class = DevelopmentConfig()
