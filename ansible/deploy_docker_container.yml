@@ -23,7 +23,7 @@
     restart_policy: always
     restart: true
     networks:
-      otel_otel:
+      - name: otel_otel
     # network_mode: host
     ports:
       - 8003:8003
