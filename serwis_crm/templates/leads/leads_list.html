@@ -99,15 +99,12 @@
           >
             <span data-feather="edit"></span>
           </a>
-          <a
-            href="#"
-            data-toggle="modal"
-            data-target="#singleLeadDeleteModal_{{ lead.id }}"
-            class="btn btn-outline-secondary btn-sm mr-1"
-            role="button"
+          <button
+          class="btn btn-sm btn-outline-danger"
+          onclick="confirmDelete({{ lead.id }})"
           >
-            <span data-feather="trash"></span>
-          </a>
+          <span data-feather="trash-2"></span>
+          </button>
           {% with lead_id=lead.id %} {% include
           'leads/single_lead_delete_modal.html' %} {% endwith %}
           <a
@@ -198,6 +195,60 @@ items=leads %} {% include "common/pagination.html" %} {% endwith %} {% endif %}
     });
   });
 </script>
+<script>
+function confirmDelete(leadId) {
+  $('#deleteConfirmModal').modal('show');
+  
+  $('#confirmDeleteBtn').off('click').on('click', function() {
+    $.ajax({
+      type: "POST",
+      url: urlForAjax("leads/del/" + leadId),
+      contentType: "application/json",
+      dataType: "json",
+      success: function(data) {
+        $('#deleteConfirmModal').modal('hide');
+        $(".ajax_indicator")
+          .html("<span data-feather='check'></span> Zlecenie usunięte")
+          .removeClass("processing")
+          .addClass("done")
+          .fadeOut(2000);
+        setTimeout(function(){
+          window.location.reload();
+        }, 1000);
+      },
+      error: function(data) {
+        $('#deleteConfirmModal').modal('hide');
+        if (data.responseJSON) {
+          alert('Błąd: ' + data.responseJSON.message);
+        } else {
+          alert('Wystąpił błąd podczas usuwania zlecenia');
+        }
+      }
+    });
+  });
+}
+</script>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" role="dialog" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
+<div class="modal-dialog" role="document">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title" id="deleteConfirmModalLabel">Potwierdź usunięcie</h5>
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      Czy na pewno chcesz usunąć to zlecenie?
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" data-dismiss="modal">Anuluj</button>
+      <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Usuń</button>
+    </div>
+  </div>
+</div>
+</div>
 
 <!-- Lead Owner Assign Modal -->
 {% include "leads/bulk_owner_assign_modal.html" %}
@@ -206,4 +257,4 @@ items=leads %} {% include "common/pagination.html" %} {% endwith %} {% endif %}
 {% include "leads/bulk_lead_status_assign_modal.html" %}
 
 <!-- Lead Bulk Delete Modal -->
-{% include "leads/bulk_lead_delete_modal.html" %} {% endblock %}
+<!-- {% include "leads/bulk_lead_delete_modal.html" %} {% endblock %} -->

@@ -357,7 +357,7 @@ def get_lead_view(lead_id):
     return render_template("leads/lead_view.html", title="Przegląd zlecenia", lead=lead, bike=bike, contact=contact)
 
 
-@leads.route("/leads/del/<int:lead_id>")
+@leads.route("/leads/del/<int:lead_id>", methods=['GET', 'POST'])
 @login_required
 @check_access('leads', 'remove')
 def delete_lead(lead_id):
@@ -372,7 +372,7 @@ def delete_lead(lead_id):
         LeadMain.query.filter_by(id=lead_id).delete()
         db.session.commit()
         flash('Zlecenie usunięte poprawnie', 'success')
-    return redirect(url_for('leads.get_leads_view'))
+    return jsonify({'message': 'Zlecenie usunięte poprawnie', 'status': 200})
 
 
 

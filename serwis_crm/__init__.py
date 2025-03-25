@@ -3,7 +3,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
-from sqlalchemy import inspect
+from sqlalchemy import inspect, text
 from opentelemetry.instrumentation.flask import FlaskInstrumentor
 from opentelemetry.instrumentation.logging import LoggingInstrumentor
 import os
@@ -53,6 +53,21 @@ def create_app(config_class=ProductionConfig):
     db.init_app(app)
     bcrypt.init_app(app)
     login_manager.init_app(app)
+
+    # Add session cleanup after request
+    @app.teardown_request
+    def shutdown_session(exception=None):
+        db.session.remove()
+
+    # Add health check endpoint
+    @app.route('/health')
+    def health_check():
+        try:
+            db.session.execute(text('SELECT 1'))
+            return {'status': 'healthy'}, 200
+        except Exception as e:
+            logger.error(f"Health check failed: {str(e)}")
+            return {'status': 'unhealthy', 'error': str(e)}, 500
 
     with app.app_context():
         # check if the config table exists, otherwise run install

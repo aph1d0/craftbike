@@ -30,7 +30,6 @@ phonenumbers==8.13.7
 requests==2.32.0
 boto3
 gunicorn==22.0.0
-gitpython
 opentelemetry-distro
 opentelemetry-exporter-otlp
 opentelemetry-instrumentation-flask 

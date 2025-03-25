@@ -3,6 +3,31 @@
   home = document.querySelector('.navbar-brand')
   home.removeAttribute('href');
   home.setAttribute('style', "color: white;")
+
+  // Add auto-submit functionality
+  let autoSubmitTimer;
+  //const TIMEOUT_DURATION = 10 * 60 * 1000; // 10 minutes in milliseconds
+  const TIMEOUT_DURATION = 60 * 1000;
+
+  function resetAutoSubmitTimer() {
+    clearTimeout(autoSubmitTimer);
+    autoSubmitTimer = setTimeout(() => {
+      // Find the submit button and click it
+      const submitButton = document.querySelector('.btn.btn-md.btn-outline-info');
+      if (submitButton) {
+        submitButton.click();
+      }
+    }, TIMEOUT_DURATION);
+  }
+
+  // Reset timer on any user interaction
+  document.addEventListener('mousemove', resetAutoSubmitTimer);
+  document.addEventListener('keypress', resetAutoSubmitTimer);
+  document.addEventListener('click', resetAutoSubmitTimer);
+  document.addEventListener('scroll', resetAutoSubmitTimer);
+
+  // Start the timer when page loads
+  resetAutoSubmitTimer();
 </script>
 <form class="form-new-lead" method="POST">
   {{ form.hidden_tag() }}
@@ -299,14 +324,14 @@
         </div>
       </div>
       {% endif %}
-      <!-- {% if current_user.is_admin %}
+      {% if current_user.is_admin %}
       <div class="form-row">
            <div class="form-group col-6">
                {{ form.assignees.label(class="form-control-label") }}
               {{ form.assignees(class="form-control from-control-lg") }}
            </div>
       </div>
-      {% endif %} -->
+      {% endif %}
       <div class="form-group">
         {{ form.notes.label(class="form-control-label") }} {{
         form.notes(class="form-control from-control-lg") }}
