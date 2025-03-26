@@ -4,7 +4,7 @@ import pandas as pd
 from sqlalchemy import or_
 from wtforms import Label
 
-from flask import Blueprint, jsonify, session, Response
+from flask import Blueprint, jsonify, session, Response, current_app
 from flask_login import current_user, login_required
 from flask import render_template, flash, url_for, redirect, request
 
@@ -28,14 +28,25 @@ from serwis_crm.rbac import check_access, is_admin
 leads = Blueprint('leads', __name__)
 
 def clean_up_not_attached_services():
-    # Get a list of IDs from the "lead_service" table
-    lead_service_ids = [record.service_id for record in db.session.query(lead_service).all()]
+    """Clean up orphaned services and related resources"""
+    try:
+        # Get a list of IDs from the "lead_service" table
+        lead_service_ids = [record.service_id for record in db.session.query(lead_service).all()]
 
-    # Delete rows from "services_to_leads" where the ID is not in "lead_service_ids"
-    deleted_rows = ServicesToLeads.query.filter(~ServicesToLeads.id.in_(lead_service_ids)).delete(synchronize_session=False)
+        # Delete rows from "services_to_leads" where the ID is not in "lead_service_ids"
+        deleted_rows = ServicesToLeads.query.filter(~ServicesToLeads.id.in_(lead_service_ids)).delete(synchronize_session=False)
 
-    # Commit the changes to the database
-    db.session.commit()
+
+        # Commit the changes to the database
+        db.session.commit()
+        
+        # Force garbage collection
+        import gc
+        gc.collect()
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(f"Error during cleanup: {str(e)}")
+        raise
 
 def reset_lead_filters():
     if 'lead_owner' in session:
@@ -487,3 +498,8 @@ def write_to_csv():
                     mimetype='text/csv',
                     headers={"Content-disposition":
                              "attachment; filename=services.csv"})
+
+@leads.before_request
+def before_request():
+    """Run cleanup before each request"""
+    clean_up_not_attached_services()

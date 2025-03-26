@@ -8,6 +8,7 @@ from serwis_crm.leads.filters import set_date_filters
 from serwis_crm.leads.forms import FilterLeads
 from serwis_crm.leads.models import LeadMain, LeadStatus
 from serwis_crm.rbac import check_access
+from datetime import datetime, timedelta
 
 parser = ConfigParser()
 
@@ -22,6 +23,23 @@ def reset_main_filters():
         session.pop('lead_date_created', None)
     if 'lead_contact' in session:
         session.pop('lead_contact', None)
+
+def cleanup_old_session_data():
+    """Clean up session data older than 24 hours"""
+    if 'lead_owner' in session:
+        session.pop('lead_owner', None)
+    if 'lead_search' in session:
+        session.pop('lead_search', None)
+    if 'lead_date_created' in session:
+        session.pop('lead_date_created', None)
+    if 'lead_contact' in session:
+        session.pop('lead_contact', None)
+    session.permanent = True
+    current_app.permanent_session_lifetime = timedelta(hours=24)
+
+@main.before_request
+def before_request():
+    cleanup_old_session_data()
 
 @main.route("/_health", methods=['GET'])
 def health_check():
@@ -41,7 +59,7 @@ def home():
     statuses = LeadStatus.query.filter(LeadStatus.status_name != "Odebrany", LeadStatus.status_name != "Sprzedany").all()
     leads = LeadMain.query \
         .filter(or_(
-            LeadMain.title.ilike(f'%{search}'),
+            LeadMain.title.ilike(f'%{search}%'),
         ) if search else True) \
         .filter(contact) \
         .filter(owner) \

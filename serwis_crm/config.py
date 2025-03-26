@@ -7,11 +7,12 @@ class Config(object):
     PYTHON_VER_MIN_REQUIRED = '3.5.0'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ENGINE_OPTIONS = {
-        "pool_size": 10,
-        "max_overflow": 20,
+        "pool_size": 5,
+        "max_overflow": 10,
         "pool_timeout": 30,
         "pool_recycle": 1800,
         "pool_pre_ping": True,
+        "echo": False,
     }
     SQLALCHEMY_POOL_TIMEOUT = 30
 

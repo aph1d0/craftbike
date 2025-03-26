@@ -57,7 +57,11 @@ def create_app(config_class=ProductionConfig):
     # Add session cleanup after request
     @app.teardown_request
     def shutdown_session(exception=None):
-        db.session.remove()
+        if hasattr(db, 'session'):
+            db.session.remove()
+            db.session.close()
+        if hasattr(db, 'engine'):
+            db.engine.dispose()
 
     # Add health check endpoint
     @app.route('/health')
