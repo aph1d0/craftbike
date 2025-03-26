@@ -26,8 +26,9 @@
         data-dropstage="{{ lead_status.id }}"
       >
         <h5 class="card-title">{{ lead_status.status_name }}</h5>
-        {% for lead in leads|sort(attribute='date_scheduled', reverse=true) %} {% if lead.status.status_name ==
-        lead_status.status_name %}
+        {% if lead_status.id == 2 %}
+          {% for lead in leads|sort(attribute='date_scheduled', reverse=false) %}
+            {% if lead.status.status_name == lead_status.status_name %}
         <div
           id="item_{{ lead.id }}"
           data-dealid="{{ lead.id }}"
@@ -99,7 +100,85 @@
             </div>
           </div>
         </div>
-        {% endif %} {% endfor %}
+            {% endif %}
+          {% endfor %}
+        {% else %}
+          {% for lead in leads %}
+            {% if lead.status.status_name == lead_status.status_name %}
+        <div
+          id="item_{{ lead.id }}"
+          data-dealid="{{ lead.id }}"
+          class="card inner-card bg-light mb-3"
+          draggable="true"
+        >
+          <div class="card-body">
+            <h5 class="card-title d-flex justify-content-between align-items-center mb-2">
+              <div class="text">{{ lead.title|truncate(35, True)}}</div>
+              <button
+                class="btn btn-sm btn-outline-danger p-1"
+                style="margin-top: -16px;"
+                onclick="confirmDelete({{ lead.id }})"
+              >
+                <span data-feather="trash-2"></span>
+              <br>
+            </h5>
+            <div class="card-text">
+              <div>
+                <span data-feather="phone"></span> {{ lead.lead_contact.phone }}
+              </div>
+              <div>
+                <span data-feather="user"></span> {{ lead.lead_contact.first_name }}
+              </div>
+              {% if lead.status.status_name == "Umówiony na serwis" %}
+              <div>
+                <span data-feather="calendar"></span> {{ lead.date_scheduled }}
+              </div>
+              {% endif %}
+              {% if lead.status.status_name == "Gotowy" %}
+              <div>
+                <span data-feather="message-square"></span> {{ 'Tak' if lead.sms_sent else 'Nie' }}
+              </div>
+              {% endif %}
+            </div>
+            <div class="card-actions">
+              <div class="ca_item">
+                <a
+                  href="leads/edit/{{ lead.id }}"
+                  class="btn btn-sm btn-outline-secondary"
+                  role="button"
+                >
+                  <span data-feather="edit"></span> Edytuj zlecenie
+                </a>
+              </div>
+              {% if lead.status.status_name == "Gotowy" %}
+              <div class="card-actions">
+                <div class="ca_item">
+                  <a
+                    class="btn btn-sm btn-outline-secondary"
+                    role="button"
+                    onClick="send_sms('{{ lead.id }}', '{{ lead.sms_sent}}');"
+                  >
+                    <span data-feather="message-square"></span> Wyślij SMS
+                  </a>
+                </div>
+                <div><br></div>
+                <div class="ca_item">
+                  <a
+                    class="btn btn-sm btn-outline-secondary"
+                    role="button"
+                    onClick="update_deal_stage('{{ lead.id }}', 6);"
+                  >
+                    <span data-feather="log-out"></span> Odebrany
+                  </a>
+                </div>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+            {% endif %}
+          {% endfor %}
+        {% endif %}
       </div>
     </div>
     {% endfor %}
