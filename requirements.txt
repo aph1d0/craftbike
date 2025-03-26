@@ -21,7 +21,7 @@ python-dateutil==2.8.2
 python-editor==1.0.4
 pytz==2024.1
 six==1.16.0
-SQLAlchemy==2.0.16
+SQLAlchemy==2.0.39
 Werkzeug==3.0.6
 WTForms==2.2.1
 WTForms-SQLAlchemy==0.1
