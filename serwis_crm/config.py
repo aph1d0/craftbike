@@ -20,13 +20,13 @@ class Config(object):
 class DevelopmentConfig(Config):
     DEBUG = True
     SECRET_KEY = os.getenv("DEV_SECRET_KEY")
-    SQLALCHEMY_DATABASE_URI = f'mysql://{os.getenv("DEV_MYSQL_USER")}:{os.getenv("DEV_MYSQL_PASS")}@{os.getenv("DEV_MYSQL_HOST")}:{os.getenv("DEV_MYSQL_PORT")}/{os.getenv("DEV_MYSQL_DB_NAME")}'
+    SQLALCHEMY_DATABASE_URI = f'mysql://{os.getenv("DEV_MYSQL_USER")}:{os.getenv("DEV_MYSQL_PASSWORD")}@{os.getenv("DEV_MYSQL_HOST")}:{os.getenv("DEV_MYSQL_PORT")}/{os.getenv("DEV_MYSQL_DB_NAME")}'
 
 
 class TestConfig(Config):
     TESTING = True
     SECRET_KEY = os.getenv("TEST_SECRET_KEY")
-    SQLALCHEMY_DATABASE_URI = f'mysql://{os.getenv("TEST_MYSQL_USER")}:{os.getenv("TEST_MYSQL_PASS")}@{os.getenv("TEST_MYSQL_HOST")}:{os.getenv("TEST_MYSQL_PORT")}/{os.getenv("TEST_MYSQL_DB_NAME")}'
+    SQLALCHEMY_DATABASE_URI = f'mysql://{os.getenv("TEST_MYSQL_USER")}:{os.getenv("TEST_MYSQL_PASSWORD")}@{os.getenv("TEST_MYSQL_HOST")}:{os.getenv("TEST_MYSQL_PORT")}/{os.getenv("TEST_MYSQL_DB_NAME")}'
 
 
 class ProductionConfig(Config):

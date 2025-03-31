@@ -5,6 +5,7 @@ from flask import render_template, flash, url_for, redirect, request
 from serwis_crm import db, bcrypt
 from .forms import Register, Login
 from .models import User
+from serwis_crm.rbac import check_access
 
 users = Blueprint('users', __name__)
 
@@ -33,25 +34,6 @@ def login():
                 flash('User does not exist! Please contact the system administrator', 'danger')
     return render_template("login.html", title="serwis_crm - Login", form=form)
 
-
-@users.route("/register", methods=['GET', 'POST'])
-def register():
-    if current_user.is_authenticated:
-        return redirect(url_for('main.home'))
-    form = Register()
-    if request.method == 'POST':
-        if form.is_submitted() and form.validate():
-            hashed_pwd = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-            user = User(first_name=form.first_name.data, last_name=form.last_name.data,
-                        email=form.email.data, is_admin=True, is_first_login=False,
-                        is_user_active=True, password=hashed_pwd)
-            db.session.add(user)
-            db.session.commit()
-            flash('User has been created! You can now login', 'success')
-            return redirect(url_for('users.login'))
-        else:
-            flash(f'Failed to register user!', 'danger')
-    return render_template("register.html", title="serwis_crm - Register New User", form=form)
 
 
 @users.route("/logout")
