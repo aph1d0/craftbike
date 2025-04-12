@@ -35,7 +35,7 @@ def create_app(config_class=ProductionConfig):
     logger = logging.getLogger(__name__)
 
     app = Flask(__name__, instance_relative_config=True)
-
+    FlaskInstrumentor().instrument_app(app)
     # Auto-instrument logging
     LoggingInstrumentor().instrument(set_logging_format=True)
 
