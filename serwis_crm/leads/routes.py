@@ -102,7 +102,7 @@ def get_leads_view():
 def send_sms(lead_id):
     lead = LeadMain.query.filter(LeadMain.id == lead_id).first()
     lead_stage = LeadStatus.get_by_id(lead.lead_status_id)
-    if lead_stage.id == 5 and lead.sms_sending is True:
+    if lead_stage.id == 5 and lead.sms_sending is True and lead.sms_sent is False:
         try:
             sns = boto3.resource('sns')
             sms_notif = SnsWrapper(sns)
@@ -115,7 +115,7 @@ def send_sms(lead_id):
             response.status_code = error['status']
             return response
     else: 
-        na = {'message': 'Zlecenie nie jest w statusie "Gotowy"', 'status': 406}
+        na = {'message': 'Zlecenie nie jest w statusie "Gotowy" lub sms już został wysłany.', 'status': 406}
         response  = jsonify(na)
         response.status_code = na['status']
         return response
