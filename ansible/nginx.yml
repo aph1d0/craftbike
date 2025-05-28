@@ -22,10 +22,10 @@
       owner: www-data
       group: www-data
       mode: '0755'
-  - name: Copy index.html to web server
+  - name: Copy home_page contents to web server
     copy:
-      src: ../home_page/index.html
-      dest: /var/www/html/index.html
+      src: ../home_page/
+      dest: /var/www/html/
       owner: www-data
       group: www-data
       mode: '0644'
