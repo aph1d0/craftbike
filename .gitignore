@@ -106,3 +106,4 @@ venv.bak/
 aws/cloud-formation/*
 .vscode/
 docker.env
+.ansible

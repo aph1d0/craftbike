@@ -15,6 +15,22 @@
       src: templates/nginx.conf.j2  # Path to your custom configuration template
       dest: /etc/nginx/nginx.conf
     become: true
+  - name: Create web directory if it doesn't exist
+    file:
+      path: /var/www/html
+      state: directory
+      owner: www-data
+      group: www-data
+      mode: '0755'
+  - name: Copy index.html to web server
+    copy:
+      src: ../home_page/index.html
+      dest: /var/www/html/index.html
+      owner: www-data
+      group: www-data
+      mode: '0644'
+      backup: true
+    notify: restart nginx
   - name: restart nginx
     service:
       name: nginx
