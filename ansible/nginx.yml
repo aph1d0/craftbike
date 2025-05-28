@@ -30,7 +30,6 @@
       group: www-data
       mode: '0644'
       backup: true
-    notify: restart nginx
   - name: restart nginx
     service:
       name: nginx
