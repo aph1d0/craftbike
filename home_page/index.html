@@ -35,6 +35,120 @@
             transform: translateY(0);
         }
 
+        /* Scroll Arrow Styles */
+        .scroll-arrow {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 50px;
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            z-index: 10;
+            animation: bounce-arrow 2s infinite;
+        }
+
+        .scroll-arrow:hover {
+            background: rgba(255, 107, 53, 0.2);
+            border-color: #ff6b35;
+            transform: translateX(-50%) scale(1.1);
+        }
+
+        .scroll-arrow::before {
+            content: '';
+            width: 12px;
+            height: 12px;
+            border-right: 2px solid rgba(255, 255, 255, 0.8);
+            border-bottom: 2px solid rgba(255, 255, 255, 0.8);
+            transform: rotate(45deg);
+            transition: all 0.3s ease;
+        }
+
+        .scroll-arrow:hover::before {
+            border-color: #ff6b35;
+        }
+
+        /* Different arrow styles for different sections */
+        .services .scroll-arrow {
+            border-color: rgba(255, 107, 53, 0.8);
+            background: rgba(255, 107, 53, 0.1);
+        }
+
+        .services .scroll-arrow::before {
+            border-color: rgba(255, 107, 53, 0.8);
+        }
+
+        .services .scroll-arrow:hover {
+            background: rgba(255, 107, 53, 0.3);
+            border-color: #ff6b35;
+        }
+
+        .hours .scroll-arrow {
+            border-color: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .hours .scroll-arrow::before {
+            border-color: rgba(255, 255, 255, 0.9);
+        }
+
+        .hours .scroll-arrow:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: #ffffff;
+        }
+
+        .location .scroll-arrow {
+            border-color: rgba(255, 107, 53, 0.8);
+            background: rgba(255, 107, 53, 0.1);
+        }
+
+        .location .scroll-arrow::before {
+            border-color: rgba(255, 107, 53, 0.8);
+        }
+
+        .location .scroll-arrow:hover {
+            background: rgba(255, 107, 53, 0.3);
+            border-color: #ff6b35;
+        }
+
+        /* Arrow animations */
+        @keyframes bounce-arrow {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateX(-50%) translateY(0);
+            }
+            40% {
+                transform: translateX(-50%) translateY(-10px);
+            }
+            60% {
+                transform: translateX(-50%) translateY(-5px);
+            }
+        }
+
+        @keyframes pulse-glow {
+            0% {
+                box-shadow: 0 0 0 0 rgba(255, 107, 53, 0.4);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(255, 107, 53, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 107, 53, 0);
+            }
+        }
+
+        /* Hide arrow on last section */
+        .section:last-child .scroll-arrow {
+            display: none;
+        }
+
         /* Hero Section */
         .hero {
             background: linear-gradient(135deg, #ff6b35 0%, #1a1a1a 100%);
@@ -269,6 +383,17 @@
             .services h2, .hours h2, .location-info h2, .contact h2 { font-size: 2rem; }
             .location-content { grid-template-columns: 1fr; }
             .social-links { flex-direction: column; align-items: center; }
+            
+            .scroll-arrow {
+                width: 40px;
+                height: 40px;
+                bottom: 20px;
+            }
+            
+            .scroll-arrow::before {
+                width: 10px;
+                height: 10px;
+            }
         }
 
         /* Scroll indicator */
@@ -298,10 +423,12 @@
     <!-- Hero Section -->
     <section class="section hero">
         <div class="hero-content">
-            <div class="bike-icon">🚴‍♂️</div>
+            <img src="cb_logo.png" alt="Craftbike Logo" style="max-width: 50%; height: auto;">
+            <!-- <div class="bike-icon">🚴‍♂️</div>
             <h1>Craftbike</h1>
-            <p>Profesjonalny serwis rowerowy w Toruniu</p>
+            <p>Profesjonalny serwis rowerowy w Toruniu</p> -->
         </div>
+        <div class="scroll-arrow" onclick="scrollToNext(this)"></div>
     </section>
 
     <!-- Services Section -->
@@ -335,6 +462,7 @@
                 </div>
             </div>
         </div>
+        <div class="scroll-arrow" onclick="scrollToNext(this)"></div>
     </section>
 
     <!-- Hours Section -->
@@ -356,6 +484,7 @@
                 </div>
             </div>
         </div>
+        <div class="scroll-arrow" onclick="scrollToNext(this)"></div>
     </section>
 
     <!-- Location Section -->
@@ -398,7 +527,7 @@
                 <div class="map-placeholder">
                     <div style="text-align: center;">
                         <div style="font-size: 0.9rem; margin-top: 0.5rem; opacity: 0.7;">
-                            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d412.2563858424383!2d18.591877383327617!3d53.013005485793556!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4703352012d8d8bf%3A0x7c9b38f1490d9407!2sCraft%20Bike%20Serwis%20Rowerowy!5e0!3m2!1spl!2spl!4v1748336376130!5m2!1spl!2spl" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d412.2563858424383!2d18.591877383327617!3d53.013005485793556!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4703352012d8d8bf%3A0x7c9b38f1490d9407!2sCraft%20Bike%20Serwis%20Rowerowy!5e0!3m2!1spl!2spl!4v1748336376130!5m2!1spl!2spl" width="500" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
                         </div>
                     </div>
                 </div>
@@ -407,6 +536,19 @@
     </section>
 
     <script>
+        // Scroll to next section function
+        function scrollToNext(arrow) {
+            const currentSection = arrow.closest('.section');
+            const nextSection = currentSection.nextElementSibling;
+            
+            if (nextSection) {
+                nextSection.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        }
+
         // Scroll animations
         function handleScroll() {
             const sections = document.querySelectorAll('.section');
