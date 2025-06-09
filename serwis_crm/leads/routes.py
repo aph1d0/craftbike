@@ -248,6 +248,7 @@ def new_lead():
     lead_services = []
     if request.method == 'POST':
         if form.is_submitted() and form.validate():
+            form.phone.data = form.phone.data.replace("-","").replace(" ", "")
             client = Contact.query.filter_by(phone=form.phone.data).first()
             if not client:
                 client = new_contact(first_name=form.first_name.data, phone=form.phone.data, current_user=current_user.id)
@@ -311,7 +312,7 @@ def update_lead(lead_id):
             lead.title = form.title.data
             contact.first_name = form.first_name.data
             #contact.last_name = form.last_name.data
-            contact.phone = form.phone.data
+            contact.phone = form.phone.data.replace("-","").replace(" ", "")
             bike.manufacturer = form.bike_manufacturer.data
             bike.model = form.bike_model.data
             lead.owner = form.assignees.data

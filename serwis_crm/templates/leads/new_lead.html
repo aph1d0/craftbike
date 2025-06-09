@@ -1,4 +1,5 @@
 {% extends "layout.html" %} {% set active_page = "leads" %} {% block content %}
+<script src="https://unpkg.com/imask"></script>
 <script>
   home = document.querySelector('.navbar-brand')
   home.removeAttribute('href');
@@ -213,20 +214,35 @@
           <ul id="suggestions_list"></ul>
         </div>
         <div class="col">
-          {{ form.phone.label(class="form-control-label") }} {% if
-          form.phone.errors %} {{ form.phone(class="form-control form-control-lg
-          required is-invalid") }}
-          <div class="invalid-feedback">
-            {% for error in form.phone.errors %}
-            <span>{{ error }}</span>
-            {% endfor %}
-          </div>
-          {% else %} {% if not form.phone.data %} {{
-          form.phone(class="form-control required from-control-lg",
-          placeholder="Telefon ...", value="+48") }} {% else %} {{
-          form.phone(class="form-control required from-control-lg",
-          placeholder="Telefon ...") }} {% endif %} {% endif %}
+          {{ form.phone.label(class="form-control-label") }}
+
+          {% if form.phone.errors %}
+            <!-- Error State -->
+            {{ form.phone(class="form-control form-control-lg required is-invalid", id="phone") }}
+            <div class="invalid-feedback">
+              {% for error in form.phone.errors %}
+              <span>{{ error }}</span>
+              {% endfor %}
+            </div>
+          {% else %}
+            <!-- Normal State -->
+            {% if not form.phone.data %}
+              <!-- Empty with a placeholder and default value -->
+              {{ form.phone(class="form-control required from-control-lg", placeholder="Telefon ...", value="+48", id="phone") }}
+            {% else %}
+              <!-- Has existing data -->
+              {{ form.phone(class="form-control required from-control-lg", placeholder="Telefon ...", id="phone") }}
+            {% endif %}
+          {% endif %}
         </div>
+        <script>
+          const phoneInput = document.getElementById('phone');
+          if (phoneInput) {
+              const phoneMask = IMask(phoneInput, {
+                  mask: '+{48} 000-000-000' // Example for a Polish number
+              });
+          }
+        </script>
       </div>
 
       <div class="form-row">
