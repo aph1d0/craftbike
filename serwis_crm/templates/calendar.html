@@ -1,7 +1,18 @@
 {% extends "layout.html" %} {% set active_page = "calendar" %} {% block content %}
 <div class="form-row" id="calendar_row" style="display: none">
     <div class="col">
-    <br><br>
+    <br>
+    <div class="d-flex justify-content-end">
+      <a
+        class="btn btn btn-sm btn-outline-primary"
+        role="button"
+        href="{{ url_for('leads.new_lead') }}"
+        >
+        <span data-feather="plus"></span>
+        Nowe zlecenie
+    </a>
+    </div>
+    <br>
       <h5>Kalendarz</h5>
       <div>Legenda: </div>
       <div style="color:blue">&#9632; - umówiony na serwis</div>
