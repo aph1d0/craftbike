@@ -66,18 +66,18 @@ def settings_staff_update(user_id):
     form = UpdateUser()
     user = User.query.filter(User.id == user_id).first()
 
-    acl = Role.query\
-        .with_entities(Role.id,
-                       Resource.id,
-                       Resource.name,
-                       Resource.can_view,
-                       Resource.can_create,
-                       Resource.can_edit,
-                       Resource.can_delete)\
-        .filter_by(id=user.role_id)\
-        .join(Role.resources)\
-        .order_by(Resource.id.asc())\
-        .all()
+    # acl = Role.query\
+    #     .with_entities(Role.id,
+    #                    Resource.id,
+    #                    Resource.name,
+    #                    Resource.can_view,
+    #                    Resource.can_create,
+    #                    Resource.can_edit,
+    #                    Resource.can_delete)\
+    #     .filter_by(id=user.role_id)\
+    #     .join(Role.resources)\
+    #     .order_by(Resource.id.asc())\
+    #     .all()
 
     if request.method == 'POST':
         if form.is_submitted() and form.validate():
@@ -88,15 +88,16 @@ def settings_staff_update(user_id):
             user.last_name = form.last_name.data
             user.email = form.email.data
             user.role = form.role.data
+            user.role_id = form.role.data.id
             user.is_user_active = form.is_user_active.data
             user.is_first_login = form.is_first_login.data
 
-            for permission in form.permissions:
-                resource = Resource.query.filter_by(id=permission.resource_id.data).first()
-                resource.can_view = permission.can_view.data
-                resource.can_create = permission.can_create.data
-                resource.can_edit = permission.can_edit.data
-                resource.can_delete = permission.can_delete.data
+            # for permission in form.permissions:
+            #     resource = Resource.query.filter_by(id=permission.resource_id.data).first()
+            #     resource.can_view = permission.can_view.data
+            #     resource.can_create = permission.can_create.data
+            #     resource.can_edit = permission.can_edit.data
+            #     resource.can_delete = permission.can_delete.data
 
             try:
                 db.session.commit()
@@ -120,15 +121,15 @@ def settings_staff_update(user_id):
         form.is_user_active.data = user.is_user_active
         form.is_first_login.data = user.is_first_login
 
-        for l in acl:
-            resource_form = ResourceForm()
-            resource_form.resource_id = l.id
-            resource_form.name = l.name
-            resource_form.can_view = l.can_view
-            resource_form.can_create = l.can_create
-            resource_form.can_edit = l.can_edit
-            resource_form.can_delete = l.can_delete
-            form.permissions.append_entry(resource_form)
+        # for l in acl:
+        #     resource_form = ResourceForm()
+        #     resource_form.resource_id = l.id
+        #     resource_form.name = l.name
+        #     resource_form.can_view = l.can_view
+        #     resource_form.can_create = l.can_create
+        #     resource_form.can_edit = l.can_edit
+        #     resource_form.can_delete = l.can_delete
+        #     form.permissions.append_entry(resource_form)
 
     return render_template("settings/staff_update.html", title="Aktualizuj personel", form=form)
 
