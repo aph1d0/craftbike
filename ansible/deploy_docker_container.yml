@@ -40,7 +40,7 @@
       MYSQL_DB_NAME: "{{ MYSQL_DB_NAME }}"
       SECRET_KEY: "{{ SECRET_KEY }}"
       GITHUB_SHA: "{{ GITHUB_SHA }}"
-      OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4317"
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://172.17.0.1:4317"
       OTEL_SERVICE_NAME: craftbike-app
       OTEL_RESOURCE_ATTRIBUTES: deployment.environment=production
       OTEL_EXPORTER_OTLP_PROTOCOL: grpc
