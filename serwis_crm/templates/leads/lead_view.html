@@ -60,6 +60,12 @@
         </div>
       </li>
       <li class="list-group-item g_field">
+        <div class="label">Podejście do dnia (Deadline)</div>
+        <div class="text">
+          {{ lead.deadline if lead.deadline else '_' }}
+        </div>
+      </li>
+      <li class="list-group-item g_field">
         <div class="label">Notatki</div>
         <div class="text">
           {{ lead.notes if lead.notes else '_' }}
@@ -77,6 +83,24 @@
           {% if lead.services %}
           {% for service in lead.services %}
             {{ service.name }} - {{ service.price }} zł <br>
+          {% endfor %}
+          {% else %}
+            _
+          {% endif %}
+        </div>
+      </li>
+    </ul>
+  </div>
+</div>
+<div class="row printable">
+  <div class="col-10">
+    <ul class="list-group list-group-flush">
+      <li class="list-group-item g_field col-12">
+        <div class="label">Części i komponenty do zamówienia z hurtowni</div>
+        <div class="text">
+          {% if lead.components %}
+          {% for component in lead.components %}
+            {{ component.name }} {% if component.is_ordered %}(Zamówiono){% else %}(Brak zamówienia){% endif %} <br>
           {% endfor %}
           {% else %}
             _

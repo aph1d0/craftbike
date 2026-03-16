@@ -65,13 +65,30 @@ def home():
         .filter(owner) \
         .filter(advanced_filters) \
     .all()
+    today = datetime.now().date()
+    # Calculate next Friday. weekday() returns 0 for Monday to 6 for Sunday
+    days_ahead = 4 - today.weekday()
+    if days_ahead <= 0: # Target is next week
+        days_ahead += 7
+    next_friday = today + timedelta(days_ahead)
+    
     for lead in leads:
         if lead.status.status_name == "Przyjęty na serwis" \
             or lead.status.status_name == "Umówiony na serwis" \
             or lead.status.status_name == "Gotowy" \
             or lead.status.status_name == "Na sprzedaż":
             lead.date_scheduled = lead.date_scheduled.strftime("%Y-%m-%d")
+            lead.priority = 2 # Normal priority by default
+            
+            if lead.deadline:
+                if lead.deadline < today:
+                    lead.priority = 0 # High priority (crossed deadline)
+                elif lead.deadline <= next_friday:
+                    lead.priority = 1 # Medium priority (upcoming deadline until next Friday)
+
             good_leads.append(lead)
+            
+    good_leads.sort(key=lambda x: (x.priority, x.deadline or datetime.max.date()))
             
     return render_template("index.html", title="Dashboard", leads=good_leads, lead_statuses=statuses, filters=filters)
 

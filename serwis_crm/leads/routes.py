@@ -12,7 +12,7 @@ from serwis_crm import config, db
 from serwis_crm.bikes.models import Bike
 from serwis_crm.bikes.routes import new_bike
 from serwis_crm.users.models import User
-from serwis_crm.leads.models import LeadMain, LeadStatus, lead_service
+from serwis_crm.leads.models import LeadMain, LeadStatus, lead_service, LeadComponent
 from serwis_crm.services.models import ServicesToLeads, ServicesAction
 from serwis_crm.contacts.models import Contact
 from serwis_crm.contacts.routes import new_contact
@@ -166,6 +166,22 @@ def get_services(lead_id):
         )
     return jsonify(json_services)
 
+@login_required
+@check_access('leads', 'view')
+@leads.route("/leads/<int:lead_id>/get_components", methods=['GET'])
+def get_components(lead_id):
+    json_components = []
+    lead = LeadMain.query.filter(LeadMain.id == lead_id).first()
+    if getattr(lead, 'components', None):
+        for comp in lead.components:
+            json_components.append({
+                'id' : comp.id,
+                'name' : comp.name,
+                'is_ordered' : comp.is_ordered
+            })
+    return jsonify(json_components)
+
+
 
 @login_required
 @check_access('leads', 'view')
@@ -261,11 +277,16 @@ def new_lead():
             if not found_bike:
                     bike = new_bike(bike_manufacturer=str(form.bike_manufacturer.data).lower(), bike_model=str(form.bike_model.data).lower(), client_id=client.id)
             lead = LeadMain(title=form.title.data,
-                        status=form.lead_status.data, notes=form.notes.data)
+                        status=form.lead_status.data, notes=form.notes.data, deadline=form.deadline.data)
             if (form.service_name.raw_data is not None) and (form.service_price.raw_data is not None):
                 for name, price in zip(form.service_name.raw_data, form.service_price.raw_data):
                     new_service = ServicesToLeads(name=name, price=price)
                     lead.services.append(new_service)
+            if form.component_name.raw_data is not None:
+                for comp_name in form.component_name.raw_data:
+                    if comp_name.strip():
+                        new_comp = LeadComponent(name=comp_name.strip(), is_ordered=False)
+                        lead.components.append(new_comp)
             if form.lead_status.data.status_name == 'Umówiony na serwis':
                 lead.date_scheduled = form.date_scheduled.data
             else:
@@ -318,6 +339,7 @@ def update_lead(lead_id):
             lead.owner = form.assignees.data
             lead.status = form.lead_status.data
             lead.date_scheduled = form.date_scheduled.data
+            lead.deadline = form.deadline.data
             lead.notes = form.notes.data
             sms_sending = request.form.get('sms_sending')
             if sms_sending == 'on':
@@ -329,6 +351,27 @@ def update_lead(lead_id):
                 for name, price in zip(form.service_name.raw_data, form.service_price.raw_data):
                     service_obj = ServicesToLeads(name=name, price=price)
                     lead.services.append(service_obj)
+            
+            if form.component_id.raw_data is not None:
+                present_ids = []
+                for idx, c_id in enumerate(form.component_id.raw_data):
+                    c_name = form.component_name.raw_data[idx]
+                    c_ordered = form.component_is_ordered.raw_data[idx] == 'true'
+                    if c_name.strip():
+                        if c_id.startswith('new_'):
+                            new_comp = LeadComponent(name=c_name.strip(), is_ordered=c_ordered)
+                            lead.components.append(new_comp)
+                        else:
+                            present_ids.append(int(c_id))
+                            for existing_comp in lead.components:
+                                if existing_comp.id == int(c_id):
+                                    existing_comp.name = c_name.strip()
+                                    existing_comp.is_ordered = c_ordered
+                
+                # remove deleted components
+                lead.components = [c for c in lead.components if getattr(c, 'id', None) is None or c.id in present_ids]
+            else:
+                lead.components.clear()
             up_stage = update_stage(lead_id=lead.id, lead_stage_id=lead.status.id, owner=form.assignees.data, lead=lead)
             if (up_stage.json is not None) and (up_stage.json["status"] == 200):
                 db.session.add(lead)
@@ -350,6 +393,7 @@ def update_lead(lead_id):
         form.assignees.data = lead.owner
         form.lead_status.data = lead.status
         form.date_scheduled.data = lead.date_scheduled
+        form.deadline.data = lead.deadline
         form.notes.data = lead.notes
         form.sms_sent.data = lead.sms_sent
         form.sms_sending.data = lead.sms_sending
@@ -480,6 +524,18 @@ def bulk_delete():
         else:
             print(form.errors)
     return redirect(url_for('leads.get_leads_view'))
+
+
+@leads.route("/leads/components", methods=['GET'])
+@login_required
+@check_access('leads', 'view')
+def get_components_summary():
+    components = LeadComponent.query \
+        .join(LeadMain, LeadComponent.lead_id == LeadMain.id) \
+        .order_by(LeadComponent.is_ordered.asc(), LeadMain.date_created.desc()) \
+        .all()
+    
+    return render_template("leads/components.html", title="Części do zamówienia", components=components)
 
 
 @leads.route("/leads/write_csv")

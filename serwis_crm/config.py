@@ -19,6 +19,7 @@ class Config(object):
 
 class DevelopmentConfig(Config):
     DEBUG = True
+    TEMPLATES_AUTO_RELOAD = True
     SECRET_KEY = os.getenv("DEV_SECRET_KEY")
     SQLALCHEMY_DATABASE_URI = f'mysql://{os.getenv("DEV_MYSQL_USER")}:{os.getenv("DEV_MYSQL_PASSWORD")}@{os.getenv("DEV_MYSQL_HOST")}:{os.getenv("DEV_MYSQL_PORT")}/{os.getenv("DEV_MYSQL_DB_NAME")}'
 

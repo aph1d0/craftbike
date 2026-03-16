@@ -246,13 +246,17 @@
       </div>
 
       <div class="form-row">
-        <div class="form-group col-6">
+        <div class="form-group col-4">
           {{ form.lead_status.label(class="form-control-label") }} {{
           form.lead_status(class="form-control from-control-lg") }}
         </div>
-        <div class="form-group col-6">
+        <div class="form-group col-4">
           {{ form.date_scheduled.label(class="form-control-label") }} {{
           form.date_scheduled(class="form-control from-control-lg") }}
+        </div>
+        <div class="form-group col-4">
+          {{ form.deadline.label(class="form-control-label") }} {{
+          form.deadline(class="form-control from-control-lg", type="date") }}
         </div>
         <script>
           window.handleDropdownChange = function () {
@@ -371,6 +375,14 @@
       <button class="btn btn-md btn-outline-secondary" id="add-input-button" , type="button">
         Dodaj czynność serwisową
       </button>
+      <hr/>
+      <div class="form-row mt-3">
+        <label>Części i komponenty do zamówienia z hurtowni (nieobowiązkowe):</label>
+      </div>
+      <div id="components-container"></div>
+      <button class="btn btn-md btn-outline-secondary" id="add-component-button" type="button">
+        Dodaj nową część
+      </button>
       <br><br>
       <script>
         function calculateSum() {
@@ -406,8 +418,94 @@
           
           calculateSum()
         }
+
+        let newCompCounter = 0;
+        function addComponentRow(comp_id, comp_name, comp_is_ordered) {
+          const row = document.createElement('div');
+          row.className = "form-row mb-2";
+          row.setAttribute('id', comp_id + '-comp-row');
+
+          const id_hidden = document.createElement('input');
+          id_hidden.type = 'hidden';
+          id_hidden.name = 'component_id';
+          id_hidden.value = comp_id;
+
+          const name_div = document.createElement('div');
+          name_div.className = "form-group col-6";
+          const name_input = document.createElement('input');
+          name_input.className = "form-control from-control-lg";
+          name_input.name = "component_name";
+          name_input.value = comp_name || '';
+          name_input.placeholder = "Nazwa komponentu...";
+          name_div.appendChild(name_input);
+
+          const ordered_div = document.createElement('div');
+          ordered_div.className = "form-group col-3 d-flex align-items-center";
+          
+          const ordered_hidden = document.createElement('input');
+          ordered_hidden.type = "hidden";
+          ordered_hidden.name = "component_is_ordered";
+          ordered_hidden.value = comp_is_ordered ? 'true' : 'false';
+          
+          const is_edit_mode = '{{ lead_id }}' !== 'None' && '{{ lead_id }}' !== '';
+          if (is_edit_mode) {
+              const ordered_checkbox = document.createElement('input');
+              ordered_checkbox.type = "checkbox";
+              ordered_checkbox.className = "mr-2";
+              ordered_checkbox.style.transform = "scale(1.5)";
+              ordered_checkbox.checked = comp_is_ordered;
+              ordered_checkbox.addEventListener('change', function() {
+                ordered_hidden.value = this.checked ? 'true' : 'false';
+              });
+              ordered_div.appendChild(ordered_checkbox);
+              
+              const ordered_label = document.createElement('label');
+              ordered_label.className = "mb-0";
+              ordered_label.innerText = "Zamówiono?";
+              ordered_div.appendChild(ordered_label);
+          }
+          ordered_div.appendChild(ordered_hidden);
+
+          const del_div = document.createElement('div');
+          del_div.className = "form-group col-3";
+          const del_btn = document.createElement('button');
+          del_btn.type = "button";
+          del_btn.className = "btn btn-md btn-outline-danger w-100";
+          const del_span = document.createElement('span');
+          del_span.setAttribute("data-feather", "trash-2");
+          del_btn.appendChild(del_span);
+          del_btn.addEventListener('click', () => { row.remove(); });
+          del_div.appendChild(del_btn);
+
+          row.appendChild(id_hidden);
+          row.appendChild(name_div);
+          row.appendChild(ordered_div);
+          row.appendChild(del_div);
+
+          document.getElementById('components-container').appendChild(row);
+          if (typeof feather !== 'undefined') feather.replace();
+        }
+
+        $("#add-component-button").on("click", function () {
+          newCompCounter++;
+          addComponentRow('new_' + newCompCounter, '', false);
+        });
+
         $(document).ready(function () {
           closeModalOnOutsideClick() 
+          
+          function getComponents(lead_id) {
+            if (lead_id && lead_id !== 'None') {
+              fetchFromBase('leads/' + lead_id  + '/get_components')
+              .then(response => response.json())
+              .then(data => {
+                data.forEach(item => {
+                  addComponentRow(item.id, item.name, item.is_ordered)
+                });
+              });
+            }
+          }
+
           function getServices(lead_id){
             if (lead_id){
               fetchFromBase('leads/' + lead_id  + '/get_services')
@@ -423,13 +521,20 @@
               // Replace HTML character entity references with double quotes
               var replacedString = jsonString.replace(/&#39;/g, "\"");
               // Parse the JSON string into a JavaScript object
-              var listOfDicts = JSON.parse(replacedString);
-              listOfDicts.forEach(item => {
-                addServiceAction(item.id, item.service_name, item.service_price)
-              })   
+              if (replacedString && replacedString !== 'None' && replacedString !== '') {
+                  try {
+                      var listOfDicts = JSON.parse(replacedString);
+                      listOfDicts.forEach(item => {
+                        addServiceAction(item.id, item.service_name, item.service_price)
+                      })
+                  } catch (e) {
+                      console.log("Error parsing services: ", e);
+                  }
+              }
           }
         }
           getServices('{{ lead_id }}')
+          getComponents('{{ lead_id }}')
         });
           function addServiceAction(service_id, service_name, service_price) {
             const new_service_row = document.createElement('div');

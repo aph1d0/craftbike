@@ -40,6 +40,7 @@ class LeadMain(db.Model):
     services = db.relationship('ServicesToLeads', secondary=lead_service, backref='leads')
     sms_sent = db.Column(db.Boolean, nullable=False, default=False)
     sms_sending = db.Column(db.Boolean, nullable=False, default=True)
+    deadline = db.Column(db.Date, nullable=True)
 
     @staticmethod
     def get_by_id(lead_id):
@@ -57,3 +58,12 @@ class LeadMain(db.Model):
     def __repr__(self):
         return f"Lead('{self.title}')"
 
+class LeadComponent(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255), nullable=False)
+    is_ordered = db.Column(db.Boolean, default=False, nullable=False)
+    lead_id = db.Column(db.Integer, db.ForeignKey('lead_main.id', ondelete='CASCADE'), nullable=False)
+    lead = db.relationship('LeadMain', backref=db.backref('components', lazy=True, cascade="all, delete-orphan"))
+
+    def __repr__(self):
+        return f"LeadComponent('{self.name}', ordered={self.is_ordered})"

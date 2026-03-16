@@ -32,7 +32,7 @@
         <div
           id="item_{{ lead.id }}"
           data-dealid="{{ lead.id }}"
-          class="card inner-card bg-light mb-3"
+          class="card inner-card bg-light mb-3 {% if lead.priority == 0 %}border-danger border-2{% elif lead.priority == 1 %}border-warning border-2{% endif %}"
           draggable="true"
         >
           <div class="card-body">
@@ -108,7 +108,7 @@
         <div
           id="item_{{ lead.id }}"
           data-dealid="{{ lead.id }}"
-          class="card inner-card bg-light mb-3"
+          class="card inner-card bg-light mb-3 {% if lead.priority == 0 %}border-danger border-2{% elif lead.priority == 1 %}border-warning border-2{% endif %}"
           draggable="true"
         >
           <div class="card-body">

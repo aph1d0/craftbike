@@ -1,0 +1,44 @@
+{% extends "layout.html" %} {% set active_page = "components" %} {% block content %}
+
+<br>
+<h2 class="h4">{% if title %}{{title}}{% else %}Części do zamówienia{% endif %}</h2>
+<br>
+
+<div class="table-responsive">
+  <table class="table table-striped table-sm text-center">
+    <thead>
+      <tr>
+        <th>Zlecenie</th>
+        <th>Część / Komponent</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for comp in components %}
+      <tr>
+        <td class="align-middle">
+          <a class="btn btn-sm btn-outline-info" href="{{ url_for('leads.get_lead_view', lead_id=comp.lead_id) }}">
+            {{ comp.lead.title }}
+          </a>
+        </td>
+        <td class="align-middle">{{ comp.name }}</td>
+        <td class="align-middle">
+          {% if comp.is_ordered %}
+          <span class="badge badge-success" style="font-size: 14px; color: black;">Zamówione</span>
+          {% else %}
+          <span class="badge badge-warning" style="font-size: 14px; color: black;">Do zamówienia</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {% if not components %}
+  <div class="alert alert-info text-center mt-4">
+    Brak zapisanych komponentów w bazie zleceń.
+  </div>
+  {% endif %}
+</div>
+
+{% endblock %}

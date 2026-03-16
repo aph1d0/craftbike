@@ -12,6 +12,8 @@ from .config import DevelopmentConfig, TestConfig, ProductionConfig
 
 # database handle
 db = SQLAlchemy(session_options={"autoflush": False})
+from flask_migrate import Migrate
+migrate = Migrate()
 
 # encryptor handle
 bcrypt = Bcrypt()
@@ -51,6 +53,7 @@ def create_app(config_class=ProductionConfig):
     app.jinja_env.globals.update(zip=zip)
 
     db.init_app(app)
+    migrate.init_app(app, db)
     bcrypt.init_app(app)
     login_manager.init_app(app)
 

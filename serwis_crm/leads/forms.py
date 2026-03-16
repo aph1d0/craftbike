@@ -39,8 +39,13 @@ class NewLead(FlaskForm):
     service_name = StringField('Czynność serwisowa')
     service_price = IntegerField('Cena czynnośći serwisowej') 
     total_price = IntegerField('Przybliżona cena całkowita serwisu') 
+    component_name = StringField('Część/Komponent')
+    component_is_ordered = StringField('Czy zamówiono?')
+    component_id = StringField('ID Komponentu')
+    deadline = DateField('Deadline (Planowane ukończenie)', id='deadline', format='%Y-%m-%d', validators=[Optional()])
     submit = SubmitField('Utwórz')
     sms_sent = BooleanField('SMS wysłany', id='sms_sent')
+
     sms_sending = BooleanField('Wysyłać SMS?', id='sms', default=True)
 
 class EditLead(NewLead):
