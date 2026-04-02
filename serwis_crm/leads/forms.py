@@ -2,7 +2,7 @@ import datetime
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from wtforms.fields.html5 import DateField
-from wtforms import StringField, SubmitField, IntegerField, DateField, BooleanField
+from wtforms import StringField, SubmitField, IntegerField, DateField, BooleanField, HiddenField
 from wtforms.widgets import TextArea
 from wtforms.validators import DataRequired, Email, Optional, ValidationError, Length
 from wtforms_sqlalchemy.fields import QuerySelectField, QuerySelectMultipleField
@@ -49,8 +49,9 @@ class NewLead(FlaskForm):
     sms_sending = BooleanField('Wysyłać SMS?', id='sms', default=True)
 
 class EditLead(NewLead):
-        lead_status = QuerySelectField('Status', query_factory=LeadStatus.lead_status_query, get_pk=lambda a: a.id,
-                                   get_label='status_name', default=LeadStatus.get_by_id(2), allow_blank=False, blank_text='Wybierz status zlecenia')
+    version_id = HiddenField('version_id')
+    lead_status = QuerySelectField('Status', query_factory=LeadStatus.lead_status_query, get_pk=lambda a: a.id,
+                               get_label='status_name', default=LeadStatus.get_by_id(2), allow_blank=False, blank_text='Wybierz status zlecenia')
 
 def filter_leads_adv_filters_admin_query():
     return [

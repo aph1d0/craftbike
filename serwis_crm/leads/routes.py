@@ -330,6 +330,10 @@ def update_lead(lead_id):
     form = EditLead()
     if request.method == 'POST':
         if form.is_submitted() and form.validate():
+            if form.version_id.data and int(form.version_id.data) != lead.version_id:
+                flash('Ktoś inny edytował to zlecenie w międzyczasie. Odśwież stronę, aby zobaczyć zmiany i spróbuj ponownie.', 'danger')
+                return redirect(url_for('leads.update_lead', lead_id=lead_id))
+
             lead.title = form.title.data
             contact.first_name = form.first_name.data
             #contact.last_name = form.last_name.data
@@ -385,6 +389,7 @@ def update_lead(lead_id):
             print(form.errors)
             flash('Aktualizacja zlecenia nie powiodła się! Sprawdź formularz.', 'danger')
     elif request.method == 'GET':
+        form.version_id.data = lead.version_id
         form.title.data = lead.title
         form.first_name.data = contact.first_name
         form.phone.data = contact.phone

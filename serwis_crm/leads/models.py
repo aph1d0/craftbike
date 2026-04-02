@@ -41,6 +41,11 @@ class LeadMain(db.Model):
     sms_sent = db.Column(db.Boolean, nullable=False, default=False)
     sms_sending = db.Column(db.Boolean, nullable=False, default=True)
     deadline = db.Column(db.Date, nullable=True)
+    version_id = db.Column(db.Integer, nullable=False, default=1)
+
+    __mapper_args__ = {
+        'version_id_col': version_id
+    }
 
     @staticmethod
     def get_by_id(lead_id):

@@ -32,6 +32,9 @@
 </script>
 <form class="form-new-lead" method="POST">
   {{ form.hidden_tag() }}
+  {% if form.version_id %}
+    {{ form.version_id() }}
+  {% endif %}
   <!-- security 'csrf' token -->
   <br>
   <h2 class="h4">{% if title %}{{title}}{% else %}No Title{% endif %}</h2>
