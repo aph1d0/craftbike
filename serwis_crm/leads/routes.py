@@ -142,6 +142,8 @@ def update_stage(lead_id, lead_stage_id, owner=None, lead=None) -> Response:
         response  = jsonify(error)
         response.status_code = error['status']
         return response
+    if lead_stage_id in (1, 2) and lead.lead_status_id in (5, 6):
+        lead.sms_sent = False
     lead.lead_status_id = lead_stage_id
     send_sms(lead_id=lead.id)
     db.session.add(lead)
