@@ -409,8 +409,16 @@
     this.classList.remove("dragging");
   }
 
+  var isMobile =
+    window.matchMedia &&
+    window.matchMedia("(max-width: 768px), (pointer: coarse)").matches;
+
   var cards = document.querySelectorAll(".card.inner-card");
   [].forEach.call(cards, function (card) {
+    if (isMobile) {
+      card.setAttribute("draggable", "false");
+      return;
+    }
     card.addEventListener("dragstart", handleDragStart, false);
     card.addEventListener("dragenter", handleDragEnter, false);
     card.addEventListener("dragover", handleDragOver, false);
@@ -424,6 +432,9 @@
   });
   var columns = document.querySelectorAll(".card.outer-card");
   [].forEach.call(columns, function (column) {
+    if (isMobile) {
+      return;
+    }
     column.addEventListener("dragover", handleDragOver, false);
     column.addEventListener("drop", handleDrop, false);
   });
