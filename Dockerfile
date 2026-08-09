@@ -16,7 +16,7 @@ ENV PYTHONUNBUFFERED 1
 
 RUN apk update \
     && apk add --virtual build-deps gcc python3-dev musl-dev g++ libffi-dev openssl-dev ca-certificates\
-    && apk add --no-cache mariadb-dev mariadb-client git bzip2-dev coreutils libc-dev libffi-dev linux-headers
+    && apk add --no-cache mariadb-dev mariadb-client git bzip2-dev coreutils libc-dev libffi-dev linux-headers curl
 
 COPY requirements.txt /
 RUN pip3 install -r /requirements.txt
