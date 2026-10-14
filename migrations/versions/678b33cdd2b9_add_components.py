@@ -17,6 +17,12 @@ depends_on = None
 
 
 def upgrade():
+    # db.create_all() przy starcie aplikacji tworzy tabele z modeli, wiec na
+    # bazie ktora juz raz wstala ta tabela istnieje, mimo ze alembic o niej
+    # "nie wie". Bez tego warunku upgrade wywala sie na 1050 Table already exists.
+    if sa.inspect(op.get_bind()).has_table('lead_component'):
+        return
+
     op.create_table('lead_component',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(length=255), nullable=False),
@@ -27,4 +33,7 @@ def upgrade():
     )
 
 def downgrade():
+    if not sa.inspect(op.get_bind()).has_table('lead_component'):
+        return
+
     op.drop_table('lead_component')
