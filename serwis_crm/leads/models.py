@@ -4,6 +4,22 @@ from sqlalchemy.orm import relationship
 from serwis_crm.contacts.models import Contact   
 from serwis_crm.services.models import lead_service
 
+# Nazwy statusow zlecen uzywane w widokach kanban
+STATUS_ACCEPTED = 'Przyjęty na serwis'
+STATUS_SCHEDULED = 'Umówiony na serwis'
+STATUS_QUOTED = 'Wycenione'
+STATUS_READY = 'Gotowy'
+STATUS_FOR_SALE = 'Na sprzedaż'
+STATUS_LOANED = 'Pożyczone'
+STATUS_DEBTORS = 'Dłużnicy'
+
+# Kolumny widoku "Dashboard"
+DASHBOARD_STATUSES = [STATUS_ACCEPTED, STATUS_QUOTED, STATUS_READY, STATUS_FOR_SALE]
+
+# Kolumny widoku "Pożyczone, umówione"
+LOANED_STATUSES = [STATUS_SCHEDULED, STATUS_LOANED, STATUS_DEBTORS]
+
+
 class LeadStatus(db.Model):
     id = db.Column(db.Integer, db.Sequence('lead_status_id_seq'), primary_key=True)
     status_name = db.Column(db.String(40), unique=True, nullable=False)

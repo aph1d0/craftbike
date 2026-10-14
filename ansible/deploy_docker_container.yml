@@ -54,3 +54,33 @@
       OTEL_LOGS_EXPORTER: otlp
       OTEL_METRICS_EXPORTER: otlp
       OTEL_TRACES_EXPORTER: otlp
+
+# Kontener przy starcie wykonuje migracje bazy (db_bootstrap.py) i nie
+# podniesie sie, jesli sie nie powioda. Czekamy wiec az aplikacja realnie
+# odpowie, zeby nieudana migracja przerwala deploy zamiast zostawic
+# restartujacy sie w kolko kontener.
+- name: Wait for the application to become healthy after migrations
+  block:
+    - name: Poll application health endpoint
+      uri:
+        url: "http://localhost:8003/serwis/health"
+        status_code: 200
+      register: app_health
+      until: app_health.status is defined and app_health.status == 200
+      retries: 30
+      delay: 5
+  rescue:
+    - name: Collect container logs for troubleshooting
+      command: docker logs --tail 100 craft-bike-app
+      register: app_logs
+      changed_when: false
+      failed_when: false
+
+    - name: Fail deployment with container logs
+      fail:
+        msg: |
+          Aplikacja nie wystartowala poprawnie po wdrozeniu.
+          Najczestsza przyczyna to blad migracji bazy (db_bootstrap.py).
+          Ostatnie logi kontenera:
+          {{ app_logs.stdout | default('brak logow') }}
+          {{ app_logs.stderr | default('') }}

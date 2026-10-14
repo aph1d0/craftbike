@@ -12,7 +12,8 @@ from serwis_crm import config, db
 from serwis_crm.bikes.models import Bike
 from serwis_crm.bikes.routes import new_bike
 from serwis_crm.users.models import User
-from serwis_crm.leads.models import LeadMain, LeadStatus, lead_service, LeadComponent
+from serwis_crm.leads.models import LeadMain, LeadStatus, lead_service, LeadComponent, \
+    STATUS_SCHEDULED
 from serwis_crm.services.models import ServicesToLeads, ServicesAction
 from serwis_crm.contacts.models import Contact
 from serwis_crm.contacts.routes import new_contact
@@ -289,15 +290,12 @@ def new_lead():
                     if comp_name.strip():
                         new_comp = LeadComponent(name=comp_name.strip(), is_ordered=False)
                         lead.components.append(new_comp)
-            if form.lead_status.data.status_name == 'Umówiony na serwis':
+            if form.lead_status.data.status_name == STATUS_SCHEDULED:
                 lead.date_scheduled = form.date_scheduled.data
             else:
                 lead.date_scheduled = datetime.datetime.now().strftime('%Y-%m-%d')
                 
-            if current_user.is_admin:
-                lead.owner = form.assignees.data
-            else:
-                lead.owner = current_user
+            lead.owner = form.assignees.data or current_user
             lead.contact_id = client.id
             lead.bike_id = bike.id
             sms_sending = request.form.get('sms_sending')

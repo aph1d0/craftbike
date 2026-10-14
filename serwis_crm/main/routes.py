@@ -1,4 +1,4 @@
-from flask import render_template, flash, session, url_for, redirect, Blueprint, current_app
+from flask import render_template, flash, session, url_for, redirect, request, Blueprint, current_app
 from serwis_crm import db
 from flask_login import login_required, current_user
 from configparser import ConfigParser
@@ -6,7 +6,8 @@ from sqlalchemy import or_
 from serwis_crm.common.filters import CommonFilters
 from serwis_crm.leads.filters import set_date_filters
 from serwis_crm.leads.forms import FilterLeads
-from serwis_crm.leads.models import LeadMain, LeadStatus
+from serwis_crm.leads.models import LeadMain, LeadStatus, \
+    DASHBOARD_STATUSES, LOANED_STATUSES
 from serwis_crm.rbac import check_access
 from datetime import datetime, timedelta
 
@@ -45,19 +46,22 @@ def before_request():
 def health_check():
     return '', 200
 
-@main.route("/")
-@main.route("/home", methods=['GET', 'POST'])
-@check_access('leads', 'view')
-@login_required
-def home():
+def build_kanban_board(status_names):
+    """Zbiera kolumny i zlecenia dla widoku kanban o podanych statusach."""
     filters = FilterLeads()
     search = CommonFilters.set_search(filters, 'lead_search')
     owner = CommonFilters.set_owner(filters, 'lead_main', 'lead_owner')
     contact = CommonFilters.set_contacts(filters, 'lead_main', 'lead_contact')
     advanced_filters = set_date_filters(filters, 'lead_date_created')
-    good_leads = []
-    statuses = LeadStatus.query.filter(LeadStatus.status_name != "Odebrany", LeadStatus.status_name != "Sprzedany").all()
+    statuses = LeadStatus.query \
+        .filter(LeadStatus.status_name.in_(status_names)) \
+        .order_by(LeadStatus.id.asc()) \
+        .all()
+    # zachowaj kolejnosc kolumn zdefiniowana w status_names
+    statuses.sort(key=lambda s: status_names.index(s.status_name))
     leads = LeadMain.query \
+        .join(LeadStatus, LeadMain.lead_status_id == LeadStatus.id) \
+        .filter(LeadStatus.status_name.in_(status_names)) \
         .filter(or_(
             LeadMain.title.ilike(f'%{search}%'),
         ) if search else True) \
@@ -71,26 +75,38 @@ def home():
     if days_ahead <= 0: # Target is next week
         days_ahead += 7
     next_friday = today + timedelta(days_ahead)
-    
-    for lead in leads:
-        if lead.status.status_name == "Przyjęty na serwis" \
-            or lead.status.status_name == "Umówiony na serwis" \
-            or lead.status.status_name == "Gotowy" \
-            or lead.status.status_name == "Na sprzedaż":
-            lead.date_scheduled = lead.date_scheduled.strftime("%Y-%m-%d")
-            lead.priority = 2 # Normal priority by default
-            
-            if lead.deadline:
-                if lead.deadline < today:
-                    lead.priority = 0 # High priority (crossed deadline)
-                elif lead.deadline <= next_friday:
-                    lead.priority = 1 # Medium priority (upcoming deadline until next Friday)
 
-            good_leads.append(lead)
-            
-    good_leads.sort(key=lambda x: (x.priority, x.deadline or datetime.max.date()))
-            
-    return render_template("index.html", title="Dashboard", leads=good_leads, lead_statuses=statuses, filters=filters)
+    for lead in leads:
+        lead.date_scheduled = lead.date_scheduled.strftime("%Y-%m-%d") if lead.date_scheduled else ''
+        lead.priority = 2 # Normal priority by default
+
+        if lead.deadline:
+            if lead.deadline < today:
+                lead.priority = 0 # High priority (crossed deadline)
+            elif lead.deadline <= next_friday:
+                lead.priority = 1 # Medium priority (upcoming deadline until next Friday)
+
+    leads.sort(key=lambda x: (x.priority, x.deadline or datetime.max.date()))
+
+    return leads, statuses, filters
+
+
+@main.route("/")
+@main.route("/home", methods=['GET', 'POST'])
+@check_access('leads', 'view')
+@login_required
+def home():
+    leads, statuses, filters = build_kanban_board(DASHBOARD_STATUSES)
+    return render_template("index.html", title="Dashboard", leads=leads, lead_statuses=statuses, filters=filters)
+
+
+@main.route("/loaned", methods=['GET', 'POST'])
+@check_access('leads', 'view')
+@login_required
+def loaned():
+    leads, statuses, filters = build_kanban_board(LOANED_STATUSES)
+    return render_template("loaned.html", title="Pożyczone, umówione", leads=leads,
+                           lead_statuses=statuses, filters=filters)
 
 @main.route("/calendar", methods=['GET'])
 @check_access('leads', 'view')
@@ -103,7 +119,10 @@ def calendar():
 @login_required
 def reset_filters():
     reset_main_filters()
-    return redirect(url_for('main.home'))
+    next_view = request.args.get('next')
+    if next_view not in ('main.home', 'main.loaned'):
+        next_view = 'main.home'
+    return redirect(url_for(next_view))
 
 @login_required
 @main.route("/create_db")

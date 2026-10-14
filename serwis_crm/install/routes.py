@@ -142,14 +142,18 @@ def empty_setup():
                 is_user_active=True
                 )
     
-    status_1 = LeadStatus(id=1, status_name='Przyjęty na serwis', is_final=False)
-    db.session.add(status_1)
-    status_2 = LeadStatus(id=2, status_name='Umówiony na serwis', is_final=False)
-    db.session.add(status_2)
-    status_5 = LeadStatus(id=5, status_name='Gotowy', is_final=True)
-    db.session.add(status_5)
-    status_6 = LeadStatus(id=6, status_name='Odebrany', is_final=True)
-    db.session.add(status_6)
+    for status_id, status_name, is_final in (
+        (1, 'Przyjęty na serwis', False),
+        (2, 'Umówiony na serwis', False),
+        (5, 'Gotowy', True),
+        (6, 'Odebrany', True),
+        (7, 'Na sprzedaż', False),
+        (8, 'Sprzedany', True),
+        (9, 'Wycenione', False),
+        (10, 'Pożyczone', False),
+        (11, 'Dłużnicy', False),
+    ):
+        db.session.add(LeadStatus(id=status_id, status_name=status_name, is_final=is_final))
     db.session.add(role)
     db.session.add(user)
 

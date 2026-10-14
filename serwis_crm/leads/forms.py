@@ -25,7 +25,7 @@ def validate_phone(self, phone):
 class NewLead(FlaskForm):
     phone = StringField('Telefon', validators=[DataRequired(message='Numer telefonu jest obowiązkowy!'), validate_phone])
     bike_manufacturer = StringField('Marka roweru', id='bike_manufacturer', validators=[DataRequired(message='Marka roweru jest obowiązkowa!')])
-    bike_model = StringField('Model roweru', id='bike_model', validators=[DataRequired(message='Model roweru jest obowiązkowy!')])
+    bike_model = StringField('Kolor roweru', id='bike_model', validators=[DataRequired(message='Kolor roweru jest obowiązkowy!')])
     title = StringField('Nazwa', id='title')
     first_name = StringField('Imię')
     #last_name = StringField('Nazwisko')
@@ -34,7 +34,9 @@ class NewLead(FlaskForm):
                                    get_label='status_name', default=LeadStatus.get_by_id(2), allow_blank=False, blank_text='Wybierz status zlecenia')
 
     assignees = QuerySelectField('Przypisz do', query_factory=User.user_list_query, get_pk=lambda a: a.id,
-                                 get_label=User.get_label, default=User.get_current_user)
+                                 get_label=User.get_label, default=User.get_current_user,
+                                 allow_blank=False,
+                                 validators=[DataRequired(message='Proszę wybrać pracownika')])
     date_scheduled = DateField('Data wizyty', id='date_scheduled', default=datetime.date.today)
     service_name = StringField('Czynność serwisowa')
     service_price = IntegerField('Cena czynnośći serwisowej') 

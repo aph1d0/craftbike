@@ -96,7 +96,7 @@
             {% endfor %}
           </div>
           {% else %} {{ form.bike_model(class="form-control required
-          from-control-lg", placeholder="Model roweru ...") }} {% endif %}
+          from-control-lg", placeholder="Kolor roweru ...") }} {% endif %}
         </div>
       </div>
       <div class="form-group">
@@ -339,22 +339,21 @@
         </div>
       </div>
 
-      {% if lead_id %}
       <div class="form-row">
         <div class="form-group col-6">
-          {{ form.assignees.label(class="form-control-label") }} {{
-          form.assignees(class="form-control from-control-lg") }}
+          {{ form.assignees.label(class="form-control-label") }}
+          {% if form.assignees.errors %}
+          {{ form.assignees(class="form-control from-control-lg is-invalid") }}
+          <div class="invalid-feedback">
+            {% for error in form.assignees.errors %}
+            <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+          {% else %}
+          {{ form.assignees(class="form-control from-control-lg") }}
+          {% endif %}
         </div>
       </div>
-      {% endif %}
-      {% if current_user.is_admin %}
-      <div class="form-row">
-           <div class="form-group col-6">
-               {{ form.assignees.label(class="form-control-label") }}
-              {{ form.assignees(class="form-control from-control-lg") }}
-           </div>
-      </div>
-      {% endif %}
       <div class="form-group">
         {{ form.notes.label(class="form-control-label") }} {{
         form.notes(class="form-control from-control-lg") }}
