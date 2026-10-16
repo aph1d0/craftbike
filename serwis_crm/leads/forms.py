@@ -33,9 +33,11 @@ class NewLead(FlaskForm):
     lead_status = QuerySelectField('Status', query_factory=LeadStatus.lead_status_query_final, get_pk=lambda a: a.id,
                                    get_label='status_name', default=LeadStatus.get_by_id(2), allow_blank=False, blank_text='Wybierz status zlecenia')
 
+    # Bez domyslnego pracownika: wybor musi byc swiadomy. Pusta opcja + DataRequired
+    # sprawiaja, ze zlecenie bez pracownika odrzuca serwer, nie tylko okienko w UI.
     assignees = QuerySelectField('Przypisz do', query_factory=User.user_list_query, get_pk=lambda a: a.id,
-                                 get_label=User.get_label, default=User.get_current_user,
-                                 allow_blank=False,
+                                 get_label=User.get_label,
+                                 allow_blank=True, blank_text='[-- Wybierz pracownika --]',
                                  validators=[DataRequired(message='Proszę wybrać pracownika')])
     date_scheduled = DateField('Data wizyty', id='date_scheduled', default=datetime.date.today)
     service_name = StringField('Czynność serwisowa')

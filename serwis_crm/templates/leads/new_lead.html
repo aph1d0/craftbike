@@ -5,6 +5,14 @@
   home.removeAttribute('href');
   home.setAttribute('style', "color: white;")
 
+  // Dopoki trwa wybor pracownika, formularz nie moze zostac wyslany - ani recznie,
+  // ani przez ponizszy auto-zapis. Przy edycji zlecenia okienko sie nie pojawia.
+  {% if lead_id %}
+  window.assigneeGateOpen = false;
+  {% else %}
+  window.assigneeGateOpen = true;
+  {% endif %}
+
   // Add auto-submit functionality
   let autoSubmitTimer;
   //const TIMEOUT_DURATION = 10 * 60 * 1000; // 10 minutes in milliseconds
@@ -12,6 +20,9 @@
 
   function resetAutoSubmitTimer() {
     clearTimeout(autoSubmitTimer);
+    if (window.assigneeGateOpen) {
+      return;
+    }
     autoSubmitTimer = setTimeout(() => {
       // Find the submit button and click it
       const submitButton = document.querySelector('.btn.btn-md.btn-outline-info');
@@ -688,4 +699,129 @@
     </div>
   </div>
 </form>
+
+{% if not lead_id %}
+<!-- Wybor pracownika przed wypelnieniem nowego zlecenia.
+     Nie da sie go pominac: brak przycisku zamkniecia, statyczne tlo i wylaczony
+     Escape. Wyjscie to albo wybor pracownika, albo "Wstecz". -->
+<div class="modal fade" id="assigneeGateModal" tabindex="-1" role="dialog"
+  aria-labelledby="assigneeGateModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="assigneeGateModalLabel">Wybierz pracownika</h5>
+      </div>
+      <div class="modal-body">
+        <p>Do którego pracownika ma zostać przypisane to zlecenie?</p>
+        <select class="form-control" id="assignee_gate_select"></select>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" id="assignee_gate_back">
+          Wstecz
+        </button>
+        <button type="button" class="btn btn-outline-info" id="assignee_gate_next" disabled>
+          Dalej
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    var modalEl = document.getElementById("assigneeGateModal");
+    var realSelect = document.getElementById("assignees");
+    var gateSelect = document.getElementById("assignee_gate_select");
+    var nextBtn = document.getElementById("assignee_gate_next");
+    var backBtn = document.getElementById("assignee_gate_back");
+    var form = document.querySelector("form.form-new-lead");
+
+    // pusta opcja QuerySelectField ma wartosc "__None"
+    function isEmpty(value) {
+      return !value || value === "__None";
+    }
+
+    // Formularz wrocil po bledzie walidacji z juz wybranym pracownikiem
+    // - wtedy nie pytamy drugi raz.
+    if (!realSelect || !isEmpty(realSelect.value)) {
+      window.assigneeGateOpen = false;
+      return;
+    }
+
+    // layout.html laduje Bootstrapa 4 i 5 naraz, a BS5 podmienia $.fn.modal
+    // dopiero w DOMContentLoaded, czyli juz po tym kodzie. Przez to jQuery-owe
+    // .modal("show") trafia do BS4, a pozniejsze .modal("hide") do BS5, ktory
+    // tej instancji nie zna i nie robi nic. Dlatego trzymamy jedna instancje
+    // BS5 i uzywamy tylko jej; gdyby BS5 zniknal, zostaje reczne pokazanie.
+    var gateModal = (window.bootstrap && window.bootstrap.Modal)
+      ? new window.bootstrap.Modal(modalEl, { backdrop: "static", keyboard: false })
+      : null;
+
+    function openGate() {
+      if (gateModal) {
+        gateModal.show();
+        return;
+      }
+      modalEl.classList.add("show");
+      modalEl.style.display = "block";
+      document.body.classList.add("modal-open");
+      var backdrop = document.createElement("div");
+      backdrop.className = "modal-backdrop fade show";
+      backdrop.id = "assignee_gate_backdrop";
+      document.body.appendChild(backdrop);
+    }
+
+    function closeGate() {
+      if (gateModal) {
+        gateModal.hide();
+        return;
+      }
+      modalEl.classList.remove("show");
+      modalEl.style.display = "none";
+      document.body.classList.remove("modal-open");
+      var backdrop = document.getElementById("assignee_gate_backdrop");
+      if (backdrop) {
+        backdrop.parentNode.removeChild(backdrop);
+      }
+    }
+
+    // Lista pracownikow pochodzi wprost z pola formularza, wiec zawsze sie z nim zgadza
+    gateSelect.innerHTML = realSelect.innerHTML;
+    gateSelect.value = realSelect.value;
+
+    function syncNextButton() {
+      nextBtn.disabled = isEmpty(gateSelect.value);
+    }
+    gateSelect.addEventListener("change", syncNextButton);
+    syncNextButton();
+
+    nextBtn.addEventListener("click", function () {
+      if (isEmpty(gateSelect.value)) {
+        return;
+      }
+      realSelect.value = gateSelect.value;
+      window.assigneeGateOpen = false;
+      closeGate();
+      resetAutoSubmitTimer();
+    });
+
+    backBtn.addEventListener("click", function () {
+      if (window.history.length > 1) {
+        window.history.back();
+      } else {
+        window.location.href = "{{ url_for('leads.get_leads_view') }}";
+      }
+    });
+
+    if (form) {
+      form.addEventListener("submit", function (event) {
+        if (window.assigneeGateOpen) {
+          event.preventDefault();
+        }
+      });
+    }
+
+    openGate();
+  });
+</script>
+{% endif %}
 {% endblock %}
